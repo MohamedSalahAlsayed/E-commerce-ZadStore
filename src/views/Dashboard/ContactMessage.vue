@@ -100,151 +100,153 @@
       </v-row>
 
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="custom-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold">
-                {{ $t("messaging.sender_th") }}
-              </th>
-              <th class="text-right font-weight-bold">
-                {{ $t("messaging.subject_th") }}
-              </th>
-              <th class="text-center font-weight-bold">
-                {{ $t("messaging.date_th") }}
-              </th>
-              <th class="text-center font-weight-bold">
-                {{ $t("messaging.status_th") }}
-              </th>
-              <th class="text-center font-weight-bold">
-                {{ $t("messaging.actions_th") }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="5" class="text-center pa-8">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
+        <div class="table-responsive">
+          <v-table class="custom-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold">
+                  {{ $t("messaging.sender_th") }}
+                </th>
+                <th class="text-right font-weight-bold">
+                  {{ $t("messaging.subject_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("messaging.date_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("messaging.status_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("messaging.actions_th") }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="5" class="text-center pa-8">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </td>
+              </tr>
 
-            <tr v-else-if="filteredMessages.length === 0">
-              <td colspan="5" class="text-center pa-8 text-grey-darken-1">
-                <v-icon size="50" color="grey-lighten-2" class="mb-3"
-                  >mdi-mailbox-open-outline</v-icon
-                >
-                <br />{{ $t("messaging.no_messages_found") }}
-              </td>
-            </tr>
-
-            <tr
-              v-for="msg in filteredMessages"
-              :key="msg.id"
-              class="hover-row"
-              :class="{ 'bg-blue-grey-lighten-5': !msg.is_read }"
-              v-else
-            >
-              <td class="py-3">
-                <div class="d-flex align-center gap-3">
-                  <v-avatar
-                    size="36"
-                    :color="msg.is_read ? 'grey-lighten-2' : 'primary'"
-                    :class="{ 'text-white': !msg.is_read }"
+              <tr v-else-if="filteredMessages.length === 0">
+                <td colspan="5" class="text-center pa-8 text-grey-darken-1">
+                  <v-icon size="50" color="grey-lighten-2" class="mb-3"
+                    >mdi-mailbox-open-outline</v-icon
                   >
-                    {{ msg.name ? msg.name.charAt(0) : "?" }}
-                  </v-avatar>
-                  <div>
-                    <div
-                      class="text-subtitle-2"
-                      :class="
-                        msg.is_read
-                          ? 'font-weight-medium'
-                          : 'font-weight-black text-primary'
-                      "
+                  <br />{{ $t("messaging.no_messages_found") }}
+                </td>
+              </tr>
+
+              <tr
+                v-for="msg in filteredMessages"
+                :key="msg.id"
+                class="hover-row"
+                :class="{ 'bg-blue-grey-lighten-5': !msg.is_read }"
+                v-else
+              >
+                <td class="py-3">
+                  <div class="d-flex align-center gap-3">
+                    <v-avatar
+                      size="36"
+                      :color="msg.is_read ? 'grey-lighten-2' : 'primary'"
+                      :class="{ 'text-white': !msg.is_read }"
                     >
-                      {{ msg.name }}
-                    </div>
-                    <div class="text-caption text-grey-darken-1">
-                      {{ msg.email }}
+                      {{ msg.name ? msg.name.charAt(0) : "?" }}
+                    </v-avatar>
+                    <div>
+                      <div
+                        class="text-subtitle-2"
+                        :class="
+                          msg.is_read
+                            ? 'font-weight-medium'
+                            : 'font-weight-black text-primary'
+                        "
+                      >
+                        {{ msg.name }}
+                      </div>
+                      <div class="text-caption text-grey-darken-1">
+                        {{ msg.email }}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </td>
+                </td>
 
-              <td style="max-width: 250px" class="text-truncate">
-                <span
-                  :class="
-                    msg.is_read
-                      ? 'text-grey-darken-2'
-                      : 'font-weight-bold text-black'
-                  "
-                >
-                  {{ msg.subject || $t("messaging.no_subject") }}
-                </span>
-                <span class="text-caption text-grey ml-2" v-if="msg.message"
-                  >-
-                  {{
-                    msg.message.length > 30
-                      ? msg.message.substring(0, 30) + "..."
-                      : msg.message
-                  }}</span
-                >
-              </td>
+                <td style="max-width: 250px" class="text-truncate">
+                  <span
+                    :class="
+                      msg.is_read
+                        ? 'text-grey-darken-2'
+                        : 'font-weight-bold text-black'
+                    "
+                  >
+                    {{ msg.subject || $t("messaging.no_subject") }}
+                  </span>
+                  <span class="text-caption text-grey ml-2" v-if="msg.message"
+                    >-
+                    {{
+                      msg.message.length > 30
+                        ? msg.message.substring(0, 30) + "..."
+                        : msg.message
+                    }}</span
+                  >
+                </td>
 
-              <td
-                class="text-center text-caption text-grey-darken-1 font-weight-medium"
-              >
-                {{ formatDate(msg.created_at) }}
-              </td>
+                <td
+                  class="text-center text-caption text-grey-darken-1 font-weight-medium"
+                >
+                  {{ formatDate(msg.created_at) }}
+                </td>
 
-              <td class="text-center">
-                <v-chip
-                  size="small"
-                  :color="msg.reply_text ? 'success' : 'warning'"
-                  variant="outlined"
-                  class="font-weight-bold"
-                >
-                  {{
-                    msg.reply_text
-                      ? $t("messaging.replied_chip")
-                      : $t("messaging.pending_chip")
-                  }}
-                </v-chip>
-              </td>
+                <td class="text-center">
+                  <v-chip
+                    size="small"
+                    :color="msg.reply_text ? 'success' : 'warning'"
+                    variant="outlined"
+                    class="font-weight-bold"
+                  >
+                    {{
+                      msg.reply_text
+                        ? $t("messaging.replied_chip")
+                        : $t("messaging.pending_chip")
+                    }}
+                  </v-chip>
+                </td>
 
-              <td class="text-center">
-                <v-btn
-                  icon
-                  size="small"
-                  color="primary"
-                  variant="text"
-                  @click="openMessage(msg)"
-                  :title="$t('messaging.read_message_title')"
-                >
-                  <v-icon>mdi-eye-outline</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  size="small"
-                  color="error"
-                  variant="text"
-                  :disabled="processingIds.includes(msg.id)"
-                  @click="deleteMessage(msg.id)"
-                  :title="$t('messaging.delete_title')"
-                >
-                  <v-progress-circular
-                    v-if="processingIds.includes(msg.id)"
-                    indeterminate
-                    size="16"
-                  ></v-progress-circular>
-                  <v-icon v-else>mdi-delete-outline</v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+                <td class="text-center">
+                  <v-btn
+                    icon
+                    size="small"
+                    color="primary"
+                    variant="text"
+                    @click="openMessage(msg)"
+                    :title="$t('messaging.read_message_title')"
+                  >
+                    <v-icon>mdi-eye-outline</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    size="small"
+                    color="error"
+                    variant="text"
+                    :disabled="processingIds.includes(msg.id)"
+                    @click="deleteMessage(msg.id)"
+                    :title="$t('messaging.delete_title')"
+                  >
+                    <v-progress-circular
+                      v-if="processingIds.includes(msg.id)"
+                      indeterminate
+                      size="16"
+                    ></v-progress-circular>
+                    <v-icon v-else>mdi-delete-outline</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <v-dialog v-model="dialog" max-width="600px">

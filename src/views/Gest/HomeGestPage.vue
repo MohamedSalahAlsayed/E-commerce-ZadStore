@@ -1,11 +1,16 @@
 <template>
   <div class="guest-home-wrapper">
-    <div class="hero-bg position-relative overflow-hidden pt-16 pb-16">
+    <div
+      class="hero-bg position-relative overflow-hidden pt-8 pb-8 pt-md-16 pb-md-16"
+    >
       <!-- Animated Background Elements -->
       <div class="decorative-blob blob-1"></div>
       <div class="decorative-blob blob-2"></div>
 
-      <v-container class="pt-16 mt-10 position-relative" style="z-index: 2">
+      <v-container
+        class="pt-10 pt-md-16 mt-5 mt-md-10 position-relative"
+        style="z-index: 2"
+      >
         <v-row align="center">
           <v-col cols="12" md="6" class="text-center text-md-start">
             <v-chip
@@ -270,7 +275,7 @@
     <!-- CTA Section -->
     <v-container class="py-16 text-center">
       <v-card
-        class="bg-grey-darken-4 rounded-xl pa-16 overflow-hidden position-relative cta-card"
+        class="bg-grey-darken-4 rounded-xl pa-8 pa-md-16 overflow-hidden position-relative cta-card"
         elevation="24"
         dark
       >

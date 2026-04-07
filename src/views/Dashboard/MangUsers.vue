@@ -41,96 +41,102 @@
       </v-card>
 
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="users-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold">العميل</th>
-              <th class="text-right font-weight-bold">البريد الإلكتروني</th>
-              <th class="text-center font-weight-bold">تاريخ الانضمام</th>
-              <th class="text-center font-weight-bold">إجمالي الطلبات</th>
-              <th class="text-center font-weight-bold">إجمالي الإنفاق</th>
-              <th class="text-center font-weight-bold">حالة الحساب</th>
-              <th class="text-center font-weight-bold">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="6" class="text-center pa-6">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
-            <tr v-else-if="filteredUsers.length === 0">
-              <td colspan="6" class="text-center pa-6 text-grey-darken-1">
-                لا يوجد عملاء مطابقين للبحث.
-              </td>
-            </tr>
+        <div class="table-responsive">
+          <v-table class="users-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold">العميل</th>
+                <th class="text-right font-weight-bold">البريد الإلكتروني</th>
+                <th class="text-center font-weight-bold">تاريخ الانضمام</th>
+                <th class="text-center font-weight-bold">إجمالي الطلبات</th>
+                <th class="text-center font-weight-bold">إجمالي الإنفاق</th>
+                <th class="text-center font-weight-bold">حالة الحساب</th>
+                <th class="text-center font-weight-bold">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="7" class="text-center pa-6">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </td>
+              </tr>
+              <tr v-else-if="filteredUsers.length === 0">
+                <td colspan="7" class="text-center pa-6 text-grey-darken-1">
+                  لا يوجد عملاء مطابقين للبحث.
+                </td>
+              </tr>
 
-            <tr v-for="user in filteredUsers" :key="user.id" class="hover-row">
-              <td class="d-flex align-center gap-3 py-3">
-                <v-avatar
-                  size="45"
-                  class="bg-primary text-white font-weight-bold"
-                >
-                  {{ user.name.charAt(0) }}
-                </v-avatar>
-                <span class="font-weight-bold text-subtitle-2">{{
-                  user.name
-                }}</span>
-              </td>
-              <td class="text-grey-darken-1">{{ user.email }}</td>
-              <td class="text-center text-grey-darken-1">
-                {{ formatDate(user.created_at) }}
-              </td>
-              <td class="text-center font-weight-bold text-primary">
-                {{ user.ordersCount }}
-              </td>
-              <td class="text-center font-weight-bold text-success">
-                {{ Number(user.totalSpent).toLocaleString("ar-EG") }} ج.م
-              </td>
-              <td class="text-center">
-                <v-chip
-                  size="small"
-                  :color="user.isActive ? 'success' : 'error'"
-                  class="font-weight-bold"
-                >
-                  {{ user.isActive ? "نشط" : "محظور" }}
-                </v-chip>
-              </td>
-              <td class="text-center">
-                <v-tooltip location="top">
-                  <template v-slot:activator="{ props }">
-                    <v-btn
-                      icon
-                      size="small"
-                      :color="user.isActive ? 'error' : 'success'"
-                      variant="text"
-                      v-bind="props"
-                      @click="toggleUserStatus(user)"
-                      :disabled="processingIds.includes(user.id)"
-                    >
-                      <v-progress-circular
-                        v-if="processingIds.includes(user.id)"
-                        indeterminate
-                        size="16"
-                      ></v-progress-circular>
-                      <v-icon v-else>{{
-                        user.isActive
-                          ? "mdi-block-helper"
-                          : "mdi-check-circle-outline"
-                      }}</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>{{
-                    user.isActive ? "حظر العميل" : "تفعيل العميل"
+              <tr
+                v-for="user in filteredUsers"
+                :key="user.id"
+                class="hover-row"
+              >
+                <td class="d-flex align-center gap-3 py-3">
+                  <v-avatar
+                    size="45"
+                    class="bg-primary text-white font-weight-bold"
+                  >
+                    {{ user.name.charAt(0) }}
+                  </v-avatar>
+                  <span class="font-weight-bold text-subtitle-2">{{
+                    user.name
                   }}</span>
-                </v-tooltip>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+                </td>
+                <td class="text-grey-darken-1">{{ user.email }}</td>
+                <td class="text-center text-grey-darken-1">
+                  {{ formatDate(user.created_at) }}
+                </td>
+                <td class="text-center font-weight-bold text-primary">
+                  {{ user.ordersCount }}
+                </td>
+                <td class="text-center font-weight-bold text-success">
+                  {{ Number(user.totalSpent).toLocaleString("ar-EG") }} ج.م
+                </td>
+                <td class="text-center">
+                  <v-chip
+                    size="small"
+                    :color="user.isActive ? 'success' : 'error'"
+                    class="font-weight-bold"
+                  >
+                    {{ user.isActive ? "نشط" : "محظور" }}
+                  </v-chip>
+                </td>
+                <td class="text-center">
+                  <v-tooltip location="top">
+                    <template v-slot:activator="{ props }">
+                      <v-btn
+                        icon
+                        size="small"
+                        :color="user.isActive ? 'error' : 'success'"
+                        variant="text"
+                        v-bind="props"
+                        @click="toggleUserStatus(user)"
+                        :disabled="processingIds.includes(user.id)"
+                      >
+                        <v-progress-circular
+                          v-if="processingIds.includes(user.id)"
+                          indeterminate
+                          size="16"
+                        ></v-progress-circular>
+                        <v-icon v-else>{{
+                          user.isActive
+                            ? "mdi-block-helper"
+                            : "mdi-check-circle-outline"
+                        }}</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>{{
+                      user.isActive ? "حظر العميل" : "تفعيل العميل"
+                    }}</span>
+                  </v-tooltip>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <!-- Snackbar for notifications -->
@@ -301,6 +307,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .users-table th {
   color: rgb(var(--v-theme-primary)) !important;
   font-size: 15px !important;

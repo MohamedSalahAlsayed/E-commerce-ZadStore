@@ -128,142 +128,144 @@
 
     <!-- Inventory Table -->
     <v-card class="rounded-xl overflow-hidden border" elevation="1">
-      <v-table class="inventory-table pa-2" fixed-header height="600">
-        <thead>
-          <tr class="bg-grey-lighten-4">
-            <th class="text-right font-weight-bold">
-              {{ $t("inventory.product_th") }}
-            </th>
-            <th class="text-right font-weight-bold">
-              {{ $t("inventory.category_th") }}
-            </th>
-            <th class="text-center font-weight-bold">
-              {{ $t("inventory.quantity_th") }}
-            </th>
-            <th class="text-center font-weight-bold">
-              {{ $t("inventory.quick_update_th") }}
-            </th>
-            <th class="text-center font-weight-bold">
-              {{ $t("inventory.status_th") }}
-            </th>
-            <th class="text-center font-weight-bold">
-              {{ $t("inventory.actions_th") }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Skeletons -->
-          <template v-if="loading">
-            <tr v-for="n in 5" :key="n">
-              <td>
-                <v-skeleton-loader
-                  type="list-item-avatar-two-line"
-                ></v-skeleton-loader>
-              </td>
-              <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-              <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-              <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-              <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
-              <td><v-skeleton-loader type="actions"></v-skeleton-loader></td>
+      <div class="table-responsive">
+        <v-table class="inventory-table pa-2" fixed-header height="600">
+          <thead>
+            <tr class="bg-grey-lighten-4">
+              <th class="text-right font-weight-bold">
+                {{ $t("inventory.product_th") }}
+              </th>
+              <th class="text-right font-weight-bold">
+                {{ $t("inventory.category_th") }}
+              </th>
+              <th class="text-center font-weight-bold">
+                {{ $t("inventory.quantity_th") }}
+              </th>
+              <th class="text-center font-weight-bold">
+                {{ $t("inventory.quick_update_th") }}
+              </th>
+              <th class="text-center font-weight-bold">
+                {{ $t("inventory.status_th") }}
+              </th>
+              <th class="text-center font-weight-bold">
+                {{ $t("inventory.actions_th") }}
+              </th>
             </tr>
-          </template>
+          </thead>
+          <tbody>
+            <!-- Skeletons -->
+            <template v-if="loading">
+              <tr v-for="n in 5" :key="n">
+                <td>
+                  <v-skeleton-loader
+                    type="list-item-avatar-two-line"
+                  ></v-skeleton-loader>
+                </td>
+                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
+                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
+                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
+                <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
+                <td><v-skeleton-loader type="actions"></v-skeleton-loader></td>
+              </tr>
+            </template>
 
-          <template v-else>
-            <tr v-if="filteredInventory.length === 0">
-              <td colspan="6" class="text-center pa-12 text-grey">
-                <v-icon size="64" class="mb-4"
-                  >mdi-package-variant-closed</v-icon
-                >
-                <div class="text-h6">
-                  {{ $t("inventory.no_products_found") }}
-                </div>
-              </td>
-            </tr>
-
-            <tr
-              v-for="item in filteredInventory"
-              :key="item.id"
-              class="hover-row"
-            >
-              <td>
-                <div class="d-flex align-center gap-3">
-                  <v-avatar
-                    size="45"
-                    rounded="lg"
-                    color="grey-lighten-3 border"
+            <template v-else>
+              <tr v-if="filteredInventory.length === 0">
+                <td colspan="6" class="text-center pa-12 text-grey">
+                  <v-icon size="64" class="mb-4"
+                    >mdi-package-variant-closed</v-icon
                   >
-                    <v-img :src="item.thumbnail" cover></v-img>
-                  </v-avatar>
-                  <div>
-                    <div
-                      class="font-weight-bold text-truncate"
-                      style="max-width: 250px"
+                  <div class="text-h6">
+                    {{ $t("inventory.no_products_found") }}
+                  </div>
+                </td>
+              </tr>
+
+              <tr
+                v-for="item in filteredInventory"
+                :key="item.id"
+                class="hover-row"
+              >
+                <td>
+                  <div class="d-flex align-center gap-3">
+                    <v-avatar
+                      size="45"
+                      rounded="lg"
+                      color="grey-lighten-3 border"
                     >
-                      {{ item.title }}
-                    </div>
-                    <div class="text-caption text-grey">
-                      SKU: PRD-{{ item.id.toString().padStart(4, "0") }}
+                      <v-img :src="item.thumbnail" cover></v-img>
+                    </v-avatar>
+                    <div>
+                      <div
+                        class="font-weight-bold text-truncate"
+                        style="max-width: 250px"
+                      >
+                        {{ item.title }}
+                      </div>
+                      <div class="text-caption text-grey">
+                        SKU: PRD-{{ item.id.toString().padStart(4, "0") }}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <v-chip size="x-small" variant="tonal" color="primary">{{
-                  item.category?.name || "عام"
-                }}</v-chip>
-              </td>
-              <td class="text-center">
-                <v-avatar
-                  :color="getQuantityColor(item)"
-                  size="36"
-                  variant="tonal"
-                  class="font-weight-black"
-                >
-                  {{ item.stock }}
-                </v-avatar>
-              </td>
-              <td class="text-center">
-                <div class="d-flex align-center justify-center gap-2">
-                  <v-btn
-                    icon="mdi-minus"
-                    size="x-small"
-                    color="error"
+                </td>
+                <td>
+                  <v-chip size="x-small" variant="tonal" color="primary">{{
+                    item.category?.name || "عام"
+                  }}</v-chip>
+                </td>
+                <td class="text-center">
+                  <v-avatar
+                    :color="getQuantityColor(item)"
+                    size="36"
                     variant="tonal"
-                    :disabled="item.stock === 0 || processingId === item.id"
-                    @click="quickAdjust(item, -1)"
-                  ></v-btn>
-                  <v-btn
-                    icon="mdi-plus"
+                    class="font-weight-black"
+                  >
+                    {{ item.stock }}
+                  </v-avatar>
+                </td>
+                <td class="text-center">
+                  <div class="d-flex align-center justify-center gap-2">
+                    <v-btn
+                      icon="mdi-minus"
+                      size="x-small"
+                      color="error"
+                      variant="tonal"
+                      :disabled="item.stock === 0 || processingId === item.id"
+                      @click="quickAdjust(item, -1)"
+                    ></v-btn>
+                    <v-btn
+                      icon="mdi-plus"
+                      size="x-small"
+                      color="success"
+                      variant="tonal"
+                      :disabled="processingId === item.id"
+                      @click="quickAdjust(item, 1)"
+                    ></v-btn>
+                  </div>
+                </td>
+                <td class="text-center">
+                  <v-chip
                     size="x-small"
-                    color="success"
-                    variant="tonal"
-                    :disabled="processingId === item.id"
-                    @click="quickAdjust(item, 1)"
+                    :color="getStatus(item).color"
+                    class="font-weight-bold"
+                  >
+                    {{ getStatus(item).text }}
+                  </v-chip>
+                </td>
+                <td class="text-center">
+                  <v-btn
+                    icon="mdi-pencil"
+                    size="small"
+                    variant="text"
+                    color="primary"
+                    @click="openAdjustDialog(item)"
                   ></v-btn>
-                </div>
-              </td>
-              <td class="text-center">
-                <v-chip
-                  size="x-small"
-                  :color="getStatus(item).color"
-                  class="font-weight-bold"
-                >
-                  {{ getStatus(item).text }}
-                </v-chip>
-              </td>
-              <td class="text-center">
-                <v-btn
-                  icon="mdi-pencil"
-                  size="small"
-                  variant="text"
-                  color="primary"
-                  @click="openAdjustDialog(item)"
-                ></v-btn>
-              </td>
-            </tr>
-          </template>
-        </tbody>
-      </v-table>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </v-table>
+      </div>
     </v-card>
 
     <!-- Advanced Adjustment Dialog -->

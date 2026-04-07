@@ -84,105 +84,107 @@
 
       <!-- Returns Table -->
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="returns-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold p-4">الطلب</th>
-              <th class="text-right font-weight-bold">العميل</th>
-              <th class="text-right font-weight-bold">التاريخ</th>
-              <th class="text-right font-weight-bold">المبلغ</th>
-              <th class="text-right font-weight-bold">السبب</th>
-              <th class="text-right font-weight-bold">الحالة</th>
-              <th class="text-center font-weight-bold">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="7" class="text-center pa-6">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
-            <tr v-else-if="filteredReturns.length === 0">
-              <td colspan="7" class="text-center pa-6 text-grey-darken-1">
-                لا توجد طلبات استرجاع حالياً.
-              </td>
-            </tr>
+        <div class="table-responsive">
+          <v-table class="returns-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold p-4">الطلب</th>
+                <th class="text-right font-weight-bold">العميل</th>
+                <th class="text-right font-weight-bold">التاريخ</th>
+                <th class="text-right font-weight-bold">المبلغ</th>
+                <th class="text-right font-weight-bold">السبب</th>
+                <th class="text-right font-weight-bold">الحالة</th>
+                <th class="text-center font-weight-bold">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="7" class="text-center pa-6">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </td>
+              </tr>
+              <tr v-else-if="filteredReturns.length === 0">
+                <td colspan="7" class="text-center pa-6 text-grey-darken-1">
+                  لا توجد طلبات استرجاع حالياً.
+                </td>
+              </tr>
 
-            <tr
-              v-for="order in filteredReturns"
-              :key="order.id"
-              class="hover-row"
-            >
-              <td class="font-weight-bold text-primary">
-                #{{ order.order_number }}
-              </td>
-              <td>
-                <div class="font-weight-bold">{{ order.user?.name }}</div>
-                <div class="text-caption text-grey">
-                  {{ order.phone || order.user?.phone }}
-                </div>
-              </td>
-              <td class="text-body-2">{{ formatDate(order.created_at) }}</td>
-              <td class="font-weight-bold text-success" dir="ltr">
-                {{ Number(order.total).toLocaleString() }} ج.م
-              </td>
-              <td>
-                <v-chip
-                  size="x-small"
-                  color="primary"
-                  variant="outlined"
-                  class="font-weight-bold"
-                >
-                  {{ getReasonText(order.return_reason_code) }}
-                </v-chip>
-              </td>
-              <td>
-                <v-chip
-                  size="small"
-                  :color="getReturnStatusColor(order.return_request_status)"
-                  variant="flat"
-                  class="font-weight-bold"
-                >
-                  <v-icon left size="14" class="ml-1">{{
-                    getReturnStatusIcon(order.return_request_status)
-                  }}</v-icon>
-                  {{ getReturnStatusText(order.return_request_status) }}
-                </v-chip>
-              </td>
-              <td class="text-center">
-                <v-btn
-                  icon="mdi-eye-outline"
-                  variant="text"
-                  color="info"
-                  size="small"
-                  class="ml-1"
-                  @click="openDetails(order)"
-                ></v-btn>
-
-                <template v-if="order.return_request_status === 'pending'">
+              <tr
+                v-for="order in filteredReturns"
+                :key="order.id"
+                class="hover-row"
+              >
+                <td class="font-weight-bold text-primary">
+                  #{{ order.order_number }}
+                </td>
+                <td>
+                  <div class="font-weight-bold">{{ order.user?.name }}</div>
+                  <div class="text-caption text-grey">
+                    {{ order.phone || order.user?.phone }}
+                  </div>
+                </td>
+                <td class="text-body-2">{{ formatDate(order.created_at) }}</td>
+                <td class="font-weight-bold text-success" dir="ltr">
+                  {{ Number(order.total).toLocaleString() }} ج.م
+                </td>
+                <td>
+                  <v-chip
+                    size="x-small"
+                    color="primary"
+                    variant="outlined"
+                    class="font-weight-bold"
+                  >
+                    {{ getReasonText(order.return_reason_code) }}
+                  </v-chip>
+                </td>
+                <td>
+                  <v-chip
+                    size="small"
+                    :color="getReturnStatusColor(order.return_request_status)"
+                    variant="flat"
+                    class="font-weight-bold"
+                  >
+                    <v-icon left size="14" class="ml-1">{{
+                      getReturnStatusIcon(order.return_request_status)
+                    }}</v-icon>
+                    {{ getReturnStatusText(order.return_request_status) }}
+                  </v-chip>
+                </td>
+                <td class="text-center">
                   <v-btn
-                    icon="mdi-check-circle-outline"
+                    icon="mdi-eye-outline"
                     variant="text"
-                    color="success"
+                    color="info"
                     size="small"
                     class="ml-1"
-                    @click="confirmAction(order, 'approve')"
+                    @click="openDetails(order)"
                   ></v-btn>
-                  <v-btn
-                    icon="mdi-close-circle-outline"
-                    variant="text"
-                    color="error"
-                    size="small"
-                    @click="confirmAction(order, 'reject')"
-                  ></v-btn>
-                </template>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+
+                  <template v-if="order.return_request_status === 'pending'">
+                    <v-btn
+                      icon="mdi-check-circle-outline"
+                      variant="text"
+                      color="success"
+                      size="small"
+                      class="ml-1"
+                      @click="confirmAction(order, 'approve')"
+                    ></v-btn>
+                    <v-btn
+                      icon="mdi-close-circle-outline"
+                      variant="text"
+                      color="error"
+                      size="small"
+                      @click="confirmAction(order, 'reject')"
+                    ></v-btn>
+                  </template>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <!-- Details Dialog -->
@@ -512,6 +514,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .returns-table :deep(th) {
   background-color: transparent !important;
   color: #555 !important;

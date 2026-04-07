@@ -130,20 +130,11 @@
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6">
-                      <v-text-field
+                      <PhoneInput
                         v-model="formData.phone"
                         label="رقم الهاتف"
-                        variant="outlined"
-                        density="comfortable"
-                        color="primary"
-                        prepend-inner-icon="mdi-phone-outline"
-                        :rules="[
-                          (v) => !!v || 'رقم الهاتف مطلوب',
-                          (v) =>
-                            /^[0-9]{11}$/.test(v) ||
-                            'رقم هاتف غير صحيح (11 رقم)',
-                        ]"
-                      ></v-text-field>
+                        :rules="[(v) => !!v || 'رقم الهاتف مطلوب']"
+                      />
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
@@ -257,6 +248,7 @@ import { ref, onMounted, inject, watch } from "vue";
 import { useAuthStore } from "@/store/auth/LogIn";
 import api from "@/axios";
 import { useRouter } from "vue-router";
+import PhoneInput from "@/components/PhoneInput.vue";
 
 const emitter = inject("emitter");
 

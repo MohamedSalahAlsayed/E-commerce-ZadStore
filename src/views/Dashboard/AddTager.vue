@@ -26,13 +26,11 @@
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="6">
-              <v-text-field
+              <PhoneInput
                 v-model="merchant.phone"
                 label="رقم التليفون"
-                type="tel"
-                variant="outlined"
                 required
-              ></v-text-field>
+              />
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
@@ -169,6 +167,7 @@
 <script setup>
 import { ref } from "vue";
 import axios from "@/axios";
+import PhoneInput from "@/components/PhoneInput.vue";
 
 const merchantForm = ref(null);
 const loading = ref(false);

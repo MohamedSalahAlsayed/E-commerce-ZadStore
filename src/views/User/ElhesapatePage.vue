@@ -84,14 +84,12 @@
                               استقبال الأرباح عبر فودافون كاش، اتصالات كاش، أو
                               انستا باي.
                             </p>
-                            <v-text-field
+                            <PhoneInput
                               label="رقم المحفظة"
                               placeholder="01xxxxxxxxx"
-                              variant="solo-filled"
-                              prepend-inner-icon="mdi-phone"
                               :disabled="paymentType !== 'cash'"
                               v-model="cashNumber"
-                            ></v-text-field>
+                            />
                           </v-card-text>
                         </v-card>
                       </v-col>
@@ -323,6 +321,7 @@
 
 <script setup>
 import { ref } from "vue";
+import PhoneInput from "@/components/PhoneInput.vue";
 
 const tab = ref("methods"); // التبويب الافتراضي
 const paymentType = ref("cash"); // للتبديل بين الكاش والفيزا

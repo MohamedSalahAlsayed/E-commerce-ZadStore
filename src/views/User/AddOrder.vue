@@ -43,17 +43,11 @@
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" md="6">
-                      <v-text-field
+                      <PhoneInput
                         v-model="orderData.phone"
                         :label="$t('checkout.phone')"
-                        variant="outlined"
-                        density="comfortable"
-                        :rules="[
-                          (v) => !!v || $t('checkout.required'),
-                          (v) =>
-                            /^[0-9]+$/.test(v) || $t('checkout.numbers_only'),
-                        ]"
-                      ></v-text-field>
+                        :rules="[(v) => !!v || $t('checkout.required')]"
+                      />
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
@@ -391,6 +385,7 @@ import { AddInCart } from "../../store/Cart";
 import api from "../../axios";
 import { useAuthStore } from "@/store/auth/LogIn";
 import { inject } from "vue";
+import PhoneInput from "@/components/PhoneInput.vue";
 
 const emitter = inject("emitter");
 

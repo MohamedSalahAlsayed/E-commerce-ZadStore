@@ -100,88 +100,90 @@
         </v-btn-toggle>
       </v-toolbar>
 
-      <v-data-table
-        :headers="headers"
-        :items="filteredUsers"
-        :search="search"
-        :loading="loading"
-        class="staff-table"
-        hover
-      >
-        <!-- User Info Slot -->
-        <template v-slot:[`item.user`]="{ item }">
-          <div class="d-flex align-center py-2">
-            <v-avatar
-              color="primary"
-              size="32"
-              class="me-3 text-white font-weight-bold"
-            >
-              {{ item.name.charAt(0).toUpperCase() }}
-            </v-avatar>
-            <div>
-              <div class="font-weight-bold">{{ item.name }}</div>
-              <div class="text-caption text-grey">{{ item.email }}</div>
+      <div class="table-responsive">
+        <v-data-table
+          :headers="headers"
+          :items="filteredUsers"
+          :search="search"
+          :loading="loading"
+          class="staff-table"
+          hover
+        >
+          <!-- User Info Slot -->
+          <template v-slot:[`item.user`]="{ item }">
+            <div class="d-flex align-center py-2">
+              <v-avatar
+                color="primary"
+                size="32"
+                class="me-3 text-white font-weight-bold"
+              >
+                {{ item.name.charAt(0).toUpperCase() }}
+              </v-avatar>
+              <div>
+                <div class="font-weight-bold">{{ item.name }}</div>
+                <div class="text-caption text-grey">{{ item.email }}</div>
+              </div>
             </div>
-          </div>
-        </template>
+          </template>
 
-        <!-- Role Slot -->
-        <template v-slot:[`item.role`]="{ item }">
-          <v-chip
-            :color="getRoleColor(item.role)"
-            size="small"
-            variant="tonal"
-            class="font-weight-bold"
-          >
-            {{ getRoleText(item.role) }}
-          </v-chip>
-        </template>
-
-        <!-- Status Slot -->
-        <template v-slot:[`item.is_active`]="{ item }">
-          <v-switch
-            v-model="item.is_active"
-            color="success"
-            hide-details
-            density="compact"
-            @change="toggleStatus(item)"
-          ></v-switch>
-        </template>
-
-        <!-- Last Login Slot -->
-        <template v-slot:[`item.last_login`]="{ item }">
-          <div class="text-caption text-grey">
-            {{
-              item.last_login_at
-                ? formatDate(item.last_login_at)
-                : "لم يدخل بعد"
-            }}
-          </div>
-        </template>
-
-        <!-- Actions Slot -->
-        <template v-slot:[`item.actions`]="{ item }">
-          <div class="d-flex gap-2">
-            <v-btn
-              icon="mdi-shield-edit-outline"
-              variant="text"
+          <!-- Role Slot -->
+          <template v-slot:[`item.role`]="{ item }">
+            <v-chip
+              :color="getRoleColor(item.role)"
               size="small"
-              color="info"
-              @click="openRoleDialog(item)"
-              title="تعديل الصلاحية"
-            ></v-btn>
-            <v-btn
-              icon="mdi-delete-outline"
-              variant="text"
-              size="small"
-              color="error"
-              :disabled="item.role === 'admin' && stats.admins <= 1"
-              @click="confirmDelete(item)"
-              title="حذف"
-            ></v-btn>
-          </div>
-        </template>
-      </v-data-table>
+              variant="tonal"
+              class="font-weight-bold"
+            >
+              {{ getRoleText(item.role) }}
+            </v-chip>
+          </template>
+
+          <!-- Status Slot -->
+          <template v-slot:[`item.is_active`]="{ item }">
+            <v-switch
+              v-model="item.is_active"
+              color="success"
+              hide-details
+              density="compact"
+              @change="toggleStatus(item)"
+            ></v-switch>
+          </template>
+
+          <!-- Last Login Slot -->
+          <template v-slot:[`item.last_login`]="{ item }">
+            <div class="text-caption text-grey">
+              {{
+                item.last_login_at
+                  ? formatDate(item.last_login_at)
+                  : "لم يدخل بعد"
+              }}
+            </div>
+          </template>
+
+          <!-- Actions Slot -->
+          <template v-slot:[`item.actions`]="{ item }">
+            <div class="d-flex gap-2">
+              <v-btn
+                icon="mdi-shield-edit-outline"
+                variant="text"
+                size="small"
+                color="info"
+                @click="openRoleDialog(item)"
+                title="تعديل الصلاحية"
+              ></v-btn>
+              <v-btn
+                icon="mdi-delete-outline"
+                variant="text"
+                size="small"
+                color="error"
+                :disabled="item.role === 'admin' && stats.admins <= 1"
+                @click="confirmDelete(item)"
+                title="حذف"
+              ></v-btn>
+            </div>
+          </template>
+        </v-data-table>
+      </div>
     </v-card>
 
     <!-- Add Admin Dialog -->

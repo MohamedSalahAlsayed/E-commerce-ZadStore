@@ -108,188 +108,184 @@
 
       <!-- Products Table -->
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-progress-linear
-          v-if="loading"
-          indeterminate
-          color="primary"
-        ></v-progress-linear>
-
-        <v-table class="products-table pa-2" fixed-header height="600">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold" style="width: 50px">
-                <v-checkbox-btn
-                  v-model="selectAll"
-                  color="primary"
-                  hide-details
-                ></v-checkbox-btn>
-              </th>
-              <th class="text-right font-weight-bold">المنتج</th>
-              <th class="text-right font-weight-bold">القسم / الماركة</th>
-              <th class="text-right font-weight-bold">الأسعار</th>
-              <th class="text-right font-weight-bold">المخزون / الربح</th>
-              <th class="text-right font-weight-bold">الحالة</th>
-              <th class="text-center font-weight-bold">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Skeleton Loading -->
-            <template v-if="loading">
-              <tr v-for="n in 5" :key="n">
-                <td><v-skeleton-loader type="avatar"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
-                <td><v-skeleton-loader type="actions"></v-skeleton-loader></td>
-              </tr>
-            </template>
-
-            <template v-else>
-              <tr v-if="(filteredProducts || []).length === 0">
-                <td colspan="9" class="text-center pa-12">
-                  <v-icon size="64" color="grey-lighten-1" class="mb-4"
-                    >mdi-package-variant-closed</v-icon
-                  >
-                  <div class="text-h6 text-grey-darken-1">
-                    لا توجد منتجات مطابقة.
-                  </div>
-                </td>
-              </tr>
-
-              <tr
-                v-for="item in filteredProducts"
-                :key="item.id"
-                class="hover-row"
-              >
-                <td>
+        <div class="table-responsive">
+          <v-table class="products-table pa-2" fixed-header height="600">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold" style="width: 50px">
                   <v-checkbox-btn
-                    v-model="selectedIds"
-                    :value="item.id"
+                    v-model="selectAll"
                     color="primary"
                     hide-details
                   ></v-checkbox-btn>
-                </td>
-                <td>
-                  <div class="d-flex align-center gap-3 py-2">
-                    <v-avatar
-                      size="50"
-                      rounded="lg"
-                      class="bg-grey-lighten-3 border"
+                </th>
+                <th class="text-right font-weight-bold">المنتج</th>
+                <th class="text-right font-weight-bold">القسم / الماركة</th>
+                <th class="text-right font-weight-bold">الأسعار</th>
+                <th class="text-right font-weight-bold">المخزون / الربح</th>
+                <th class="text-right font-weight-bold">الحالة</th>
+                <th class="text-center font-weight-bold">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Skeleton Loading -->
+              <template v-if="loading">
+                <tr v-for="n in 5" :key="n">
+                  <td><v-skeleton-loader type="avatar"></v-skeleton-loader></td>
+                  <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
+                  <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
+                  <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
+                  <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
+                  <td><v-skeleton-loader type="text"></v-skeleton-loader></td>
+                  <td><v-skeleton-loader type="chip"></v-skeleton-loader></td>
+                </tr>
+              </template>
+
+              <template v-else>
+                <tr v-if="(filteredProducts || []).length === 0">
+                  <td colspan="7" class="text-center pa-12">
+                    <v-icon size="64" color="grey-lighten-1" class="mb-4"
+                      >mdi-package-variant-closed</v-icon
                     >
-                      <v-img :src="item.thumbnail" cover></v-img>
-                    </v-avatar>
-                    <div>
-                      <div class="font-weight-bold text-subtitle-2">
-                        {{ shortTitle(item.title) }}
-                      </div>
-                      <div class="text-caption text-grey">
-                        SKU: {{ item.sku || "N/A" }}
+                    <div class="text-h6 text-grey-darken-1">
+                      لا توجد منتجات مطابقة.
+                    </div>
+                  </td>
+                </tr>
+
+                <tr
+                  v-for="item in filteredProducts"
+                  :key="item.id"
+                  class="hover-row"
+                >
+                  <td>
+                    <v-checkbox-btn
+                      v-model="selectedIds"
+                      :value="item.id"
+                      color="primary"
+                      hide-details
+                    ></v-checkbox-btn>
+                  </td>
+                  <td>
+                    <div class="d-flex align-center gap-3 py-2">
+                      <v-avatar
+                        size="50"
+                        rounded="lg"
+                        class="bg-grey-lighten-3 border"
+                      >
+                        <v-img :src="item.thumbnail" cover></v-img>
+                      </v-avatar>
+                      <div>
+                        <div class="font-weight-bold text-subtitle-2">
+                          {{ shortTitle(item.title) }}
+                        </div>
+                        <div class="text-caption text-grey">
+                          SKU: {{ item.sku || "N/A" }}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="d-flex flex-column gap-1">
-                    <v-chip
-                      size="x-small"
-                      color="primary"
-                      variant="tonal"
-                      class="w-fit"
-                      >{{ item.category }}</v-chip
-                    >
-                    <v-chip
-                      size="x-small"
-                      color="secondary"
-                      variant="outlined"
-                      v-if="item.brand"
-                      class="w-fit"
-                      >{{ item.brand }}</v-chip
-                    >
-                  </div>
-                </td>
-                <td>
-                  <div class="font-weight-bold text-primary">
-                    {{ item.price }} ج.م
-                  </div>
-                  <div class="text-caption text-grey">
-                    التكلفة: {{ item.purchase_price || 0 }} ج.م
-                  </div>
-                </td>
-                <td>
-                  <div class="mb-1">
+                  </td>
+                  <td>
+                    <div class="d-flex flex-column gap-1">
+                      <v-chip
+                        size="x-small"
+                        color="primary"
+                        variant="tonal"
+                        class="w-fit"
+                        >{{ item.category }}</v-chip
+                      >
+                      <v-chip
+                        size="x-small"
+                        color="secondary"
+                        variant="outlined"
+                        v-if="item.brand"
+                        class="w-fit"
+                        >{{ item.brand }}</v-chip
+                      >
+                    </div>
+                  </td>
+                  <td>
+                    <div class="font-weight-bold text-primary">
+                      {{ item.price }} ج.م
+                    </div>
+                    <div class="text-caption text-grey">
+                      التكلفة: {{ item.purchase_price || 0 }} ج.م
+                    </div>
+                  </td>
+                  <td>
+                    <div class="mb-1">
+                      <v-chip
+                        size="x-small"
+                        :color="
+                          item.stock > 10
+                            ? 'success'
+                            : item.stock > 0
+                            ? 'warning'
+                            : 'error'
+                        "
+                        class="font-weight-bold"
+                      >
+                        {{ item.stock }} في المخزن
+                      </v-chip>
+                    </div>
                     <v-chip
                       size="x-small"
                       :color="
-                        item.stock > 10
+                        item.price - item.purchase_price > 0
                           ? 'success'
-                          : item.stock > 0
-                          ? 'warning'
-                          : 'error'
+                          : 'grey'
                       "
-                      class="font-weight-bold"
+                      variant="flat"
                     >
-                      {{ item.stock }} في المخزن
+                      ربح:
+                      {{ (item.price - (item.purchase_price || 0)).toFixed(1) }}
+                      ج.م
                     </v-chip>
-                  </div>
-                  <v-chip
-                    size="x-small"
-                    :color="
-                      item.price - item.purchase_price > 0 ? 'success' : 'grey'
-                    "
-                    variant="flat"
-                  >
-                    ربح:
-                    {{ (item.price - (item.purchase_price || 0)).toFixed(1) }}
-                    ج.م
-                  </v-chip>
-                </td>
-                <td>
-                  <v-switch
-                    :model-value="item.isActive"
-                    @update:model-value="toggleProductStatus(item)"
-                    color="success"
-                    hide-details
-                    density="compact"
-                  ></v-switch>
-                </td>
-                <td class="text-center">
-                  <v-tooltip text="تعديل" location="top">
-                    <template v-slot:activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        icon
-                        size="small"
-                        color="primary"
-                        variant="text"
-                        @click="editItem(item)"
-                      >
-                        <v-icon>mdi-pencil</v-icon>
-                      </v-btn>
-                    </template>
-                  </v-tooltip>
-                  <v-tooltip text="حذف" location="top">
-                    <template v-slot:activator="{ props }">
-                      <v-btn
-                        v-bind="props"
-                        icon
-                        size="small"
-                        color="error"
-                        variant="text"
-                        @click="openDeleteDialog(item)"
-                      >
-                        <v-icon>mdi-delete</v-icon>
-                      </v-btn>
-                    </template>
-                  </v-tooltip>
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </v-table>
+                  </td>
+                  <td>
+                    <v-switch
+                      :model-value="item.isActive"
+                      @update:model-value="toggleProductStatus(item)"
+                      color="success"
+                      hide-details
+                      density="compact"
+                    ></v-switch>
+                  </td>
+                  <td class="text-center">
+                    <v-tooltip text="تعديل" location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          icon
+                          size="small"
+                          color="primary"
+                          variant="text"
+                          @click="editItem(item)"
+                        >
+                          <v-icon>mdi-pencil</v-icon>
+                        </v-btn>
+                      </template>
+                    </v-tooltip>
+                    <v-tooltip text="حذف" location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-btn
+                          v-bind="props"
+                          icon
+                          size="small"
+                          color="error"
+                          variant="text"
+                          @click="openDeleteDialog(item)"
+                        >
+                          <v-icon>mdi-delete</v-icon>
+                        </v-btn>
+                      </template>
+                    </v-tooltip>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <!-- Add/Edit Dialog with Tabs -->
@@ -992,6 +988,11 @@ const confirmDelete = async () => {
 .shadow-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(var(--v-theme-primary), 0.3) !important;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .w-fit {

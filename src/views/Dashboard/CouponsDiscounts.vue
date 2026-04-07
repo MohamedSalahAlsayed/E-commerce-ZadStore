@@ -92,146 +92,149 @@
       </v-row>
 
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="coupons-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold">كود الخصم</th>
-              <th class="text-center font-weight-bold">نوع الخصم</th>
-              <th class="text-center font-weight-bold">قيمة الخصم</th>
-              <th class="text-center font-weight-bold">الحد الأدنى للطلب</th>
-              <th class="text-center font-weight-bold">تاريخ الانتهاء</th>
-              <th class="text-center font-weight-bold">الاستخدام</th>
-              <th class="text-center font-weight-bold">الحالة</th>
-              <th class="text-center font-weight-bold">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="7" class="text-center pa-6">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
-
-            <tr v-else-if="filteredCoupons.length === 0">
-              <td colspan="7" class="text-center pa-6 text-grey-darken-1">
-                لا توجد كوبونات مطابقة.
-              </td>
-            </tr>
-
-            <tr
-              v-for="coupon in filteredCoupons"
-              :key="coupon.id"
-              class="hover-row"
-              v-else
-            >
-              <td>
-                <v-chip
-                  color="rgb(var(--v-theme-primary))"
-                  variant="tonal"
-                  class="font-weight-black text-uppercase"
-                  size="large"
-                >
-                  <v-icon left size="18" class="mr-2">mdi-ticket</v-icon>
-                  {{ coupon.code }}
-                </v-chip>
-              </td>
-
-              <td class="text-center text-grey-darken-1 font-weight-medium">
-                {{
-                  coupon.type === "percentage" || coupon.type === "percent"
-                    ? "نسبة مئوية (%)"
-                    : "مبلغ ثابت ($)"
-                }}
-              </td>
-
-              <td
-                class="text-center font-weight-black text-success text-subtitle-1"
-              >
-                {{
-                  coupon.type === "percentage" || coupon.type === "percent"
-                    ? coupon.value + "%"
-                    : "$" + coupon.value
-                }}
-              </td>
-
-              <td class="text-center">
-                <div class="mb-1 text-caption font-weight-bold">
-                  {{ coupon.used_count || 0 }} / {{ coupon.usage_limit || "∞" }}
-                </div>
-                <v-progress-linear
-                  :model-value="
-                    coupon.usage_limit
-                      ? (coupon.used_count / coupon.usage_limit) * 100
-                      : 0
-                  "
-                  color="primary"
-                  height="6"
-                  rounded
-                  background-opacity="0.1"
-                ></v-progress-linear>
-              </td>
-
-              <td
-                class="text-center"
-                :class="
-                  isExpired(coupon.expires_at)
-                    ? 'text-error font-weight-bold'
-                    : 'text-grey-darken-1'
-                "
-              >
-                {{ coupon.expires_at ? formatDate(coupon.expires_at) : "-" }}
-              </td>
-
-              <td class="text-center">
-                <v-switch
-                  v-model="coupon.is_active"
-                  color="success"
-                  hide-details
-                  density="compact"
-                  class="d-inline-flex"
-                  :disabled="
-                    isExpired(coupon.expires_at) ||
-                    processingIds.includes(coupon.id)
-                  "
-                  @change="toggleActive(coupon)"
-                ></v-switch>
-              </td>
-
-              <td class="text-center">
-                <v-btn
-                  icon
-                  size="small"
-                  color="primary"
-                  variant="text"
-                  @click="editItem(coupon)"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  size="small"
-                  color="error"
-                  variant="text"
-                  :disabled="processingIds.includes(coupon.id)"
-                  @click="openDeleteDialog(coupon)"
-                >
+        <div class="table-responsive">
+          <v-table class="coupons-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold">كود الخصم</th>
+                <th class="text-center font-weight-bold">نوع الخصم</th>
+                <th class="text-center font-weight-bold">قيمة الخصم</th>
+                <th class="text-center font-weight-bold">الحد الأدنى للطلب</th>
+                <th class="text-center font-weight-bold">تاريخ الانتهاء</th>
+                <th class="text-center font-weight-bold">الاستخدام</th>
+                <th class="text-center font-weight-bold">الحالة</th>
+                <th class="text-center font-weight-bold">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="7" class="text-center pa-6">
                   <v-progress-circular
-                    v-if="
-                      processingIds.includes(coupon.id) &&
-                      lastAction === 'delete'
-                    "
                     indeterminate
-                    size="16"
+                    color="primary"
                   ></v-progress-circular>
-                  <v-icon v-else>mdi-delete</v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+                </td>
+              </tr>
+
+              <tr v-else-if="filteredCoupons.length === 0">
+                <td colspan="7" class="text-center pa-6 text-grey-darken-1">
+                  لا توجد كوبونات مطابقة.
+                </td>
+              </tr>
+
+              <tr
+                v-for="coupon in filteredCoupons"
+                :key="coupon.id"
+                class="hover-row"
+                v-else
+              >
+                <td>
+                  <v-chip
+                    color="rgb(var(--v-theme-primary))"
+                    variant="tonal"
+                    class="font-weight-black text-uppercase"
+                    size="large"
+                  >
+                    <v-icon left size="18" class="mr-2">mdi-ticket</v-icon>
+                    {{ coupon.code }}
+                  </v-chip>
+                </td>
+
+                <td class="text-center text-grey-darken-1 font-weight-medium">
+                  {{
+                    coupon.type === "percentage" || coupon.type === "percent"
+                      ? "نسبة مئوية (%)"
+                      : "مبلغ ثابت ($)"
+                  }}
+                </td>
+
+                <td
+                  class="text-center font-weight-black text-success text-subtitle-1"
+                >
+                  {{
+                    coupon.type === "percentage" || coupon.type === "percent"
+                      ? coupon.value + "%"
+                      : "$" + coupon.value
+                  }}
+                </td>
+
+                <td class="text-center">
+                  <div class="mb-1 text-caption font-weight-bold">
+                    {{ coupon.used_count || 0 }} /
+                    {{ coupon.usage_limit || "∞" }}
+                  </div>
+                  <v-progress-linear
+                    :model-value="
+                      coupon.usage_limit
+                        ? (coupon.used_count / coupon.usage_limit) * 100
+                        : 0
+                    "
+                    color="primary"
+                    height="6"
+                    rounded
+                    background-opacity="0.1"
+                  ></v-progress-linear>
+                </td>
+
+                <td
+                  class="text-center"
+                  :class="
+                    isExpired(coupon.expires_at)
+                      ? 'text-error font-weight-bold'
+                      : 'text-grey-darken-1'
+                  "
+                >
+                  {{ coupon.expires_at ? formatDate(coupon.expires_at) : "-" }}
+                </td>
+
+                <td class="text-center">
+                  <v-switch
+                    v-model="coupon.is_active"
+                    color="success"
+                    hide-details
+                    density="compact"
+                    class="d-inline-flex"
+                    :disabled="
+                      isExpired(coupon.expires_at) ||
+                      processingIds.includes(coupon.id)
+                    "
+                    @change="toggleActive(coupon)"
+                  ></v-switch>
+                </td>
+
+                <td class="text-center">
+                  <v-btn
+                    icon
+                    size="small"
+                    color="primary"
+                    variant="text"
+                    @click="editItem(coupon)"
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    size="small"
+                    color="error"
+                    variant="text"
+                    :disabled="processingIds.includes(coupon.id)"
+                    @click="openDeleteDialog(coupon)"
+                  >
+                    <v-progress-circular
+                      v-if="
+                        processingIds.includes(coupon.id) &&
+                        lastAction === 'delete'
+                      "
+                      indeterminate
+                      size="16"
+                    ></v-progress-circular>
+                    <v-icon v-else>mdi-delete</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <v-dialog v-model="dialog" max-width="500px" persistent>

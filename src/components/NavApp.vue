@@ -151,6 +151,7 @@
           variant="outlined"
           density="compact"
           return-object
+          class="mb-2"
         >
           <template v-slot:selection="{ item }">
             <div class="d-flex align-center">
@@ -166,6 +167,29 @@
             ></v-list-item>
           </template>
         </v-select>
+
+        <!-- Mobile Theme Switcher -->
+        <v-select
+          label="المظهر / Theme"
+          :items="availableThemes"
+          item-title="name"
+          item-value="value"
+          variant="outlined"
+          density="compact"
+          class="mb-2"
+          @update:model-value="changeTheme"
+        >
+          <template v-slot:item="{ props, item }">
+            <v-list-item v-bind="props">
+              <template v-slot:prepend>
+                <v-icon :color="item.raw.color" size="small" class="me-2"
+                  >mdi-circle</v-icon
+                >
+              </template>
+            </v-list-item>
+          </template>
+        </v-select>
+
         <v-btn
           block
           color="error"
@@ -480,14 +504,18 @@
             </v-btn>
           </div>
 
-          <v-menu location="bottom end" transition="scale-transition">
+          <v-menu
+            location="bottom end"
+            transition="scale-transition"
+            content-class="d-none d-md-block"
+          >
             <template v-slot:activator="{ props }">
               <v-btn
                 icon
                 color="white"
                 variant="text"
                 v-bind="props"
-                class="ml-2"
+                class="ml-2 d-none d-md-flex"
               >
                 <v-icon>mdi-palette-outline</v-icon>
               </v-btn>

@@ -146,107 +146,110 @@
       </v-row>
 
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="custom-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold">المنطقة / المحافظة</th>
-              <th class="text-center font-weight-bold">تكلفة الشحن</th>
-              <th class="text-center font-weight-bold">مدة التوصيل</th>
-              <th class="text-center font-weight-bold">
-                رسوم الدفع عند الاستلام
-              </th>
-              <th class="text-center font-weight-bold">الحالة</th>
-              <th class="text-center font-weight-bold">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="4" class="text-center pa-6">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
-            <tr v-else-if="zones.length === 0">
-              <td colspan="4" class="text-center pa-6 text-grey-darken-1">
-                لا توجد مناطق شحن مضافة حتى الآن.
-              </td>
-            </tr>
-
-            <tr v-for="zone in zones" :key="zone.id" class="hover-row" v-else>
-              <td
-                class="font-weight-bold py-3 text-subtitle-2"
-                style="color: rgb(var(--v-theme-primary))"
-              >
-                <v-icon color="primary" size="20" class="mr-1 ml-2"
-                  >mdi-map-marker-radius</v-icon
-                >
-                {{ zone.name }}
-              </td>
-
-              <td class="text-center">
-                <span
-                  class="font-weight-black text-subtitle-1"
-                  :class="zone.fee == 0 ? 'text-success' : 'text-primary'"
-                >
-                  {{ zone.fee == 0 ? "مجانًا" : zone.fee + " ج.م" }}
-                </span>
-              </td>
-
-              <td class="text-center text-grey-darken-1">
-                {{ zone.delivery_time || "غير محدد" }}
-              </td>
-
-              <td class="text-center text-error font-weight-bold">
-                {{ zone.cod_fee ? zone.cod_fee + " ج.م" : "0" }}
-              </td>
-
-              <td class="text-center">
-                <v-switch
-                  v-model="zone.is_active"
-                  color="success"
-                  hide-details
-                  density="compact"
-                  class="d-inline-flex"
-                  :disabled="processingIds.includes(zone.id)"
-                  @change="toggleZoneStatus(zone)"
-                ></v-switch>
-              </td>
-
-              <td class="text-center">
-                <v-btn
-                  icon
-                  size="small"
-                  color="primary"
-                  variant="text"
-                  @click="editItem(zone)"
-                  title="تعديل"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  size="small"
-                  color="error"
-                  variant="text"
-                  :disabled="processingIds.includes(zone.id)"
-                  @click="openDeleteDialog(zone)"
-                  title="حذف"
-                >
+        <div class="table-responsive">
+          <v-table class="custom-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold">المنطقة / المحافظة</th>
+                <th class="text-center font-weight-bold">تكلفة الشحن</th>
+                <th class="text-center font-weight-bold">مدة التوصيل</th>
+                <th class="text-center font-weight-bold">
+                  رسوم الدفع عند الاستلام
+                </th>
+                <th class="text-center font-weight-bold">الحالة</th>
+                <th class="text-center font-weight-bold">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="4" class="text-center pa-6">
                   <v-progress-circular
-                    v-if="
-                      processingIds.includes(zone.id) && lastAction === 'delete'
-                    "
                     indeterminate
-                    size="16"
+                    color="primary"
                   ></v-progress-circular>
-                  <v-icon v-else>mdi-delete</v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+                </td>
+              </tr>
+              <tr v-else-if="zones.length === 0">
+                <td colspan="4" class="text-center pa-6 text-grey-darken-1">
+                  لا توجد مناطق شحن مضافة حتى الآن.
+                </td>
+              </tr>
+
+              <tr v-for="zone in zones" :key="zone.id" class="hover-row" v-else>
+                <td
+                  class="font-weight-bold py-3 text-subtitle-2"
+                  style="color: rgb(var(--v-theme-primary))"
+                >
+                  <v-icon color="primary" size="20" class="mr-1 ml-2"
+                    >mdi-map-marker-radius</v-icon
+                  >
+                  {{ zone.name }}
+                </td>
+
+                <td class="text-center">
+                  <span
+                    class="font-weight-black text-subtitle-1"
+                    :class="zone.fee == 0 ? 'text-success' : 'text-primary'"
+                  >
+                    {{ zone.fee == 0 ? "مجانًا" : zone.fee + " ج.م" }}
+                  </span>
+                </td>
+
+                <td class="text-center text-grey-darken-1">
+                  {{ zone.delivery_time || "غير محدد" }}
+                </td>
+
+                <td class="text-center text-error font-weight-bold">
+                  {{ zone.cod_fee ? zone.cod_fee + " ج.م" : "0" }}
+                </td>
+
+                <td class="text-center">
+                  <v-switch
+                    v-model="zone.is_active"
+                    color="success"
+                    hide-details
+                    density="compact"
+                    class="d-inline-flex"
+                    :disabled="processingIds.includes(zone.id)"
+                    @change="toggleZoneStatus(zone)"
+                  ></v-switch>
+                </td>
+
+                <td class="text-center">
+                  <v-btn
+                    icon
+                    size="small"
+                    color="primary"
+                    variant="text"
+                    @click="editItem(zone)"
+                    title="تعديل"
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    size="small"
+                    color="error"
+                    variant="text"
+                    :disabled="processingIds.includes(zone.id)"
+                    @click="openDeleteDialog(zone)"
+                    title="حذف"
+                  >
+                    <v-progress-circular
+                      v-if="
+                        processingIds.includes(zone.id) &&
+                        lastAction === 'delete'
+                      "
+                      indeterminate
+                      size="16"
+                    ></v-progress-circular>
+                    <v-icon v-else>mdi-delete</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <v-dialog v-model="dialog" max-width="500px" persistent>

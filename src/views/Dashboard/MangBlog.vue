@@ -24,143 +24,147 @@
 
     <!-- Data Table -->
     <v-card class="rounded-xl border-0 custom-shadow" elevation="0">
-      <v-data-table
-        :headers="headers"
-        :items="posts"
-        :loading="loading"
-        hover
-        class="bg-transparent"
-        density="comfortable"
-      >
-        <!-- Table Header Customization -->
-        <template v-slot:headers="{ columns }">
-          <tr>
-            <th
-              v-for="col in columns"
-              :key="col.key"
-              class="text-uppercase text-caption font-weight-bold text-grey-darken-1 bg-grey-lighten-4 px-4 py-3"
-            >
-              {{ col.title }}
-            </th>
-          </tr>
-        </template>
+      <div class="table-responsive">
+        <v-data-table
+          :headers="headers"
+          :items="posts"
+          :loading="loading"
+          hover
+          class="bg-transparent"
+          density="comfortable"
+        >
+          <!-- Table Header Customization -->
+          <template v-slot:headers="{ columns }">
+            <tr>
+              <th
+                v-for="col in columns"
+                :key="col.key"
+                class="text-uppercase text-caption font-weight-bold text-grey-darken-1 bg-grey-lighten-4 px-4 py-3"
+              >
+                {{ col.title }}
+              </th>
+            </tr>
+          </template>
 
-        <!-- Cover Image Column -->
-        <template v-slot:item.cover_image="{ item }">
-          <div class="py-2">
-            <v-avatar
-              rounded="lg"
-              size="64"
-              class="border"
-              color="grey-lighten-3"
-            >
-              <v-img
-                v-if="item.cover_image"
-                :src="item.cover_image"
-                cover
-              ></v-img>
-              <v-icon v-else size="32" color="grey-lighten-1">mdi-image</v-icon>
-            </v-avatar>
-          </div>
-        </template>
+          <!-- Cover Image Column -->
+          <template v-slot:item.cover_image="{ item }">
+            <div class="py-2">
+              <v-avatar
+                rounded="lg"
+                size="64"
+                class="border"
+                color="grey-lighten-3"
+              >
+                <v-img
+                  v-if="item.cover_image"
+                  :src="item.cover_image"
+                  cover
+                ></v-img>
+                <v-icon v-else size="32" color="grey-lighten-1"
+                  >mdi-image</v-icon
+                >
+              </v-avatar>
+            </div>
+          </template>
 
-        <!-- Title Column -->
-        <template v-slot:item.title="{ item }">
-          <div class="font-weight-medium text-body-1">{{ item.title }}</div>
-          <div class="text-caption text-grey">{{ item.slug }}</div>
-        </template>
+          <!-- Title Column -->
+          <template v-slot:item.title="{ item }">
+            <div class="font-weight-medium text-body-1">{{ item.title }}</div>
+            <div class="text-caption text-grey">{{ item.slug }}</div>
+          </template>
 
-        <!-- Status Column -->
-        <template v-slot:item.is_published="{ item }">
-          <v-chip
-            :color="item.is_published ? 'success' : 'grey-darken-1'"
-            :variant="item.is_published ? 'flat' : 'tonal'"
-            size="small"
-            class="font-weight-medium px-3"
-          >
-            <v-icon start size="small">
-              {{ item.is_published ? "mdi-check-circle" : "mdi-eye-off" }}
-            </v-icon>
-            {{ item.is_published ? "منشور" : "مخفي" }}
-          </v-chip>
-        </template>
-
-        <!-- Views Column -->
-        <template v-slot:item.views="{ item }">
-          <v-chip size="small" variant="outlined" color="primary">
-            {{ item.views }} مشاهدة
-          </v-chip>
-        </template>
-
-        <!-- Date Column -->
-        <template v-slot:item.created_at="{ item }">
-          <div class="text-body-2 text-grey-darken-2">
-            {{ formatDate(item.created_at) }}
-          </div>
-        </template>
-
-        <!-- Category Column -->
-        <template v-slot:item.category="{ item }">
-          <v-chip size="x-small" color="secondary" variant="flat">
-            {{ item.category || "عام" }}
-          </v-chip>
-        </template>
-
-        <!-- Actions Column -->
-        <template v-slot:item.actions="{ item }">
-          <div class="d-flex gap-2">
-            <v-btn
-              icon
-              variant="text"
+          <!-- Status Column -->
+          <template v-slot:item.is_published="{ item }">
+            <v-chip
+              :color="item.is_published ? 'success' : 'grey-darken-1'"
+              :variant="item.is_published ? 'flat' : 'tonal'"
               size="small"
-              color="blue-darken-2"
-              @click="openDialog(item)"
-              class="hover-bg"
+              class="font-weight-medium px-3"
             >
-              <v-icon>mdi-pencil</v-icon>
-              <v-tooltip activator="parent" location="top">تعديل</v-tooltip>
-            </v-btn>
+              <v-icon start size="small">
+                {{ item.is_published ? "mdi-check-circle" : "mdi-eye-off" }}
+              </v-icon>
+              {{ item.is_published ? "منشور" : "مخفي" }}
+            </v-chip>
+          </template>
 
-            <v-btn
-              icon
-              variant="text"
-              size="small"
-              color="error"
-              @click="confirmDelete(item)"
-              class="hover-bg"
-            >
-              <v-icon>mdi-delete</v-icon>
-              <v-tooltip activator="parent" location="top">حذف</v-tooltip>
-            </v-btn>
-          </div>
-        </template>
+          <!-- Views Column -->
+          <template v-slot:item.views="{ item }">
+            <v-chip size="small" variant="outlined" color="primary">
+              {{ item.views }} مشاهدة
+            </v-chip>
+          </template>
 
-        <!-- Loading State -->
-        <template v-slot:loading>
-          <div class="text-center py-8">
-            <v-progress-circular
-              indeterminate
-              color="primary"
-            ></v-progress-circular>
-            <p class="mt-2 text-grey-darken-1">جاري تحميل المقالات...</p>
-          </div>
-        </template>
+          <!-- Date Column -->
+          <template v-slot:item.created_at="{ item }">
+            <div class="text-body-2 text-grey-darken-2">
+              {{ formatDate(item.created_at) }}
+            </div>
+          </template>
 
-        <!-- Empty State -->
-        <template v-slot:no-data>
-          <div class="d-flex flex-column align-center justify-center py-12">
-            <v-icon size="64" color="grey-lighten-2" class="mb-4"
-              >mdi-file-document-box-multiple-outline</v-icon
-            >
-            <h3 class="text-h6 font-weight-medium text-grey-darken-1 mb-2">
-              لا توجد مقالات مضافة
-            </h3>
-            <p class="text-body-2 text-grey">
-              اضغط على "كتابة مقال جديد" للبدء في إضافة محتوى المتجر
-            </p>
-          </div>
-        </template>
-      </v-data-table>
+          <!-- Category Column -->
+          <template v-slot:item.category="{ item }">
+            <v-chip size="x-small" color="secondary" variant="flat">
+              {{ item.category || "عام" }}
+            </v-chip>
+          </template>
+
+          <!-- Actions Column -->
+          <template v-slot:item.actions="{ item }">
+            <div class="d-flex gap-2">
+              <v-btn
+                icon
+                variant="text"
+                size="small"
+                color="blue-darken-2"
+                @click="openDialog(item)"
+                class="hover-bg"
+              >
+                <v-icon>mdi-pencil</v-icon>
+                <v-tooltip activator="parent" location="top">تعديل</v-tooltip>
+              </v-btn>
+
+              <v-btn
+                icon
+                variant="text"
+                size="small"
+                color="error"
+                @click="confirmDelete(item)"
+                class="hover-bg"
+              >
+                <v-icon>mdi-delete</v-icon>
+                <v-tooltip activator="parent" location="top">حذف</v-tooltip>
+              </v-btn>
+            </div>
+          </template>
+
+          <!-- Loading State -->
+          <template v-slot:loading>
+            <div class="text-center py-8">
+              <v-progress-circular
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
+              <p class="mt-2 text-grey-darken-1">جاري تحميل المقالات...</p>
+            </div>
+          </template>
+
+          <!-- Empty State -->
+          <template v-slot:no-data>
+            <div class="d-flex flex-column align-center justify-center py-12">
+              <v-icon size="64" color="grey-lighten-2" class="mb-4"
+                >mdi-file-document-box-multiple-outline</v-icon
+              >
+              <h3 class="text-h6 font-weight-medium text-grey-darken-1 mb-2">
+                لا توجد مقالات مضافة
+              </h3>
+              <p class="text-body-2 text-grey">
+                اضغط على "كتابة مقال جديد" للبدء في إضافة محتوى المتجر
+              </p>
+            </div>
+          </template>
+        </v-data-table>
+      </div>
     </v-card>
 
     <!-- Post Dialog (Create/Edit) -->

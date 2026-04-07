@@ -268,26 +268,16 @@
                   ></v-text-field>
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
+                  <PhoneInput
                     v-model="settings.phone"
                     label="رقم خدمة العملاء"
-                    prepend-inner-icon="mdi-phone-outline"
-                    variant="outlined"
-                    color="primary"
-                    dir="ltr"
-                    class="text-right-input"
-                  ></v-text-field>
+                  />
                 </v-col>
                 <v-col cols="12" md="6">
-                  <v-text-field
+                  <PhoneInput
                     v-model="settings.whatsapp"
                     label="رقم الواتساب"
-                    prepend-inner-icon="mdi-whatsapp"
-                    variant="outlined"
-                    color="success"
-                    dir="ltr"
-                    class="text-right-input"
-                  ></v-text-field>
+                  />
                 </v-col>
                 <v-col cols="12">
                   <v-text-field
@@ -491,6 +481,7 @@
 import { ref, onMounted, computed } from "vue";
 import axios from "@/axios";
 import { themePalettes } from "@/utils/themePalettes";
+import PhoneInput from "@/components/PhoneInput.vue";
 
 const activeTab = ref("general");
 const isSaving = ref(false);

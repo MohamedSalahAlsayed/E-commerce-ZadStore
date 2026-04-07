@@ -120,170 +120,173 @@
       </v-row>
 
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="custom-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold">المنتج</th>
-              <th class="text-right font-weight-bold">العميل</th>
-              <th class="text-center font-weight-bold">التقييم</th>
-              <th class="text-right font-weight-bold">التعليق</th>
-              <th class="text-center font-weight-bold">الرد</th>
-              <th class="text-center font-weight-bold">الحالة</th>
-              <th class="text-center font-weight-bold">إجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="6" class="text-center pa-6">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
-
-            <tr v-else-if="filteredReviews.length === 0">
-              <td colspan="6" class="text-center pa-6 text-grey-darken-1">
-                لا توجد تقييمات مطابقة لبحثك.
-              </td>
-            </tr>
-
-            <tr
-              v-for="review in filteredReviews"
-              :key="review.id"
-              class="hover-row"
-              v-else
-            >
-              <td
-                class="d-flex align-center gap-3 py-2"
-                style="max-width: 200px"
-              >
-                <v-avatar
-                  size="45"
-                  rounded
-                  class="bg-grey-lighten-2 elevation-1"
-                >
-                  <v-img :src="review.product?.thumbnail" cover></v-img>
-                </v-avatar>
-                <span class="font-weight-bold text-subtitle-2 text-truncate">{{
-                  review.product?.title || "منتج محذوف"
-                }}</span>
-              </td>
-
-              <td class="text-grey-darken-1 font-weight-medium">
-                <div class="d-flex align-center gap-2">
-                  <v-avatar
-                    size="30"
+        <div class="table-responsive">
+          <v-table class="custom-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold">المنتج</th>
+                <th class="text-right font-weight-bold">العميل</th>
+                <th class="text-center font-weight-bold">التقييم</th>
+                <th class="text-right font-weight-bold">التعليق</th>
+                <th class="text-center font-weight-bold">الرد</th>
+                <th class="text-center font-weight-bold">الحالة</th>
+                <th class="text-center font-weight-bold">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="6" class="text-center pa-6">
+                  <v-progress-circular
+                    indeterminate
                     color="primary"
-                    class="text-white text-caption font-weight-bold"
-                  >
-                    {{ review.user?.name ? review.user.name.charAt(0) : "؟" }}
-                  </v-avatar>
-                  {{ review.user?.name || "مستخدم غير معروف" }}
-                </div>
-              </td>
+                  ></v-progress-circular>
+                </td>
+              </tr>
 
-              <td class="text-center">
-                <v-rating
-                  :model-value="review.rating"
-                  color="amber-darken-2"
-                  density="compact"
-                  size="small"
-                  readonly
-                  half-increments
-                ></v-rating>
-              </td>
+              <tr v-else-if="filteredReviews.length === 0">
+                <td colspan="6" class="text-center pa-6 text-grey-darken-1">
+                  لا توجد تقييمات مطابقة لبحثك.
+                </td>
+              </tr>
 
-              <td
-                style="max-width: 250px"
-                class="text-truncate text-grey-darken-2"
-                :title="review.comment"
+              <tr
+                v-for="review in filteredReviews"
+                :key="review.id"
+                class="hover-row"
+                v-else
               >
-                {{ review.comment || "لا يوجد تعليق" }}
-              </td>
-
-              <td class="text-center">
-                <v-chip
-                  size="small"
-                  :color="review.admin_reply ? 'info' : 'grey'"
-                  variant="outlined"
-                  class="font-weight-bold"
+                <td
+                  class="d-flex align-center gap-3 py-2"
+                  style="max-width: 200px"
                 >
-                  {{ review.admin_reply ? "تم الرد" : "بدون رد" }}
-                </v-chip>
-              </td>
+                  <v-avatar
+                    size="45"
+                    rounded
+                    class="bg-grey-lighten-2 elevation-1"
+                  >
+                    <v-img :src="review.product?.thumbnail" cover></v-img>
+                  </v-avatar>
+                  <span
+                    class="font-weight-bold text-subtitle-2 text-truncate"
+                    >{{ review.product?.title || "منتج محذوف" }}</span
+                  >
+                </td>
 
-              <td class="text-center">
-                <v-chip
-                  size="small"
-                  :color="review.is_approved ? 'success' : 'warning'"
-                  class="font-weight-bold"
-                >
-                  {{ review.is_approved ? "مقبول" : "مخفي" }}
-                </v-chip>
-              </td>
+                <td class="text-grey-darken-1 font-weight-medium">
+                  <div class="d-flex align-center gap-2">
+                    <v-avatar
+                      size="30"
+                      color="primary"
+                      class="text-white text-caption font-weight-bold"
+                    >
+                      {{ review.user?.name ? review.user.name.charAt(0) : "؟" }}
+                    </v-avatar>
+                    {{ review.user?.name || "مستخدم غير معروف" }}
+                  </div>
+                </td>
 
-              <td class="text-center">
-                <v-btn
-                  icon
-                  size="small"
-                  color="info"
-                  variant="text"
-                  @click="viewReview(review)"
-                  title="قراءة التفاصيل"
-                >
-                  <v-icon>mdi-eye-outline</v-icon>
-                </v-btn>
+                <td class="text-center">
+                  <v-rating
+                    :model-value="review.rating"
+                    color="amber-darken-2"
+                    density="compact"
+                    size="small"
+                    readonly
+                    half-increments
+                  ></v-rating>
+                </td>
 
-                <v-btn
-                  icon
-                  size="small"
-                  :color="review.is_approved ? 'warning' : 'success'"
-                  variant="text"
-                  @click="toggleStatus(review)"
-                  :disabled="processingIds.includes(review.id)"
-                  :title="
-                    review.is_approved ? 'إخفاء التقييم' : 'الموافقة ونشر'
-                  "
+                <td
+                  style="max-width: 250px"
+                  class="text-truncate text-grey-darken-2"
+                  :title="review.comment"
                 >
-                  <v-progress-circular
-                    v-if="
-                      processingIds.includes(review.id) &&
-                      lastAction === 'toggle'
+                  {{ review.comment || "لا يوجد تعليق" }}
+                </td>
+
+                <td class="text-center">
+                  <v-chip
+                    size="small"
+                    :color="review.admin_reply ? 'info' : 'grey'"
+                    variant="outlined"
+                    class="font-weight-bold"
+                  >
+                    {{ review.admin_reply ? "تم الرد" : "بدون رد" }}
+                  </v-chip>
+                </td>
+
+                <td class="text-center">
+                  <v-chip
+                    size="small"
+                    :color="review.is_approved ? 'success' : 'warning'"
+                    class="font-weight-bold"
+                  >
+                    {{ review.is_approved ? "مقبول" : "مخفي" }}
+                  </v-chip>
+                </td>
+
+                <td class="text-center">
+                  <v-btn
+                    icon
+                    size="small"
+                    color="info"
+                    variant="text"
+                    @click="viewReview(review)"
+                    title="قراءة التفاصيل"
+                  >
+                    <v-icon>mdi-eye-outline</v-icon>
+                  </v-btn>
+
+                  <v-btn
+                    icon
+                    size="small"
+                    :color="review.is_approved ? 'warning' : 'success'"
+                    variant="text"
+                    @click="toggleStatus(review)"
+                    :disabled="processingIds.includes(review.id)"
+                    :title="
+                      review.is_approved ? 'إخفاء التقييم' : 'الموافقة ونشر'
                     "
-                    indeterminate
-                    size="16"
-                  ></v-progress-circular>
-                  <v-icon v-else>{{
-                    review.is_approved
-                      ? "mdi-eye-off-outline"
-                      : "mdi-check-circle-outline"
-                  }}</v-icon>
-                </v-btn>
+                  >
+                    <v-progress-circular
+                      v-if="
+                        processingIds.includes(review.id) &&
+                        lastAction === 'toggle'
+                      "
+                      indeterminate
+                      size="16"
+                    ></v-progress-circular>
+                    <v-icon v-else>{{
+                      review.is_approved
+                        ? "mdi-eye-off-outline"
+                        : "mdi-check-circle-outline"
+                    }}</v-icon>
+                  </v-btn>
 
-                <v-btn
-                  icon
-                  size="small"
-                  color="error"
-                  variant="text"
-                  :disabled="processingIds.includes(review.id)"
-                  @click="deleteReview(review.id)"
-                  title="حذف"
-                >
-                  <v-progress-circular
-                    v-if="
-                      processingIds.includes(review.id) &&
-                      lastAction === 'delete'
-                    "
-                    indeterminate
-                    size="16"
-                  ></v-progress-circular>
-                  <v-icon v-else>mdi-delete-outline</v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+                  <v-btn
+                    icon
+                    size="small"
+                    color="error"
+                    variant="text"
+                    :disabled="processingIds.includes(review.id)"
+                    @click="deleteReview(review.id)"
+                    title="حذف"
+                  >
+                    <v-progress-circular
+                      v-if="
+                        processingIds.includes(review.id) &&
+                        lastAction === 'delete'
+                      "
+                      indeterminate
+                      size="16"
+                    ></v-progress-circular>
+                    <v-icon v-else>mdi-delete-outline</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <v-dialog v-model="viewDialog" max-width="500px">

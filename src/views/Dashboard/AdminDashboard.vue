@@ -183,46 +183,48 @@
             </v-btn>
           </v-card-title>
           <v-divider></v-divider>
-          <v-table class="bg-transparent border-0">
-            <thead>
-              <tr class="bg-grey-lighten-5">
-                <th class="text-right">{{ $t("dashboard.order_th") }}</th>
-                <th class="text-right">{{ $t("dashboard.customer_th") }}</th>
-                <th class="text-right">{{ $t("dashboard.amount_th") }}</th>
-                <th class="text-center">{{ $t("dashboard.status_th") }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="order in recentOrders"
-                :key="order.id"
-                class="hover-row"
-              >
-                <td class="font-weight-bold">#{{ order.id }}</td>
-                <td>
-                  {{
-                    order.user
-                      ? order.user.name
-                      : $t("dashboard.guest_customer")
-                  }}
-                </td>
-                <td class="font-weight-bold text-success">
-                  {{ Number(order.total).toLocaleString() }}
-                  {{ $t("products.currency") }}
-                </td>
-                <td class="text-center">
-                  <v-chip
-                    size="x-small"
-                    :color="getStatusColor(order.status)"
-                    variant="flat"
-                    class="font-weight-bold"
-                  >
-                    {{ getStatusText(order.status) }}
-                  </v-chip>
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
+          <div class="table-responsive">
+            <v-table class="bg-transparent border-0">
+              <thead>
+                <tr class="bg-grey-lighten-5">
+                  <th class="text-right">{{ $t("dashboard.order_th") }}</th>
+                  <th class="text-right">{{ $t("dashboard.customer_th") }}</th>
+                  <th class="text-right">{{ $t("dashboard.amount_th") }}</th>
+                  <th class="text-center">{{ $t("dashboard.status_th") }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="order in recentOrders"
+                  :key="order.id"
+                  class="hover-row"
+                >
+                  <td class="font-weight-bold">#{{ order.id }}</td>
+                  <td>
+                    {{
+                      order.user
+                        ? order.user.name
+                        : $t("dashboard.guest_customer")
+                    }}
+                  </td>
+                  <td class="font-weight-bold text-success">
+                    {{ Number(order.total).toLocaleString() }}
+                    {{ $t("products.currency") }}
+                  </td>
+                  <td class="text-center">
+                    <v-chip
+                      size="x-small"
+                      :color="getStatusColor(order.status)"
+                      variant="flat"
+                      class="font-weight-bold"
+                    >
+                      {{ getStatusText(order.status) }}
+                    </v-chip>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+          </div>
         </v-card>
       </v-col>
 
@@ -484,6 +486,10 @@ export default {
 </script>
 
 <style scoped>
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .shadow-btn {
   box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.3) !important;
 }

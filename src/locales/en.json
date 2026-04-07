@@ -200,6 +200,8 @@
     "register_subtitle": "Create your account now and start your journey in e-commerce with rewarding commissions.",
     "create_account_btn": "Create New Account",
     "unexpected_error": "An unexpected error occurred",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
     "login_required_cart": "You must log in first to add products to the cart",
     "login_required_favorites": "You must log in first to add products to favorites",
     "register": {

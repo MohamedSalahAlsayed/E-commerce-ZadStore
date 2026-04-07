@@ -302,4 +302,8 @@ nav {
   background: rgb(var(--v-theme-primary));
   border-radius: 10px;
 }
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 </style>

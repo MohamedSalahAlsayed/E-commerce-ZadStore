@@ -2,8 +2,9 @@
   <v-layout :dir="isRtl ? 'rtl' : 'ltr'" class="dashboard-layout">
     <v-navigation-drawer
       v-model="drawer"
-      :rail="rail"
-      permanent
+      :rail="rail && !isMobile"
+      :permanent="!isMobile"
+      :temporary="isMobile"
       :location="isRtl ? 'right' : 'left'"
       width="280"
       @click="rail = false"
@@ -457,8 +458,10 @@
 import { ref, onMounted, onUnmounted, inject, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { useLocale } from "vuetify";
+import { useLocale, useDisplay } from "vuetify";
 import axios from "@/axios";
+
+const { mobile: isMobile } = useDisplay();
 
 const emitter = inject("emitter");
 const { locale } = useI18n();

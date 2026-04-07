@@ -79,112 +79,116 @@
       </v-card>
 
       <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <v-table class="orders-table pa-2">
-          <thead class="bg-grey-lighten-4">
-            <tr>
-              <th class="text-right font-weight-bold">رقم الطلب</th>
-              <th class="text-right font-weight-bold">العميل</th>
-              <th class="text-right font-weight-bold">التاريخ / الوقت</th>
-              <th class="text-right font-weight-bold">الدفع</th>
-              <th class="text-right font-weight-bold">الإجمالي</th>
-              <th class="text-right font-weight-bold">الحالة</th>
-              <th class="text-center font-weight-bold">الإجراءات</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="loading">
-              <td colspan="6" class="text-center pa-6">
-                <v-progress-circular
-                  indeterminate
-                  color="primary"
-                ></v-progress-circular>
-              </td>
-            </tr>
-            <tr v-else-if="filteredOrders.length === 0">
-              <td colspan="6" class="text-center pa-6 text-grey-darken-1">
-                لا توجد طلبات مطابقة للبحث.
-              </td>
-            </tr>
+        <div class="table-responsive">
+          <v-table class="orders-table pa-2">
+            <thead class="bg-grey-lighten-4">
+              <tr>
+                <th class="text-right font-weight-bold">رقم الطلب</th>
+                <th class="text-right font-weight-bold">العميل</th>
+                <th class="text-right font-weight-bold">التاريخ / الوقت</th>
+                <th class="text-right font-weight-bold">الدفع</th>
+                <th class="text-right font-weight-bold">الإجمالي</th>
+                <th class="text-right font-weight-bold">الحالة</th>
+                <th class="text-center font-weight-bold">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="7" class="text-center pa-6">
+                  <v-progress-circular
+                    indeterminate
+                    color="primary"
+                  ></v-progress-circular>
+                </td>
+              </tr>
+              <tr v-else-if="filteredOrders.length === 0">
+                <td colspan="7" class="text-center pa-6 text-grey-darken-1">
+                  لا توجد طلبات مطابقة للبحث.
+                </td>
+              </tr>
 
-            <tr
-              v-for="order in filteredOrders"
-              :key="order.id"
-              class="hover-row"
-            >
-              <td
-                class="font-weight-bold text-primary d-flex align-center gap-1"
+              <tr
+                v-for="order in filteredOrders"
+                :key="order.id"
+                class="hover-row"
               >
-                #{{ order.orderNumber }}
-                <v-tooltip
-                  text="طلب مستعجل!"
-                  location="top"
-                  v-if="order.isUrgent"
+                <td
+                  class="font-weight-bold text-primary d-flex align-center gap-1"
                 >
-                  <template v-slot:activator="{ props }">
-                    <v-icon
-                      v-bind="props"
-                      color="error"
-                      size="small"
-                      class="pulse-icon"
-                      >mdi-fire</v-icon
-                    >
-                  </template>
-                </v-tooltip>
-              </td>
-              <td class="font-weight-bold text-subtitle-2">
-                {{ order.customerName }}
-              </td>
-              <td class="text-grey-darken-1">
-                {{ formatDate(order.date) }}
-              </td>
-              <td>
-                <div class="d-flex flex-column gap-1">
-                  <v-chip
-                    size="x-small"
-                    :color="
-                      order.paymentStatus === 'paid' ? 'success' : 'error'
-                    "
-                    variant="flat"
-                    label
+                  #{{ order.orderNumber }}
+                  <v-tooltip
+                    text="طلب مستعجل!"
+                    location="top"
+                    v-if="order.isUrgent"
                   >
-                    {{
-                      order.paymentStatus === "paid"
-                        ? "تم الدفع"
-                        : "لم يتم الدفع"
-                    }}
+                    <template v-slot:activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        color="error"
+                        size="small"
+                        class="pulse-icon"
+                        >mdi-fire</v-icon
+                      >
+                    </template>
+                  </v-tooltip>
+                </td>
+                <td class="font-weight-bold text-subtitle-2">
+                  {{ order.customerName }}
+                </td>
+                <td class="text-grey-darken-1">
+                  {{ formatDate(order.date) }}
+                </td>
+                <td>
+                  <div class="d-flex flex-column gap-1">
+                    <v-chip
+                      size="x-small"
+                      :color="
+                        order.paymentStatus === 'paid' ? 'success' : 'error'
+                      "
+                      variant="flat"
+                      label
+                    >
+                      {{
+                        order.paymentStatus === "paid"
+                          ? "تم الدفع"
+                          : "لم يتم الدفع"
+                      }}
+                    </v-chip>
+                    <span class="text-caption text-grey">{{
+                      order.paymentMethod?.toUpperCase() || ""
+                    }}</span>
+                  </div>
+                </td>
+                <td class="font-weight-bold text-success" dir="ltr">
+                  {{ Number(order.total).toLocaleString("ar-EG") }} ج.م
+                </td>
+                <td>
+                  <v-chip
+                    size="small"
+                    :color="getStatusColor(order.status)"
+                    class="font-weight-bold"
+                  >
+                    {{ order.status }}
                   </v-chip>
-                  <span class="text-caption text-grey">{{
-                    order.paymentMethod?.toUpperCase() || ""
-                  }}</span>
-                </div>
-              </td>
-              <td class="font-weight-bold text-success" dir="ltr">
-                {{ Number(order.total).toLocaleString("ar-EG") }} ج.م
-              </td>
-              <td>
-                <v-chip
-                  size="small"
-                  :color="getStatusColor(order.status)"
-                  class="font-weight-bold"
-                >
-                  {{ order.status }}
-                </v-chip>
-              </td>
-              <td class="text-center">
-                <v-btn
-                  color="rgb(var(--v-theme-primary))"
-                  variant="tonal"
-                  size="small"
-                  class="font-weight-bold rounded-lg px-4"
-                  @click="openOrderDetails(order)"
-                >
-                  التفاصيل
-                  <v-icon right size="18" class="ml-1">mdi-eye-outline</v-icon>
-                </v-btn>
-              </td>
-            </tr>
-          </tbody>
-        </v-table>
+                </td>
+                <td class="text-center">
+                  <v-btn
+                    color="rgb(var(--v-theme-primary))"
+                    variant="tonal"
+                    size="small"
+                    class="font-weight-bold rounded-lg px-4"
+                    @click="openOrderDetails(order)"
+                  >
+                    التفاصيل
+                    <v-icon right size="18" class="ml-1"
+                      >mdi-eye-outline</v-icon
+                    >
+                  </v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </div>
       </v-card>
 
       <v-dialog v-model="detailsDialog" max-width="700px" scrollable>
@@ -714,6 +718,10 @@ const printInvoice = () => {
 </script>
 
 <style scoped>
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .shadow-btn {
   box-shadow: 0 4px 12px rgba(24, 103, 192, 0.3) !important;
   transition: transform 0.2s ease;
