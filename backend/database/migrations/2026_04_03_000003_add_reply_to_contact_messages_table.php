@@ -1,0 +1,22 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up() {
+        Schema::table('contact_messages', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->text('reply_text')->nullable();
+            $table->timestamp('replied_at')->nullable();
+        });
+    }
+
+    public function down() {
+        Schema::table('contact_messages', function (Blueprint $table) {
+            $table->dropForeign(['user_id']);
+            $table->dropColumn(['user_id', 'reply_text', 'replied_at']);
+        });
+    }
+};
