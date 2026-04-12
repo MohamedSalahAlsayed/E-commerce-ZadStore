@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\Category;
+use App\Models\Brand;
 use App\Models\Product;
 use Faker\Factory as Faker;
 
@@ -24,6 +25,7 @@ class ECommerceSeeder extends Seeder
 
         Product::query()->delete();
         Category::query()->delete();
+        Brand::query()->delete();
 
         $categoryIds = [];
         foreach ($categories as $cat) {
@@ -35,11 +37,21 @@ class ECommerceSeeder extends Seeder
             $categoryIds[] = $category->id;
         }
 
+        $brands = ['Apple', 'Samsung', 'Nike', 'Sony', 'Adidas', 'Dell', 'HP', 'Lenovo', 'LG', 'Asus'];
+        $brandIds = [];
+        foreach ($brands as $brandName) {
+            $brand = Brand::create([
+                'name' => $brandName,
+                'logo' => "https://picsum.photos/seed/" . urlencode($brandName) . "/100"
+            ]);
+            $brandIds[] = $brand->id;
+        }
+
         for ($i = 0; $i < 100; $i++) {
             $price = $faker->randomFloat(2, 50, 5000);
             Product::create([
                 'category_id' => $faker->randomElement($categoryIds),
-                'brand_id' => null,
+                'brand_id' => $faker->randomElement($brandIds),
                 'title' => 'منتج ' . $faker->words(3, true),
                 'description' => 'هذا منتج رائع عالي الجودة ومميز من الفئة الفاخرة مصمم ليناسب احتياجاتك اليومية بشكل كامل بكل احترافية بتصميم ديناميكي.',
                 'price' => $price,

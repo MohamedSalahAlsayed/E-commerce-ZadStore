@@ -6,11 +6,14 @@ use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Supplier;
 use App\Models\Product;
+use App\Traits\LogsInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminPurchaseController extends Controller
 {
+    use LogsInventory;
+
     public function index()
     {
         $purchases = Purchase::with(['supplier', 'items.product'])->orderBy('purchase_date', 'desc')->get();
@@ -72,8 +75,19 @@ class AdminPurchaseController extends Controller
                 // If received, update stock
                 if ($purchase->status === 'received') {
                     $product = Product::find($item['product_id']);
+                    $oldS = $product->stock;
                     $product->increment('stock', $item['quantity']);
-                    // Update purchase_price in product too? (Moving average or last price)
+
+                    $this->logInventoryChange(
+                        $product->id, 
+                        $oldS, 
+                        $oldS + $item['quantity'], 
+                        'purchase', 
+                        "استلام مشتريات من فاتورة رقم #{$purchase->invoice_number}",
+                        ['purchase_id' => $purchase->id]
+                    );
+
+                    // Update purchase_price in product too
                     $product->update(['purchase_price' => $item['unit_price']]);
                 }
             }
@@ -98,13 +112,37 @@ class AdminPurchaseController extends Controller
             // If changing FROM anything TO received
             if ($newStatus === 'received') {
                 foreach ($purchase->items as $item) {
-                    Product::find($item->product_id)->increment('stock', $item->quantity);
+                    $p = Product::find($item->product_id);
+                    $oldS = $p->stock;
+                    $p->increment('stock', $item->quantity);
+
+                    $this->logInventoryChange(
+                        $p->id, 
+                        $oldS, 
+                        $oldS + $item->quantity, 
+                        'purchase_received', 
+                        "تغيير حالة الفاتورة #{$purchase->invoice_number} إلى مستلم",
+                        ['purchase_id' => $purchase->id]
+                    );
+                    // Update purchase_price in product too
+                    $p->update(['purchase_price' => $item->unit_price]);
                 }
             } 
             // If changing FROM received TO cancelled or pending (Reverse stock)
             elseif ($oldStatus === 'received' && $newStatus !== 'received') {
                 foreach ($purchase->items as $item) {
-                    Product::find($item->product_id)->decrement('stock', $item->quantity);
+                    $p = Product::find($item->product_id);
+                    $oldS = $p->stock;
+                    $p->decrement('stock', $item->quantity);
+
+                    $this->logInventoryChange(
+                        $p->id, 
+                        $oldS, 
+                        $oldS - $item->quantity, 
+                        'purchase_cancelled', 
+                        "تغيير حالة الفاتورة #{$purchase->invoice_number} من مستلم إلى {$newStatus}",
+                        ['purchase_id' => $purchase->id]
+                    );
                 }
             }
 
@@ -120,7 +158,18 @@ class AdminPurchaseController extends Controller
         return DB::transaction(function () use ($purchase) {
             if ($purchase->status === 'received') {
                 foreach ($purchase->items as $item) {
-                    Product::find($item->product_id)->decrement('stock', $item->quantity);
+                    $p = Product::find($item->product_id);
+                    $oldS = $p->stock;
+                    $p->decrement('stock', $item->quantity);
+
+                    $this->logInventoryChange(
+                        $p->id, 
+                        $oldS, 
+                        $oldS - $item->quantity, 
+                        'purchase_deletion', 
+                        "حذف فاتورة مشتريات رقم #{$purchase->invoice_number}",
+                        ['purchase_id' => $purchase->id]
+                    );
                 }
             }
             $purchase->delete();
@@ -128,7 +177,6 @@ class AdminPurchaseController extends Controller
         });
     }
 
-    // Suppliers Methods
     public function getSuppliers()
     {
         return response()->json(Supplier::all());

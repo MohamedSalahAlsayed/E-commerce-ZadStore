@@ -11,19 +11,25 @@ class PublicController extends Controller
 {
     public function getCategories()
     {
-        $categories = Category::all();
+        $categories = \Illuminate\Support\Facades\Cache::remember('public_categories', 3600, function () {
+            return Category::all();
+        });
         return response()->json($categories);
     }
 
     public function getBrands()
     {
-        $brands = Brand::all();
+        $brands = \Illuminate\Support\Facades\Cache::remember('public_brands', 3600, function () {
+            return Brand::all();
+        });
         return response()->json($brands);
     }
 
     public function getProducts(Request $request)
     {
-        $query = Product::with(['category', 'brand', 'images'])->orderBy('created_at', 'desc');
+        $query = Product::with(['category', 'brand', 'images'])
+            ->where('is_active', true)
+            ->orderBy('created_at', 'desc');
 
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
@@ -48,6 +54,7 @@ class PublicController extends Controller
     {
         $products = Product::with(['category', 'brand', 'images'])
                            ->where('is_flash_deal', true)
+                           ->where('is_active', true)
                            ->take(10)
                            ->get();
 
@@ -62,15 +69,23 @@ class PublicController extends Controller
         return response()->json($product);
     }
 
-    public function getBanners()
+    public function getBanners(Request $request)
     {
-        $banners = \App\Models\Banner::where('is_active', true)->get();
-        return response()->json($banners);
+        $target = $request->query('target');
+        $query = \App\Models\Banner::where('is_active', true);
+        
+        if ($target) {
+            $query->whereIn('target', [$target, 'both']);
+        }
+        
+        return response()->json($query->get());
     }
 
     public function getSettings()
     {
-        $settings = \App\Models\StoreSetting::pluck('value', 'key');
+        $settings = \Illuminate\Support\Facades\Cache::remember('store_settings', 3600, function () {
+            return \App\Models\StoreSetting::pluck('value', 'key');
+        });
         return response()->json($settings);
     }
 
@@ -155,6 +170,7 @@ class PublicController extends Controller
     {
         $products = Product::with(['category', 'brand', 'images'])
                            ->where('is_best_seller', true)
+                           ->where('is_active', true)
                            ->take(10)
                            ->get();
 

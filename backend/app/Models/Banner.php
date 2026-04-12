@@ -1,11 +1,14 @@
 <?php
 namespace App\Models;
 
+use App\Traits\SyncToMysql;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
 {
+    use SyncToMysql;
     use HasFactory;
 
     protected $fillable = ['title', 'image', 'link', 'is_active'];

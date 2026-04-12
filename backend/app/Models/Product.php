@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\SyncToMysql;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
+    use SyncToMysql;
     use HasFactory;
 
     protected $fillable = [
@@ -23,7 +26,10 @@ class Product extends Model
         'is_best_seller',
         'is_active',
         'rating',
-        'purchase_price'
+        'purchase_price',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     public function category()

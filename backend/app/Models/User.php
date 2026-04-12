@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\SyncToMysql;
+
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,6 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    use SyncToMysql;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -25,6 +28,7 @@ class User extends Authenticatable
         'phone',
         'is_active',
         'role',
+        'permissions',
     ];
 
     /**
@@ -50,7 +54,28 @@ class User extends Authenticatable
             'notifications_prefs' => 'array',
             'wallet_balance' => 'float',
             'total_earnings' => 'float',
+            'permissions' => 'array',
         ];
+    }
+
+    /**
+     * Check if user has a specific permission.
+     * 
+     * @param string $permission
+     * @return bool
+     */
+    public function hasPermission(string $permission): bool
+    {
+        // Admins have all permissions by default (Super Admin)
+        if ($this->role === 'admin' && ($this->permissions === null || empty($this->permissions))) {
+            return true;
+        }
+
+        if (!$this->permissions) {
+            return false;
+        }
+
+        return in_array($permission, $this->permissions);
     }
 
     public function orders()

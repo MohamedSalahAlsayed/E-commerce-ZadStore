@@ -63,4 +63,10 @@ class AdminBlogController extends Controller {
         BlogPost::findOrFail($id)->delete();
         return response()->json(['message' => 'تم حذف المقال بنجاح']);
     }
+
+    public function batchDeletePosts(Request $request) {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:blog_posts,id']);
+        BlogPost::whereIn('id', $request->ids)->delete();
+        return response()->json(['message' => 'تم حذف المقالات بنجاح']);
+    }
 }

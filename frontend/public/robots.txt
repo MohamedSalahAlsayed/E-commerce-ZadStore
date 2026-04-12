@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /Dashboard/
+Disallow: /User/ControlPannel/
+Disallow: /Auth/LogOut
+
+Sitemap: https://zadstore.com/sitemap.xml

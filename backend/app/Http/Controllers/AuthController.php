@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 use Laravel\Socialite\Facades\Socialite;
@@ -13,6 +15,17 @@ use App\Mail\WelcomeEmail;
 
 class AuthController extends Controller
 {
+    /**
+     * Full URL for hash-based Vue routes, e.g. {base}/#/auth/callback?code=...
+     */
+    private function spaUrl(string $hashPath): string
+    {
+        $base = rtrim((string) config('app.frontend_url'), '/');
+        $hashPath = ltrim($hashPath, '/');
+
+        return "{$base}/#/{$hashPath}";
+    }
+
     public function redirectToGoogle()
     {
         if (!class_exists('Laravel\Socialite\Facades\Socialite')) {
@@ -24,14 +37,14 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         if (!class_exists('Laravel\Socialite\Facades\Socialite')) {
-            return redirect('http://localhost:8080/#/Auth/LogIn?error=socialite_missing');
+            return redirect()->away($this->spaUrl('Auth/LogIn?error=socialite_missing'));
         }
         try {
             $googleUser = Socialite::driver('google')->user();
             
             // تحقق من أن الحساب مفعل من قبل جوجل
             if (!($googleUser->user['email_verified'] ?? false)) {
-                return redirect('http://localhost:8080/#/Auth/LogIn?error=google_not_verified');
+                return redirect()->away($this->spaUrl('Auth/LogIn?error=google_not_verified'));
             }
 
             $user = User::updateOrCreate([
@@ -39,17 +52,58 @@ class AuthController extends Controller
             ], [
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
-                'password' => Hash::make(\Illuminate\Support\Str::random(16)),
+                'password' => Hash::make(Str::random(16)),
             ]);
 
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $code = Str::random(64);
+            Cache::put(
+                'oauth_exchange:'.$code,
+                $user->id,
+                now()->addMinutes(3)
+            );
 
-            // Redirect back to frontend with token
-            return redirect('http://localhost:8080/#/auth/callback?token=' . $token);
+            return redirect()->away(
+                $this->spaUrl('auth/callback?code='.urlencode($code))
+            );
         } catch (\Exception $e) {
-            return redirect('http://localhost:8080/#/Auth/LogIn?error=google_failed');
+            \Illuminate\Support\Facades\Log::warning('Google OAuth callback failed', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return redirect()->away($this->spaUrl('Auth/LogIn?error=google_failed'));
         }
     }
+
+    /**
+     * Exchange short-lived OAuth redirect code for an API token (avoids token in browser URL).
+     */
+    public function exchangeOAuthCode(Request $request)
+    {
+        $data = $request->validate([
+            'code' => 'required|string|size:64',
+        ]);
+
+        $userId = Cache::pull('oauth_exchange:'.$data['code']);
+
+        if (! $userId) {
+            return response()->json(['message' => 'رمز الدخول غير صالح أو منتهي. أعد المحاولة من جوجل.'], 401);
+        }
+
+        $user = User::findOrFail($userId);
+
+        if (! $user->is_active) {
+            return response()->json(['message' => 'هذا الحساب موقوف'], 403);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ]);
+    }
+
     public function register(Request $request)
     {
         $request->validate([

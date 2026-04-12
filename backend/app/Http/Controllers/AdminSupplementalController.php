@@ -19,7 +19,8 @@ class AdminSupplementalController extends Controller
             'title' => 'nullable|string',
             'image' => 'required|image|max:2048',
             'link' => 'nullable|string',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'target' => 'nullable|in:guest,user,both'
         ]);
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('banners', 'public');
@@ -33,7 +34,8 @@ class AdminSupplementalController extends Controller
             'title' => 'nullable|string',
             'image' => 'nullable|image|max:2048',
             'link' => 'nullable|string',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'target' => 'nullable|in:guest,user,both'
         ]);
         $updateData = $request->except('image');
         if ($request->hasFile('image')) {
@@ -46,6 +48,11 @@ class AdminSupplementalController extends Controller
     public function deleteBanner($id) {
         Banner::findOrFail($id)->delete();
         return response()->json(['message' => 'Deleted']);
+    }
+    public function batchDeleteBanners(Request $request) {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:banners,id']);
+        Banner::whereIn('id', $request->ids)->delete();
+        return response()->json(['message' => 'Banners deleted']);
     }
 
     // --- Coupons ---
@@ -80,10 +87,13 @@ class AdminSupplementalController extends Controller
             }])->orderBy('created_at', 'desc')->get()
         ); 
     }
-    public function toggleMessageRead($id) {
+    /** Admin opened the message — mark as read (idempotent, no toggle). */
+    public function markMessageAsRead($id)
+    {
         $msg = ContactMessage::findOrFail($id);
-        $msg->is_read = !$msg->is_read;
+        $msg->is_read = true;
         $msg->save();
+
         return response()->json($msg);
     }
     public function replyToMessage(Request $request, $id) {
@@ -199,7 +209,28 @@ class AdminSupplementalController extends Controller
         foreach ($settings as $key => $value) {
             StoreSetting::updateOrCreate(['key' => $key], ['value' => is_array($value) ? json_encode($value) : $value]);
         }
+
+        // Clear the cache to reflect changes immediately on the frontend
+        \Illuminate\Support\Facades\Cache::forget('store_settings');
+
         return response()->json(['message' => 'Settings updated']);
+    }
+
+    public function updateBulkSettings(Request $request) {
+        $data = $request->validate([
+            'settings' => 'required|array',
+            'settings.*.key' => 'required|string',
+            'settings.*.value' => 'nullable|string'
+        ]);
+
+        foreach ($data['settings'] as $item) {
+            StoreSetting::updateOrCreate(['key' => $item['key']], ['value' => $item['value']]);
+        }
+
+        // Clear the cache to reflect changes immediately on the frontend
+        \Illuminate\Support\Facades\Cache::forget('store_settings');
+
+        return response()->json(['message' => 'Bulk settings updated']);
     }
 
     // --- Header Data ---

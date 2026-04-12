@@ -142,7 +142,12 @@ class UserController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'حدث خطأ أثناء إنشاء الطلب', 'error' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('createOrder failed', [
+                'user_id' => $request->user()->id,
+                'exception' => $e->getMessage(),
+            ]);
+
+            return response()->json(['message' => 'حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.'], 500);
         }
     }
     // ==========================================

@@ -7,11 +7,15 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Brand;
+use App\Models\InventoryLog;
+use App\Traits\LogsInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    use LogsInventory;
+
     public function statistics()
     {
         $now = \Carbon\Carbon::now();
@@ -152,6 +156,13 @@ class AdminController extends Controller
         return response()->json(['message' => 'تم حذف المستخدم بنجاح']);
     }
 
+    public function batchDeleteUsers(Request $request)
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:users,id']);
+        User::whereIn('id', $request->ids)->delete();
+        return response()->json(['message' => 'تم حذف المستخدمين بنجاح']);
+    }
+
     public function getStaff()
     {
         return response()->json(User::whereIn('role', ['admin', 'moderator'])->orderBy('created_at', 'desc')->get());
@@ -184,6 +195,15 @@ class AdminController extends Controller
         $user->role = $request->role;
         $user->save();
         return response()->json(['message' => 'تم تحديث صلاحيات المستخدم بنجاح', 'user' => $user]);
+    }
+
+    public function updateStaffPermissions(Request $request, $id)
+    {
+        $request->validate(['permissions' => 'nullable|array']);
+        $user = User::findOrFail($id);
+        $user->permissions = $request->permissions;
+        $user->save();
+        return response()->json(['message' => 'تم تحديث أذونات الموظف بنجاح', 'user' => $user]);
     }
 
     // --- Categories Management ---
@@ -236,6 +256,13 @@ class AdminController extends Controller
         return response()->json(['message' => 'تم حذف القسم بنجاح']);
     }
 
+    public function batchDeleteCategories(Request $request)
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:categories,id']);
+        Category::whereIn('id', $request->ids)->delete();
+        return response()->json(['message' => 'تم حذف الأقسام بنجاح']);
+    }
+
     // --- Brands Management ---
     public function getBrands()
     {
@@ -284,6 +311,13 @@ class AdminController extends Controller
     {
         Brand::findOrFail($id)->delete();
         return response()->json(['message' => 'تم حذف الماركة بنجاح']);
+    }
+
+    public function batchDeleteBrands(Request $request)
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:brands,id']);
+        Brand::whereIn('id', $request->ids)->delete();
+        return response()->json(['message' => 'تم حذف الماركات بنجاح']);
     }
 
     // --- Products Management ---
@@ -362,10 +396,25 @@ class AdminController extends Controller
 
     public function updateProductStock(Request $request, $id)
     {
-        $request->validate(['stock' => 'required|numeric|min:0']);
+        $request->validate([
+            'stock' => 'required|numeric|min:0',
+            'notes' => 'nullable|string'
+        ]);
+        
         $product = Product::findOrFail($id);
-        $product->stock = $request->stock;
+        $oldStock = $product->stock;
+        $newStock = $request->stock;
+        
+        $product->stock = $newStock;
         $product->save();
+
+        $this->logInventoryChange(
+            $product->id, 
+            $oldStock, 
+            $newStock, 
+            'manual', 
+            $request->notes ?? 'تعديل يدوي من لوحة التحكم'
+        );
         
         return response()->json(['message' => 'تم تحديث المخزون بنجاح']);
     }
@@ -376,6 +425,16 @@ class AdminController extends Controller
         // Optional: delete image file from storage here
         $product->delete();
         return response()->json(['message' => 'تم حذف المنتج بنجاح']);
+    }
+
+    public function getInventoryLogs()
+    {
+        return response()->json(
+            InventoryLog::with(['product:id,title,thumbnail', 'user:id,name'])
+                ->orderBy('created_at', 'desc')
+                ->take(500)
+                ->get()
+        );
     }
 
     // --- Orders Management ---
@@ -418,7 +477,18 @@ class AdminController extends Controller
             
             $order->load('items');
             foreach ($order->items as $item) {
-                \App\Models\Product::where('id', $item->product_id)->increment('stock', $item->quantity);
+                $p = \App\Models\Product::findOrFail($item->product_id);
+                $oldS = $p->stock;
+                $p->increment('stock', $item->quantity);
+                
+                $this->logInventoryChange(
+                    $p->id, 
+                    $oldS, 
+                    $oldS + $item->quantity, 
+                    'order_cancellation', 
+                    "إلغاء الطلب رقم #{$order->order_number}",
+                    ['order_id' => $order->id]
+                );
             }
         } 
         elseif (in_array($order->status, ['cancelled', 'returned']) && 
@@ -426,7 +496,18 @@ class AdminController extends Controller
             
             $order->load('items');
             foreach ($order->items as $item) {
-                \App\Models\Product::where('id', $item->product_id)->decrement('stock', $item->quantity);
+                $p = \App\Models\Product::findOrFail($item->product_id);
+                $oldS = $p->stock;
+                $p->decrement('stock', $item->quantity);
+
+                $this->logInventoryChange(
+                    $p->id, 
+                    $oldS, 
+                    $oldS - $item->quantity, 
+                    'order_restoration', 
+                    "إعادة تفعيل الطلب رقم #{$order->order_number}",
+                    ['order_id' => $order->id]
+                );
             }
         }
 
@@ -479,7 +560,18 @@ class AdminController extends Controller
                 $order->status = 'returned';
                 $order->load('items');
                 foreach ($order->items as $item) {
-                    \App\Models\Product::where('id', $item->product_id)->increment('stock', $item->quantity);
+                    $p = \App\Models\Product::findOrFail($item->product_id);
+                    $oldS = $p->stock;
+                    $p->increment('stock', $item->quantity);
+
+                    $this->logInventoryChange(
+                        $p->id, 
+                        $oldS, 
+                        $oldS + $item->quantity, 
+                        'order_return', 
+                        "مرتجع الطلب رقم #{$order->order_number}",
+                        ['order_id' => $order->id]
+                    );
                 }
             }
         } else {
@@ -503,5 +595,19 @@ class AdminController extends Controller
         ]);
 
         return response()->json(['message' => 'تم معالجة طلب الإرجاع بنجاح', 'order' => $order]);
+    }
+
+    public function deleteOrder($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->delete();
+        return response()->json(['message' => 'تم حذف الطلب بنجاح']);
+    }
+
+    public function batchDeleteOrders(Request $request)
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:orders,id']);
+        Order::whereIn('id', $request->ids)->delete();
+        return response()->json(['message' => 'تم حذف الطلبات بنجاح']);
     }
 }
