@@ -288,4 +288,39 @@ nav {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* Dashboard Specific Typography Refinement */
+.dashboard-layout {
+  font-size: 0.88rem !important;
+
+  :deep(.v-list-item-title),
+  :deep(.v-list-item-subtitle),
+  :deep(.v-btn__content),
+  :deep(.v-label),
+  :deep(.v-field__input),
+  :deep(table td),
+  :deep(table th) {
+    font-size: 0.88rem !important;
+  }
+
+  :deep(.v-card-title),
+  :deep(.v-toolbar-title),
+  :deep(.v-list-subheader) {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+  }
+
+  :deep(.text-h4),
+  :deep(.text-h5),
+  :deep(.text-h6) {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+  }
+
+  /* Compact spacing for buttons in dashboard */
+  :deep(.v-btn) {
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+}
 </style>

@@ -9,7 +9,7 @@
       <v-col cols="12">
         <div class="d-flex justify-space-between align-center flex-wrap gap-4">
           <div>
-            <h2 class="text-h4 font-weight-black text-blue-grey-darken-4">
+            <h2 class="text-h5 font-weight-black text-blue-grey-darken-4">
               {{ $t("dashboard.dashboard_title") }}
             </h2>
             <p class="text-subtitle-1 text-grey-darken-1 mt-1">
@@ -58,7 +58,7 @@
                 <div class="text-grey-darken-1 text-subtitle-2 mb-1">
                   {{ stat.title }}
                 </div>
-                <div class="text-h4 font-weight-black">
+                <div class="text-h5 font-weight-black">
                   {{ stat.value }}
                 </div>
               </div>

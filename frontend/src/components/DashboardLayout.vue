@@ -6,7 +6,7 @@
       :permanent="!isMobile"
       :temporary="isMobile"
       :location="isRtl ? 'right' : 'left'"
-      width="280"
+      width="250"
       @click="rail = false"
       class="sidebar-menu custom-scrollbar border-0"
       elevation="4"
@@ -18,7 +18,7 @@
         "
         :title="adminUser.name || 'ZadStore Admin'"
         :subtitle="adminUser.email || $t('dashboard.admin_role')"
-        class="py-5 text-white font-weight-black text-h6 border-b-0"
+        class="py-4 text-white font-weight-black text-subtitle-1 border-b-0"
         nav
       >
         <template v-slot:append>
@@ -33,7 +33,7 @@
 
       <v-divider color="white" class="mb-2 opacity-20"></v-divider>
 
-      <v-list density="compact" nav class="px-2">
+      <v-list density="compact" nav class="px-0">
         <v-list-item
           to="/Dashboard/AdminDashboard"
           exact
@@ -665,22 +665,24 @@ onUnmounted(() => {
 /* =========================================
      تنسيق الـ Scrollbar بشكل أنيق
   ========================================= */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
+.sidebar-menu :deep(.v-navigation-drawer__content)::-webkit-scrollbar {
+  width: 4px;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
+.sidebar-menu :deep(.v-navigation-drawer__content)::-webkit-scrollbar-track {
   background: transparent;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
+.sidebar-menu :deep(.v-navigation-drawer__content)::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+.sidebar-menu
+  :deep(.v-navigation-drawer__content)::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 202, 40, 0.6);
 }
-.custom-scrollbar {
+.sidebar-menu :deep(.v-navigation-drawer__content) {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  padding-inline-end: 0px !important;
 }
 
 /* Pulse Animations */
@@ -721,15 +723,27 @@ onUnmounted(() => {
 .sidebar-menu :deep(.v-list-item__content) {
   color: #f4f4f5 !important;
   opacity: 1 !important;
+  font-size: 11px !important;
+}
+
+.sidebar-menu :deep(.v-list-item__prepend) {
+  margin-inline-end: 2px !important;
+}
+.sidebar-menu :deep(.v-list-item__prepend) :deep(.v-icon) {
+  font-size: 18px !important;
+}
+.sidebar-menu :deep(.v-list-item__content) {
+  padding-inline-start: 0px !important;
 }
 
 .menu-item {
   transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  border-radius: 12px !important;
-  margin-bottom: 6px !important;
-  padding: 10px 16px !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+  padding: 6px 10px !important;
   position: relative;
   overflow: hidden;
+  min-height: 40px !important;
 }
 
 .menu-item :deep(.v-list-item-title) {
@@ -806,11 +820,13 @@ onUnmounted(() => {
 .opacity-50 {
   opacity: 0.6;
   letter-spacing: 0.5px;
-  font-size: 12px;
+  font-size: 10px;
 }
 .v-list-item__content,
 .v-list-item--nav .v-list-item-title {
-  text-align: inherit !important;
+  text-align: justify !important;
+  text-align-last: justify !important;
+  white-space: normal !important;
   font-weight: 700;
   z-index: 1;
   position: relative;

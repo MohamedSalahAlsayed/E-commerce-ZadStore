@@ -209,10 +209,6 @@ class AdminSupplementalController extends Controller
         foreach ($settings as $key => $value) {
             StoreSetting::updateOrCreate(['key' => $key], ['value' => is_array($value) ? json_encode($value) : $value]);
         }
-
-        // Clear the cache to reflect changes immediately on the frontend
-        \Illuminate\Support\Facades\Cache::forget('store_settings');
-
         return response()->json(['message' => 'Settings updated']);
     }
 
@@ -226,10 +222,6 @@ class AdminSupplementalController extends Controller
         foreach ($data['settings'] as $item) {
             StoreSetting::updateOrCreate(['key' => $item['key']], ['value' => $item['value']]);
         }
-
-        // Clear the cache to reflect changes immediately on the frontend
-        \Illuminate\Support\Facades\Cache::forget('store_settings');
-
         return response()->json(['message' => 'Bulk settings updated']);
     }
 

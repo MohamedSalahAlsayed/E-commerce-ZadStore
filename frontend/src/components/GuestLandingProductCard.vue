@@ -1,20 +1,20 @@
 <template>
   <div class="guest-lp-card-wrap">
     <v-card
-      class="guest-lp-card rounded-xl overflow-hidden h-100 d-flex flex-column"
+      class="guest-lp-card overflow-hidden h-100 d-flex flex-column"
       elevation="0"
     >
       <div class="guest-lp-card__media position-relative">
         <v-img
           :src="imageSrc"
           :alt="title"
-          height="220"
+          height="260"
           cover
           class="guest-lp-card__img"
         >
           <template v-slot:placeholder>
             <div
-              class="d-flex align-center justify-center fill-height bg-grey-lighten-3"
+              class="d-flex align-center justify-center fill-height bg-grey-lighten-4"
             >
               <v-progress-circular indeterminate color="primary" size="32" />
             </div>
@@ -24,33 +24,30 @@
           -{{ Math.round(discountPct) }}%
         </div>
       </div>
-      <v-card-text class="pa-4 flex-grow-1 d-flex flex-column">
-        <div class="text-caption text-medium-emphasis mb-1 text-truncate">
+      <v-card-text class="pa-4 pt-5 flex-grow-1 d-flex flex-column">
+        <div class="category-label mb-2">
           {{ categoryLabel }}
         </div>
-        <h3
-          class="text-subtitle-1 font-weight-black mb-2 text-truncate"
-          style="line-height: 1.35"
-        >
+        <h3 class="product-title mb-2">
           {{ title }}
         </h3>
-        <div class="d-flex align-center justify-space-between mt-auto pt-2">
-          <div>
-            <span class="text-caption text-medium-emphasis d-block">{{
-              priceLabel
-            }}</span>
-            <span class="text-h6 font-weight-black text-primary">{{
-              formattedPrice
-            }}</span>
+        <div
+          class="d-flex align-center justify-space-between mt-auto pt-3"
+          style="border-top: 1px solid rgba(0, 0, 0, 0.05)"
+        >
+          <div class="price-info">
+            <span class="price-label">{{ priceLabel }}</span>
+            <span class="price-value">{{ formattedPrice }}</span>
           </div>
           <v-btn
             color="primary"
             variant="flat"
-            size="small"
-            class="font-weight-bold rounded-lg"
+            height="44"
+            class="cta-btn font-weight-black rounded-lg px-4"
             :to="ctaTo"
           >
             {{ ctaText }}
+            <v-icon end size="18" class="mr-1">mdi-arrow-left</v-icon>
           </v-btn>
         </div>
       </v-card-text>
@@ -100,48 +97,109 @@ const formattedPrice = computed(() => {
 </script>
 
 <style scoped>
-.guest-lp-card-wrap {
-  height: 100%;
-}
-
+/* ================= Base Card ================= */
 .guest-lp-card {
-  background: rgb(var(--v-theme-surface));
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  background: white;
+  border-radius: 20px !important;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  border: 1px solid rgba(0, 0, 0, 0.03) !important;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
 }
 
 .guest-lp-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12) !important;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(var(--v-theme-primary), 0.15) !important;
 }
 
+/* ================= Media Section ================= */
 .guest-lp-card__media {
   position: relative;
-  padding: 3px;
-  border-radius: 12px 12px 0 0;
-  background: linear-gradient(
-    135deg,
-    rgb(var(--v-theme-primary)) 0%,
-    #fb923c 45%,
-    #ea580c 100%
-  );
+  overflow: hidden;
+  border-radius: 20px 20px 0 0;
+  background: #f8fafc;
 }
 
 .guest-lp-card__img {
-  border-radius: 10px 10px 0 0;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.guest-lp-card:hover .guest-lp-card__img {
+  transform: scale(1.1);
 }
 
 .guest-lp-card__badge {
   position: absolute;
-  top: 12px;
+  top: 15px;
+  inset-inline-end: 15px;
   z-index: 2;
-  inset-inline-end: 12px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
   color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 6px 12px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+}
+
+/* ================= Content Section ================= */
+.category-label {
+  font-size: 10px;
+  color: #fb923c;
+  font-weight: 900;
+  text-transform: uppercase;
+  background: rgba(251, 146, 60, 0.1);
+  padding: 3px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.product-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1.5;
+  height: 50px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.price-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-label {
   font-size: 12px;
-  font-weight: 800;
-  padding: 4px 10px;
-  border-radius: 999px;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.price-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ff4757;
+  line-height: 1;
+}
+
+/* ================= Buttons ================= */
+.cta-btn {
+  text-transform: none !important;
+  font-size: 13px !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
+  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.2) !important;
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(var(--v-theme-primary), 0.3) !important;
 }
 </style>

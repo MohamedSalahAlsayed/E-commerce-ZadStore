@@ -118,42 +118,67 @@
                   <div class="discount-badge" v-if="product.discountPercentage">
                     -{{ Math.round(product.discountPercentage) }}%
                   </div>
-                  <div class="flash-tag">عرض فلاش</div>
                 </div>
               </div>
 
-              <v-card-text class="flex-grow-1 d-flex flex-column pa-4">
-                <div class="category-text mb-1">عرض محدود</div>
+              <v-card-text class="flex-grow-1 d-flex flex-column pa-4 pt-5">
+                <div class="category-text mb-2">عرض محدود</div>
                 <h3 class="product-title mb-2" :title="product.title">
                   {{ shortTitle(product.title) }}
                 </h3>
 
-                <div class="d-flex align-center mb-3">
+                <div class="d-flex align-center mb-4">
                   <v-rating
                     :model-value="product.rating"
                     readonly
-                    color="amber-darken-1"
+                    color="amber-darken-2"
                     density="compact"
                     half-increments
-                    size="16"
+                    size="14"
                   ></v-rating>
-                  <span class="rating-count mr-2">({{ product.rating }})</span>
+                  <span
+                    class="rating-count mr-2"
+                    style="font-size: 11px; color: #777"
+                    >({{ product.rating }})</span
+                  >
                 </div>
 
-                <div class="mt-auto">
-                  <div class="price-wrapper d-flex align-end gap-2">
-                    <span class="current-price text-error">
-                      {{
-                        Math.ceil(
-                          product.price -
-                            product.price * (product.discountPercentage / 100)
-                        ).toLocaleString()
-                      }}
-                      <small>ج.م</small>
-                    </span>
-                    <del v-if="product.discountPercentage" class="old-price">
-                      {{ Number(product.price).toLocaleString() }} ج.م
-                    </del>
+                <div
+                  class="mt-auto pt-3"
+                  style="border-top: 1px solid rgba(0, 0, 0, 0.05)"
+                >
+                  <div class="d-flex justify-space-between align-end">
+                    <div class="price-wrapper d-flex flex-column">
+                      <del
+                        v-if="product.discountPercentage"
+                        class="old-price mb-1"
+                        style="font-size: 13px; color: #999"
+                      >
+                        {{ Number(product.price).toLocaleString() }} ج.م
+                      </del>
+                      <div
+                        class="current-price text-error d-flex align-end gap-1"
+                        style="line-height: 1"
+                      >
+                        <span style="font-size: 24px; font-weight: 900">
+                          {{
+                            Math.ceil(
+                              product.price -
+                                product.price *
+                                  (product.discountPercentage / 100)
+                            ).toLocaleString()
+                          }}
+                        </span>
+                        <small
+                          style="
+                            font-size: 14px;
+                            font-weight: 800;
+                            margin-bottom: 2px;
+                          "
+                          >ج.م</small
+                        >
+                      </div>
+                    </div>
                   </div>
                 </div>
               </v-card-text>
@@ -351,29 +376,32 @@ onUnmounted(() => {
 .product-card {
   position: relative;
   background: white;
-  border-radius: 16px !important;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  border: 1px solid #eee !important;
+  border-radius: 20px !important;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  border: 1px solid rgba(0, 0, 0, 0.03) !important;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(var(--v-theme-primary), 0.15) !important;
 }
 
 /* ================= Media Section ================= */
 .card-media-wrapper {
   position: relative;
   overflow: hidden;
+  border-radius: 20px 20px 0 0;
 }
 
 .product-img {
-  transition: transform 0.8s ease;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .product-card:hover .product-img {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .media-overlay {
@@ -382,12 +410,13 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: all 0.3s ease;
+  backdrop-filter: blur(2px);
+  transition: all 0.4s ease;
   z-index: 2;
 }
 
@@ -399,114 +428,143 @@ onUnmounted(() => {
   background: white !important;
   color: black !important;
   border-radius: 50px !important;
-  font-weight: 800 !important;
-  padding: 0 24px !important;
-  height: 42px !important;
+  font-weight: 900 !important;
+  padding: 0 28px !important;
+  height: 46px !important;
+  font-size: 13px !important;
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
+}
+
+.product-card:hover .quick-view-btn {
+  transform: translateY(0);
 }
 
 /* ================= Badge System ================= */
 .badge-container {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 15px;
+  right: 15px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   z-index: 3;
 }
 
 .discount-badge {
-  background: #ff4757;
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
   color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 13px;
+  box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
 }
 
 .flash-tag {
-  background: #ff9f43;
+  background: linear-gradient(45deg, #ff4757, #ff6b81);
   color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
+  padding: 5px 14px;
+  border-radius: 50px;
+  font-size: 11px;
   font-weight: 900;
   text-transform: uppercase;
+  box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+  letter-spacing: 0.5px;
 }
 
 /* ================= Floating Actions ================= */
 .floating-actions {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 15px;
+  left: 15px;
   z-index: 3;
 }
 
 .action-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: white;
-  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-  color: #555;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  color: #444;
 }
 
 .action-btn:hover {
-  transform: scale(1.1);
+  transform: rotate(10deg) scale(1.1);
+  background: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .action-btn.active {
   color: #ff4757;
+  background: white;
+  border-color: rgba(255, 71, 87, 0.2);
 }
 
 /* ================= Content Section ================= */
 .category-text {
-  font-size: 11px;
-  color: #999;
-  font-weight: 700;
+  font-size: 10px;
+  color: #fb923c;
+  font-weight: 900;
   text-transform: uppercase;
+  background: rgba(251, 146, 60, 0.1);
+  padding: 3px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  width: fit-content;
 }
 
 .product-title {
-  font-size: 16px;
-  font-weight: 800;
-  color: #111;
-  line-height: 1.4;
-  height: 44px;
+  font-size: 17px;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1.5;
+  height: 50px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .current-price {
-  font-size: 20px;
-  font-weight: 900;
+  color: #ff4757 !important;
 }
 
-.old-price {
-  font-size: 14px;
-  color: #aaa;
-  text-decoration: line-through;
-}
-
-/* ================= Professional Solid Buttons ================= */
+/* ================= Buttons ================= */
 .add-to-cart-btn {
-  border-radius: 10px !important;
+  border-radius: 14px !important;
   font-weight: 900 !important;
-  transition: all 0.2s ease !important;
+  font-size: 14px !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
   text-transform: none !important;
+  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.2) !important;
 }
 
 .add-to-cart-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(var(--v-theme-primary), 0.25) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(var(--v-theme-primary), 0.35) !important;
 }
 
 .details-icon-btn {
   border: 1px solid rgba(var(--v-theme-primary), 0.1) !important;
+  background: rgba(var(--v-theme-primary), 0.03) !important;
+  border-radius: 14px !important;
+}
+
+.details-icon-btn:hover {
+  background: rgba(var(--v-theme-primary), 0.08) !important;
+  transform: translateY(-2px);
 }
 
 .gap-3 {
