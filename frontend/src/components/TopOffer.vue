@@ -21,8 +21,10 @@
               settingsStore.promoOffers.small1.offer
             }}</span>
           </div>
-          :src="settingsStore.promoOffers.small1.image" class="promo-img
-          small-img" />
+          <img
+            :src="settingsStore.promoOffers.small1.image"
+            class="promo-img small-img"
+          />
         </v-card>
       </v-col>
 
@@ -42,8 +44,10 @@
               settingsStore.promoOffers.small2.offer
             }}</span>
           </div>
-          :src="settingsStore.promoOffers.small2.image" class="promo-img
-          small-img audio-img" />
+          <img
+            :src="settingsStore.promoOffers.small2.image"
+            class="promo-img small-img audio-img"
+          />
         </v-card>
       </v-col>
 
@@ -63,8 +67,10 @@
               settingsStore.promoOffers.small3.offer
             }}</span>
           </div>
-          :src="settingsStore.promoOffers.small3.image" class="promo-img
-          small-img chair-img" />
+          <img
+            :src="settingsStore.promoOffers.small3.image"
+            class="promo-img small-img chair-img"
+          />
         </v-card>
       </v-col>
     </v-row>
