@@ -145,7 +145,7 @@
             <div class="d-flex justify-space-between mb-4 text-body-1">
               <span class="text-grey-darken-1">{{ $t("cart.shipping") }}</span>
               <v-chip
-                v-if="freeShippingReached"
+                v-if="freeShippingReached && settingsStore.freeShippingEnabled"
                 size="small"
                 color="success"
                 variant="flat"
@@ -157,7 +157,7 @@
             </div>
 
             <!-- Free Shipping Progress -->
-            <div class="mt-4 mb-2">
+            <div class="mt-4 mb-2" v-if="settingsStore.freeShippingEnabled">
               <div
                 class="d-flex justify-space-between text-caption font-weight-bold mb-1"
                 :class="freeShippingReached ? 'text-success' : 'text-primary'"
@@ -241,9 +241,7 @@ const cartItems = computed(() => cartStore.CartItem || []);
 const router = useRouter();
 
 onMounted(async () => {
-  if (!settingsStore.freeShippingThreshold) {
-    await settingsStore.fetchSettings();
-  }
+  await settingsStore.fetchSettings(true);
 });
 
 // 2. State Variables
@@ -278,12 +276,18 @@ const finalTotal = computed(() => {
   return parseFloat(cartTotal.value).toFixed(2);
 });
 
-const freeShippingThreshold = computed(
-  () => settingsStore.freeShippingThreshold || 0
+const freeShippingThreshold = computed(() =>
+  settingsStore.freeShippingEnabled
+    ? settingsStore.freeShippingThreshold || 0
+    : Infinity
 );
 
 const freeShippingProgress = computed(() => {
-  if (freeShippingThreshold.value <= 0) return 100;
+  if (
+    freeShippingThreshold.value <= 0 ||
+    freeShippingThreshold.value === Infinity
+  )
+    return 100;
   return Math.min(100, (cartTotal.value / freeShippingThreshold.value) * 100);
 });
 

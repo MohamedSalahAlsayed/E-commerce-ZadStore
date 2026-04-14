@@ -18,6 +18,7 @@ export const useSettingsStore = defineStore("settings", {
     tiktok: "",
     currency: "EGP",
     taxRate: 0,
+    freeShippingEnabled: false,
     freeShippingThreshold: 1000,
     maintenanceMode: false,
     primaryColor: "#f97316",
@@ -108,6 +109,12 @@ export const useSettingsStore = defineStore("settings", {
           this.footerShowContact =
             data.footerShowContact === "true" ||
             data.footerShowContact === true;
+        }
+
+        if (data.free_shipping_enabled !== undefined) {
+          this.freeShippingEnabled =
+            data.free_shipping_enabled === "true" ||
+            data.free_shipping_enabled === true;
         }
 
         if (data.free_shipping_threshold !== undefined) {
