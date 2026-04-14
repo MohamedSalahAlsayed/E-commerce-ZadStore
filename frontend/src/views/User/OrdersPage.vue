@@ -204,101 +204,231 @@
           class="mb-6 rounded-xl overflow-hidden order-card custom-shadow border-0"
           elevation="0"
         >
-          <!-- رأس الطلب (مظهره عصري جداً) -->
+          <!-- رأس الطلب (تصميم احترافي ومنظم) -->
           <div
-            class="order-header pa-5 d-flex flex-wrap justify-space-between align-center"
-            :class="getOrderTheme(order.status).headerClass"
+            class="order-header pa-6 bg-white border-b"
+            :class="getOrderTheme(order.status).headerBorder"
           >
-            <div class="d-flex align-center gap-6 flex-wrap">
-              <div class="d-flex align-center gap-3">
-                <v-avatar
-                  size="44"
-                  :color="getOrderTheme(order.status).iconBg"
-                  class="rounded-lg"
+            <div
+              class="d-flex flex-column flex-md-row justify-space-between align-start align-md-center gap-4"
+            >
+              <div class="d-flex align-center gap-4">
+                <v-chip
+                  :color="getOrderTheme(order.status).iconColor"
+                  :variant="
+                    getOrderTheme(order.status).headerClass ? 'tonal' : 'flat'
+                  "
+                  class="font-weight-bold px-4"
+                  size="large"
                 >
+                  <v-icon start size="18">{{
+                    getOrderTheme(order.status).icon
+                  }}</v-icon>
+                  {{ getOrderTheme(order.status).text }}
                   <v-icon
-                    :color="getOrderTheme(order.status).iconColor"
-                    size="24"
-                    >{{ getOrderTheme(order.status).icon }}</v-icon
+                    v-if="order.is_urgent"
+                    color="error"
+                    size="16"
+                    class="mr-2 pulse-icon"
+                    >mdi-fire</v-icon
                   >
-                </v-avatar>
-                <div>
-                  <div
-                    class="text-caption text-grey-darken-1 text-uppercase font-weight-bold mb-1"
+                </v-chip>
+
+                <div class="d-flex flex-column">
+                  <span
+                    class="text-caption text-grey-darken-1 font-weight-bold mb-n1"
                   >
-                    {{ $t("orders.order_status_label") }}
-                  </div>
-                  <div
-                    class="text-subtitle-1 font-weight-black"
-                    :class="getOrderTheme(order.status).textColor"
+                    {{ $t("orders.order_id_label") }}
+                  </span>
+                  <span
+                    class="text-subtitle-2 font-weight-black text-grey-darken-4"
                   >
-                    {{ getOrderTheme(order.status).text }}
-                  </div>
+                    #{{ order.order_number }}
+                  </span>
                 </div>
               </div>
 
-              <v-divider
-                vertical
-                class="d-none d-md-block h-auto my-2 border-opacity-50"
-              ></v-divider>
-
-              <div>
-                <div
-                  class="text-caption text-grey-darken-1 text-uppercase font-weight-bold mb-1"
-                >
-                  {{ $t("orders.order_date_label") }}
-                </div>
-                <div
-                  class="text-body-2 font-weight-bold text-grey-darken-3 d-flex align-center"
-                >
-                  <v-icon size="small" class="ml-1 text-grey"
-                    >mdi-calendar-clock</v-icon
+              <div class="d-flex align-center gap-3 flex-wrap">
+                <div class="d-flex flex-column align-md-end mr-md-6">
+                  <span
+                    class="text-caption text-grey-darken-1 font-weight-bold mb-n1"
                   >
-                  {{ formatDate(order.created_at) }}
+                    {{ $t("orders.order_date_label") }}
+                  </span>
+                  <span
+                    class="text-body-2 font-weight-medium text-grey-darken-3"
+                  >
+                    {{ formatDate(order.created_at) }}
+                  </span>
                 </div>
-              </div>
 
-              <v-divider
-                vertical
-                class="d-none d-md-block h-auto my-2 border-opacity-50"
-              ></v-divider>
+                <v-divider vertical class="mx-2 d-none d-md-block h-6" />
 
-              <div>
-                <div
-                  class="text-caption text-grey-darken-1 text-uppercase font-weight-bold mb-1"
-                >
-                  {{ $t("orders.billed_total_label") }}
+                <div class="d-flex flex-column align-md-end mr-md-6">
+                  <span
+                    class="text-caption text-grey-darken-1 font-weight-bold mb-n1"
+                  >
+                    {{ $t("orders.billed_total_label") }}
+                  </span>
+                  <span class="text-body-1 font-weight-black text-primary">
+                    {{ order.total }} {{ $t("products.currency") }}
+                  </span>
                 </div>
-                <div
-                  class="text-body-1 font-weight-black text-primary-darken-1"
+
+                <v-btn
+                  variant="outlined"
+                  color="grey-darken-1"
+                  size="small"
+                  class="rounded-lg ml-md-4"
+                  prepend-icon="mdi-printer-outline"
+                  @click="printInvoice(order)"
                 >
-                  {{ order.total }} {{ $t("products.currency") }}
-                </div>
+                  {{ $t("orders.download_invoice") }}
+                </v-btn>
               </div>
             </div>
+          </div>
 
-            <div class="d-flex flex-column align-end mt-4 mt-sm-0">
-              <div
-                class="text-caption text-grey-darken-1 text-uppercase font-weight-bold mb-1"
-              >
-                {{ $t("orders.order_id_label") }}
+          <!-- Professional Invoice Template (Hidden by default, visible on print) -->
+          <div :id="'invoice-' + order.id" class="invoice-container d-none">
+            <div class="invoice-header">
+              <div class="d-flex justify-space-between align-center mb-6">
+                <div>
+                  <h1 class="text-h4 font-weight-black text-primary">
+                    ZadStore
+                  </h1>
+                  <p class="text-subtitle-2 text-grey-darken-1">
+                    رؤية جديدة للتسوق
+                  </p>
+                </div>
+                <div
+                  class="${locale === 'ar' ? 'text-left' : 'text-right'}"
+                  style="text-align: $ {locale==='ar'?'left': 'right'}"
+                >
+                  <h2 class="text-h6 font-weight-bold">فاتورة ضريبية</h2>
+                  <p class="text-body-2">
+                    رقم الطلب: #{{ order.order_number }}
+                  </p>
+                  <p class="text-body-2">
+                    التاريخ: {{ formatDate(order.created_at) }}
+                  </p>
+                </div>
               </div>
+              <v-divider class="mb-6"></v-divider>
+              <v-row>
+                <v-col cols="6">
+                  <h3 class="text-subtitle-2 font-weight-black mb-2">
+                    بيانات العميل:
+                  </h3>
+                  <p class="mb-1">
+                    <strong>الاسم:</strong> {{ order.customer_name }}
+                  </p>
+                  <p class="mb-1"><strong>الهاتف:</strong> {{ order.phone }}</p>
+                  <p class="mb-1">
+                    <strong>العنوان:</strong> {{ order.address }}
+                  </p>
+                </v-col>
+                <v-col
+                  cols="6"
+                  class="${locale === 'ar' ? 'text-left' : 'text-right'}"
+                  style="text-align: $ {locale==='ar'?'left': 'right'}"
+                >
+                  <h3 class="text-subtitle-2 font-weight-black mb-2">
+                    حالة الدفع:
+                  </h3>
+                  <p class="mb-1">
+                    <strong>الطريقة:</strong>
+                    {{ order.payment_method?.toUpperCase() }}
+                  </p>
+                  <v-chip
+                    size="small"
+                    :color="
+                      order.payment_status === 'paid' ? 'success' : 'error'
+                    "
+                    class="mt-1"
+                  >
+                    {{
+                      order.payment_status === "paid"
+                        ? "تم الدفع"
+                        : "لم يتم الدفع"
+                    }}
+                  </v-chip>
+                </v-col>
+              </v-row>
+            </div>
+            <v-table density="compact" class="invoice-table my-8 border">
+              <thead>
+                <tr class="bg-grey-lighten-4">
+                  <th>{{ locale === "ar" ? "المنتج" : "Product" }}</th>
+                  <th class="text-center">
+                    {{ locale === "ar" ? "الكمية" : "Qty" }}
+                  </th>
+                  <th :class="locale === 'ar' ? 'text-left' : 'text-right'">
+                    {{ locale === "ar" ? "السعر" : "Price" }}
+                  </th>
+                  <th :class="locale === 'ar' ? 'text-left' : 'text-right'">
+                    {{ locale === "ar" ? "الإجمالي" : "Total" }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in order.items" :key="item.id">
+                  <td class="py-2">{{ item.name }}</td>
+                  <td class="text-center">{{ item.quantity }}</td>
+                  <td :class="locale === 'ar' ? 'text-left' : 'text-right'">
+                    {{ item.price }} {{ $t("products.currency") }}
+                  </td>
+                  <td
+                    :class="
+                      locale === 'ar'
+                        ? 'text-left'
+                        : 'text-right' + ' font-weight-bold'
+                    "
+                  >
+                    {{ item.price * item.quantity }}
+                    {{ $t("products.currency") }}
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
+            <div class="invoice-footer d-flex flex-column align-end">
               <div
-                class="text-subtitle-2 font-weight-bold bg-white px-3 py-1 rounded-md border text-grey-darken-3 mb-3"
+                class="summary-line d-flex justify-space-between w-100"
+                style="max-width: 250px"
               >
-                # {{ order.order_number }}
-              </div>
-              <div class="d-flex gap-2">
-                <v-btn
-                  variant="text"
-                  color="primary"
-                  size="small"
-                  class="font-weight-bold rounded-lg px-2"
-                  prepend-icon="mdi-text-box-outline"
-                  @click="printInvoice(order)"
-                  >{{ $t("orders.download_invoice") }}</v-btn
+                <span>{{ locale === "ar" ? "المجموع:" : "Subtotal:" }}</span>
+                <span
+                  >{{
+                    order.subtotal || order.total - (order.shipping_fee || 0)
+                  }}
+                  {{ $t("products.currency") }}</span
                 >
               </div>
+              <div
+                class="summary-line d-flex justify-space-between w-100"
+                style="max-width: 250px"
+              >
+                <span>{{ locale === "ar" ? "الشحن:" : "Shipping:" }}</span>
+                <span
+                  >{{ order.shipping_fee || 0 }}
+                  {{ $t("products.currency") }}</span
+                >
+              </div>
+              <v-divider class="my-2" style="width: 250px"></v-divider>
+              <div
+                class="summary-line final-total d-flex justify-space-between w-100 text-h6 font-weight-black text-primary"
+                style="max-width: 250px"
+              >
+                <span>{{ locale === "ar" ? "الإجمالي:" : "Total:" }}</span>
+                <span>{{ order.total }} {{ $t("products.currency") }}</span>
+              </div>
+            </div>
+            <div class="mt-16 text-center text-caption text-grey">
+              {{
+                locale === "ar"
+                  ? "شكراً لتسوقكم من زاد ستور - نتمنى لكم يوماً سعيداً"
+                  : "Thank you for shopping at ZadStore - Have a great day!"
+              }}
             </div>
           </div>
 
@@ -326,12 +456,11 @@
                 <div
                   v-for="(item, i) in order.items"
                   :key="i"
-                  class="product-row d-flex gap-4 pa-3 rounded-lg transition-all mb-3 position-relative"
-                  :class="{ 'bg-grey-lighten-5': true }"
+                  class="product-row d-flex align-center gap-4 pa-4 rounded-xl border mb-3 bg-white"
                 >
                   <div
-                    class="image-wrapper rounded-lg overflow-hidden border bg-white flex-shrink-0"
-                    style="width: 100px; height: 100px"
+                    class="image-wrapper rounded-lg overflow-hidden border bg-grey-lighten-5 flex-shrink-0"
+                    style="width: 80px; height: 80px"
                   >
                     <v-img
                       :src="
@@ -345,74 +474,53 @@
                     ></v-img>
                   </div>
 
-                  <div
-                    class="py-1 d-flex flex-column justify-center flex-grow-1"
-                  >
+                  <div class="flex-grow-1 min-width-0">
                     <h5
-                      class="text-subtitle-1 font-weight-bold text-grey-darken-4 mb-1 line-clamp-2"
-                      style="line-height: 1.3"
+                      class="text-subtitle-2 font-weight-bold text-grey-darken-4 mb-0 line-clamp-1"
                     >
                       {{ item.name }}
                     </h5>
-                    <div class="text-caption text-grey-darken-1 mb-2">
-                      {{ $t("checkout.quantity") }} {{ item.quantity || 1 }}
-                    </div>
-
-                    <div class="mt-auto d-flex align-center gap-2">
-                      <v-btn
-                        color="primary"
-                        variant="tonal"
-                        height="32"
-                        class="rounded-pill font-weight-bold px-4 text-caption"
-                        elevation="0"
-                        :to="`/product-details/${item.product_id}`"
-                      >
-                        {{ $t("orders.buy_again") }}
-                        <v-icon
-                          size="small"
-                          :class="locale === 'ar' ? 'mr-1' : 'ml-1'"
-                          >mdi-refresh</v-icon
-                        >
-                      </v-btn>
+                    <div class="d-flex align-center gap-4 mt-1">
+                      <span class="text-caption text-grey-darken-1">
+                        {{ $t("checkout.quantity") }} {{ item.quantity || 1 }}
+                      </span>
+                      <span class="text-caption font-weight-black text-primary">
+                        {{ item.price || 0 }} {{ $t("products.currency") }}
+                      </span>
                     </div>
                   </div>
 
-                  <!-- سعر العنصر -->
-                  <div
-                    class="d-none d-sm-block"
-                    :class="locale === 'ar' ? 'ml-4' : 'mr-4'"
-                    style="text-align: left; padding-top: 4px"
+                  <v-btn
+                    color="primary"
+                    variant="text"
+                    size="small"
+                    class="rounded-pill font-weight-bold"
+                    :loading="actionLoading === 'add_to_cart_' + item.id"
+                    @click="buyAgain(item)"
                   >
-                    <span
-                      class="font-weight-black text-body-1 text-primary-darken-1"
-                      >{{ item.price || 0 }} {{ $t("products.currency") }}</span
-                    >
-                  </div>
+                    {{ $t("orders.buy_again") }}
+                    <v-icon size="small" class="ms-1">mdi-refresh</v-icon>
+                  </v-btn>
                 </div>
               </div>
 
-              <!-- لوحة التحكم الجانبية للإجراءات -->
+              <!-- لوحة التحكم الجانبية للإجراءات (تجميع ذكي) -->
               <div
-                class="action-panel bg-grey-lighten-5 rounded-xl p-5 border d-flex flex-column justify-center mt-4 mt-lg-0"
+                class="action-panel bg-grey-lighten-5 rounded-xl pa-6 border-s-md d-flex flex-column"
+                style="min-width: 250px"
               >
-                <h4
-                  class="text-subtitle-2 font-weight-bold mb-4 text-center text-grey-darken-2"
-                >
-                  {{ $t("orders.order_actions") }}
-                </h4>
-                <div class="d-flex flex-column gap-3 w-100">
+                <div class="d-flex flex-column gap-3">
+                  <!-- الإجراءات الأساسية -->
                   <v-btn
                     v-if="order.status === 'shipped'"
                     block
                     color="primary"
-                    class="rounded-lg font-weight-bold text-body-2"
-                    height="44"
+                    class="rounded-xl font-weight-bold"
+                    height="48"
                     elevation="2"
+                    prepend-icon="mdi-map-marker-path"
                     @click="trackOrder(order)"
                   >
-                    <v-icon :class="locale === 'ar' ? 'ml-2' : 'mr-2'"
-                      >mdi-map-marker-path</v-icon
-                    >
                     {{ $t("orders.live_track") }}
                   </v-btn>
 
@@ -420,16 +528,14 @@
                     v-if="order.status === 'pending'"
                     block
                     color="primary"
-                    class="rounded-lg font-weight-bold text-body-2 text-white"
-                    height="44"
+                    class="rounded-xl font-weight-bold text-white"
+                    height="48"
                     elevation="2"
+                    prepend-icon="mdi-fire"
                     :loading="actionLoading === 'expedite_' + order.id"
                     :disabled="order.is_urgent"
                     @click="expediteOrder(order)"
                   >
-                    <v-icon :class="locale === 'ar' ? 'ml-2' : 'mr-2'"
-                      >mdi-fire</v-icon
-                    >
                     {{
                       order.is_urgent
                         ? $t("orders.expedited_success")
@@ -437,67 +543,66 @@
                     }}
                   </v-btn>
 
-                  <v-btn
-                    v-if="order.status === 'pending'"
-                    block
-                    variant="outlined"
-                    color="error"
-                    class="rounded-lg font-weight-bold text-body-2 bg-white"
-                    height="44"
-                    :loading="actionLoading === 'cancel_' + order.id"
-                    @click="cancelOrder(order)"
-                  >
-                    <v-icon :class="locale === 'ar' ? 'ml-2' : 'mr-2'"
-                      >mdi-cancel</v-icon
-                    >
-                    {{ $t("orders.cancel_order") }}
-                  </v-btn>
+                  <v-divider class="my-2 border-opacity-50" />
 
-                  <v-btn
-                    block
-                    variant="outlined"
-                    color="primary"
-                    class="rounded-lg font-weight-bold text-body-2 bg-white"
-                    height="44"
-                    v-if="
-                      ['completed', 'shipped', 'delivered'].includes(
-                        order.status
-                      )
-                    "
-                    :loading="actionLoading === 'return_' + order.id"
-                    :disabled="
-                      order.return_request_status === 'pending' ||
-                      order.return_request_status === 'approved'
-                    "
-                    @click="openReturnDialog(order)"
-                  >
-                    <v-icon :class="locale === 'ar' ? 'ml-2' : 'mr-2'"
-                      >mdi-undo-variant</v-icon
+                  <!-- الإجراءات الثانوية -->
+                  <div class="d-flex flex-column gap-2">
+                    <v-btn
+                      v-if="order.status === 'pending'"
+                      block
+                      variant="text"
+                      color="error"
+                      class="rounded-lg font-weight-bold justify-start"
+                      size="small"
+                      prepend-icon="mdi-cancel"
+                      :loading="actionLoading === 'cancel_' + order.id"
+                      @click="cancelOrder(order)"
                     >
-                    {{
-                      order.return_request_status === "pending"
-                        ? $t("orders.return_review")
-                        : $t("orders.return_request")
-                    }}
-                  </v-btn>
+                      {{ $t("orders.cancel_order") }}
+                    </v-btn>
 
-                  <v-btn
-                    block
-                    variant="tonal"
-                    color="blue-grey-darken-2"
-                    class="rounded-lg font-weight-bold text-body-2 mt-2"
-                    height="44"
-                    v-if="
-                      order.status === 'delivered' ||
-                      order.status === 'completed'
-                    "
-                    @click="rateOrder(order)"
-                  >
-                    <v-icon :class="locale === 'ar' ? 'ml-2' : 'mr-2'"
-                      >mdi-message-star-outline</v-icon
+                    <v-btn
+                      v-if="
+                        ['completed', 'shipped', 'delivered'].includes(
+                          order.status
+                        )
+                      "
+                      block
+                      variant="text"
+                      color="grey-darken-2"
+                      class="rounded-lg font-weight-bold justify-start"
+                      size="small"
+                      prepend-icon="mdi-undo-variant"
+                      :loading="actionLoading === 'return_' + order.id"
+                      :disabled="
+                        order.return_request_status === 'pending' ||
+                        order.return_request_status === 'approved'
+                      "
+                      @click="openReturnDialog(order)"
                     >
-                    {{ $t("orders.rate_experience") }}
-                  </v-btn>
+                      {{
+                        order.return_request_status === "pending"
+                          ? $t("orders.return_review")
+                          : $t("orders.return_request")
+                      }}
+                    </v-btn>
+
+                    <v-btn
+                      v-if="
+                        order.status === 'delivered' ||
+                        order.status === 'completed'
+                      "
+                      block
+                      variant="tonal"
+                      color="primary"
+                      class="rounded-xl font-weight-bold mt-2"
+                      height="40"
+                      prepend-icon="mdi-message-star-outline"
+                      @click="rateOrder(order)"
+                    >
+                      {{ $t("orders.rate_experience") }}
+                    </v-btn>
+                  </div>
                 </div>
               </div>
             </div>
@@ -522,106 +627,25 @@
         <v-card-text>
           <v-timeline align="start" density="compact" truncate-line="both">
             <v-timeline-item
+              v-for="(st, i) in orderStory"
+              :key="i"
               :dot-color="
-                [
-                  'pending',
-                  'processing',
-                  'shipped',
-                  'delivered',
-                  'completed',
-                ].includes(selectedOrder?.status)
-                  ? 'success'
-                  : 'grey-lighten-2'
+                isStepCompleted(st.value) ? 'success' : 'grey-lighten-2'
               "
-              size="small"
+              :size="st.value === selectedOrder?.status ? 'large' : 'small'"
+              :icon="st.value === selectedOrder?.status ? st.icon : ''"
             >
               <div class="mb-4">
                 <div
                   class="font-weight-bold"
                   :class="
-                    selectedOrder?.status === 'pending' ? 'text-primary' : ''
+                    isStepCompleted(st.value) ? 'text-primary' : 'text-grey'
                   "
                 >
-                  {{ $t("orders.confirmed_status") }}
+                  {{ st.title }}
                 </div>
                 <div class="text-caption text-grey">
-                  {{ $t("orders.confirmed_hint") }}
-                </div>
-              </div>
-            </v-timeline-item>
-
-            <v-timeline-item
-              :dot-color="
-                ['processing', 'shipped', 'delivered', 'completed'].includes(
-                  selectedOrder?.status
-                )
-                  ? 'success'
-                  : 'grey-lighten-2'
-              "
-              size="small"
-            >
-              <div class="mb-4">
-                <div
-                  class="font-weight-bold"
-                  :class="
-                    selectedOrder?.status === 'processing' ? 'text-primary' : ''
-                  "
-                >
-                  {{ $t("orders.processing_status") }}
-                </div>
-                <div class="text-caption text-grey">
-                  {{ $t("orders.processing_hint") }}
-                </div>
-              </div>
-            </v-timeline-item>
-
-            <v-timeline-item
-              :dot-color="
-                ['shipped', 'delivered', 'completed'].includes(
-                  selectedOrder?.status
-                )
-                  ? 'primary'
-                  : 'grey-lighten-2'
-              "
-              size="large"
-              icon="mdi-truck"
-            >
-              <div class="mb-4">
-                <div
-                  class="font-weight-bold"
-                  :class="
-                    selectedOrder?.status === 'shipped' ? 'text-primary' : ''
-                  "
-                >
-                  {{ $t("orders.shipped_status") }}
-                </div>
-                <div class="text-caption text-grey">
-                  {{ $t("orders.shipped_hint") }}
-                </div>
-              </div>
-            </v-timeline-item>
-
-            <v-timeline-item
-              :dot-color="
-                ['delivered', 'completed'].includes(selectedOrder?.status)
-                  ? 'success'
-                  : 'grey-lighten-2'
-              "
-              size="small"
-            >
-              <div class="mb-4">
-                <div
-                  class="font-weight-bold"
-                  :class="
-                    ['delivered', 'completed'].includes(selectedOrder?.status)
-                      ? 'text-primary'
-                      : 'text-grey'
-                  "
-                >
-                  {{ $t("orders.delivered_status") }}
-                </div>
-                <div class="text-caption text-grey">
-                  {{ $t("orders.delivered_hint") }}
+                  {{ st.hint }}
                 </div>
               </div>
             </v-timeline-item>
@@ -768,7 +792,9 @@ import { useI18n } from "vue-i18n";
 const { locale, t } = useI18n();
 import axios from "@/axios";
 import { useRouter } from "vue-router";
+import { AddInCart } from "../../store/Cart";
 
+const cartStore = AddInCart();
 const router = useRouter();
 const emitter = inject("emitter");
 
@@ -804,6 +830,46 @@ const returnReasonOptions = computed(() => [
   { title: t("orders.reason_changed_mind"), value: "CHANGED_MIND" },
   { title: t("orders.reason_other"), value: "OTHER" },
 ]);
+
+const orderStory = computed(() => [
+  {
+    title: t("orders.confirmed_status"),
+    hint: t("orders.confirmed_hint"),
+    value: "pending",
+    icon: "mdi-check-decagram",
+  },
+  {
+    title: t("orders.processing_status"),
+    hint: t("orders.processing_hint"),
+    value: "processing",
+    icon: "mdi-cog-sync",
+  },
+  {
+    title: t("orders.shipped_status"),
+    hint: t("orders.shipped_hint"),
+    value: "shipped",
+    icon: "mdi-truck-fast",
+  },
+  {
+    title: t("orders.delivered_status"),
+    hint: t("orders.delivered_hint"),
+    value: "completed",
+    icon: "mdi-package-variant-closed-check",
+  },
+]);
+
+const isStepCompleted = (statusValue) => {
+  if (!selectedOrder.value) return false;
+  const currentStatusEn = selectedOrder.value.status;
+  const statusLevels = {
+    pending: 1,
+    processing: 2,
+    shipped: 3,
+    delivered: 4,
+    completed: 4,
+  };
+  return statusLevels[statusValue] <= statusLevels[currentStatusEn];
+};
 
 const fetchOrders = async (showLoading = true) => {
   if (showLoading) loading.value = true;
@@ -856,7 +922,8 @@ const getOrderTheme = (status) => {
   if (status === "delivered" || status === "completed")
     return {
       text: t("orders.delivered"),
-      headerClass: "bg-green-lighten-5 border-green-lighten-4 border-b",
+      headerClass: "bg-green-lighten-5",
+      headerBorder: "border-green-lighten-4",
       iconBg: "green-lighten-4",
       iconColor: "green-darken-3",
       icon: "mdi-check-decagram",
@@ -865,16 +932,28 @@ const getOrderTheme = (status) => {
   if (status === "shipped")
     return {
       text: t("orders.shipped"),
-      headerClass: "bg-blue-lighten-5 border-blue-lighten-4 border-b",
+      headerClass: "bg-blue-lighten-5",
+      headerBorder: "border-blue-lighten-4",
       iconBg: "blue-lighten-4",
       iconColor: "blue-darken-3",
       icon: "mdi-truck-fast",
       textColor: "text-blue-darken-4",
     };
+  if (status === "processing")
+    return {
+      text: t("orders.processing"),
+      headerClass: "bg-indigo-lighten-5",
+      headerBorder: "border-indigo-lighten-4",
+      iconBg: "indigo-lighten-4",
+      iconColor: "indigo-darken-3",
+      icon: "mdi-cog-sync",
+      textColor: "text-indigo-darken-4",
+    };
   if (status === "cancelled")
     return {
       text: t("orders.cancelled"),
-      headerClass: "bg-red-lighten-5 border-red-lighten-4 border-b",
+      headerClass: "bg-red-lighten-5",
+      headerBorder: "border-red-lighten-4",
       iconBg: "red-lighten-4",
       iconColor: "red-darken-3",
       icon: "mdi-cancel",
@@ -883,7 +962,8 @@ const getOrderTheme = (status) => {
   if (status === "returned")
     return {
       text: t("orders.returned"),
-      headerClass: "bg-grey-lighten-3 border-grey-lighten-2 border-b",
+      headerClass: "bg-grey-lighten-3",
+      headerBorder: "border-grey-lighten-2",
       iconBg: "grey-lighten-2",
       iconColor: "grey-darken-3",
       icon: "mdi-keyboard-return",
@@ -892,7 +972,8 @@ const getOrderTheme = (status) => {
   // default / pending
   return {
     text: t("orders.pending"),
-    headerClass: "bg-primary-lighten-5 border-primary-lighten-4 border-b",
+    headerClass: "bg-primary-lighten-5",
+    headerBorder: "border-primary-lighten-4",
     iconBg: "primary-lighten-4",
     iconColor: "primary-darken-3",
     icon: "mdi-package-variant-closed",
@@ -936,8 +1017,84 @@ watch([tab, selectedPeriod], () => {
   fetchOrders();
 });
 
-const printInvoice = () => {
-  window.print();
+const printInvoice = (order) => {
+  const invoiceHtml = document.getElementById(`invoice-${order.id}`).innerHTML;
+  const printWindow = window.open("", "_blank", "height=600,width=800");
+
+  printWindow.document.write(`
+    <html dir="${locale.value === "ar" ? "rtl" : "ltr"}">
+      <head>
+        <title>Invoice - ${order.order_number}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+          body { 
+            font-family: 'Cairo', sans-serif; 
+            padding: 40px; 
+            color: #333;
+            background: #fff;
+          }
+          .invoice-container { display: block !important; }
+          .text-primary { color: #1976D2 !important; }
+          .invoice-header { margin-bottom: 40px; }
+          .d-flex { display: flex; }
+          .justify-space-between { justify-content: space-between; }
+          .align-center { align-items: center; }
+          .mb-6 { margin-bottom: 24px; }
+          .invoice-table { width: 100%; border-collapse: collapse; margin: 30px 0; border: 1px solid #eee; }
+          .invoice-table th { background: #f8fafc; padding: 15px; border: 1px solid #eee; text-align: ${
+            locale.value === "ar" ? "right" : "left"
+          }; font-weight: bold; }
+          .invoice-table td { padding: 15px; border: 1px solid #eee; text-align: ${
+            locale.value === "ar" ? "right" : "left"
+          }; }
+          .text-center { text-align: center !important; }
+          .text-left { text-align: ${
+            locale.value === "ar" ? "left" : "right"
+          } !important; }
+          .invoice-footer { margin-top: 40px; }
+          .summary-line { padding: 10px 0; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; }
+          .final-total { font-size: 24px; font-weight: 800; color: #1976D2 !important; border-bottom: none; }
+          @media print {
+            body { padding: 20px; }
+          }
+        </style>
+      </head>
+      <body>
+        ${invoiceHtml}
+        <script>
+          window.onload = function() { 
+            setTimeout(() => {
+              window.print(); 
+              window.close(); 
+            }, 500);
+          };
+        </scrip' + 't>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
+
+const buyAgain = async (item) => {
+  actionLoading.value = "add_to_cart_" + item.id;
+  try {
+    // AddInCartItem expects a product object
+    await cartStore.AddInCartItem({
+      id: item.product_id,
+      title: item.name,
+      price: item.price,
+      thumbnail: item.image,
+      quantity: 1,
+    });
+    emitter.emit("showMessage", {
+      text: t("orders.add_to_cart_success"),
+      color: "success",
+    });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    actionLoading.value = null;
+  }
 };
 
 const trackOrder = (order) => {
@@ -1125,6 +1282,25 @@ const submitRating = async (productId) => {
   overflow: hidden;
 }
 
+.pulse-icon {
+  animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+}
+
 .action-panel {
   min-width: 300px;
   padding: 24px;
@@ -1146,6 +1322,41 @@ const submitRating = async (productId) => {
   .modern-search,
   .modern-select {
     max-width: 100% !important;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .v-app-bar,
+  .v-footer,
+  .orders-page > .v-container > *:not(.order-card),
+  .action-panel,
+  .modern-tabs,
+  .filter-card,
+  .order-header v-btn,
+  .order-items-list h4,
+  .product-row v-btn,
+  .no-print {
+    display: none !important;
+  }
+
+  .orders-page {
+    background-color: white !important;
+    padding: 0 !important;
+  }
+
+  .order-card {
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .invoice-container {
+    display: block !important;
+    padding: 20px;
+    background: white;
   }
 }
 </style>

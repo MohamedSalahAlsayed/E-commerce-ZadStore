@@ -18,6 +18,11 @@ export const AddInCart = defineStore("AddInCart", {
         const res = await api.get("/user/cart");
         this.CartItem = res.data.map((item) => ({
           ...item.product,
+          discountPercentage: Number(
+            item.product.discount_percentage ||
+              item.product.discountPercentage ||
+              0
+          ),
           quantity: item.quantity,
           cart_id: item.id,
         }));

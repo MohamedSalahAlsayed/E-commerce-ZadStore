@@ -5,7 +5,7 @@
       <v-img
         :src="getImageUrl(product.thumbnail || product.image)"
         :alt="product.title || product.name"
-        height="260"
+        height="240"
         cover
         class="bg-grey-lighten-4 product-img"
       >
@@ -28,7 +28,7 @@
           @click.stop="QuickVeiw.open(product.id)"
           variant="flat"
         >
-          <v-icon size="20" class="ml-2">mdi-eye-outline</v-icon>
+          <v-icon size="18" class="ml-1">mdi-eye</v-icon>
           نظرة سريعة
         </v-btn>
       </div>
@@ -40,7 +40,7 @@
           :class="{ active: isFavourite(product.id) }"
           @click.stop="toggleFavourite(product)"
         >
-          <v-icon size="22">
+          <v-icon size="20">
             {{ isFavourite(product.id) ? "mdi-heart" : "mdi-heart-outline" }}
           </v-icon>
         </button>
@@ -63,51 +63,40 @@
     </div>
 
     <!-- Details Content -->
-    <v-card-text class="product-content pa-4 pt-5 d-flex flex-column">
-      <div class="category-text mb-2">{{ product.category || "العام" }}</div>
+    <v-card-text class="product-content pa-4 d-flex flex-column">
+      <div class="category-text mb-1">{{ product.category || "العام" }}</div>
 
       <h3 class="product-title mb-2" @click="showDetails(product)">
         {{ product.title || product.name }}
       </h3>
 
-      <div class="d-flex align-center mb-4">
+      <div class="d-flex align-center mb-3">
         <v-rating
           :model-value="Number(product.rating || product.avg_rating || 0)"
           readonly
-          color="amber-darken-2"
+          color="amber-darken-1"
+          active-color="amber-darken-2"
           density="compact"
           half-increments
-          size="14"
+          size="16"
         ></v-rating>
-        <span class="rating-count mr-2" style="font-size: 11px; color: #777">
+        <span class="rating-count mr-2">
           ({{ Number(product.rating || 0).toFixed(1) }})
         </span>
       </div>
 
       <!-- Price Section -->
-      <div
-        class="mt-auto pt-3"
-        style="border-top: 1px solid rgba(0, 0, 0, 0.05)"
-      >
-        <div class="price-wrapper d-flex flex-column">
-          <del
+      <div class="mt-auto pt-2">
+        <div class="price-wrapper d-flex align-end gap-2">
+          <span class="current-price">
+            {{ getDiscountedPrice(product) }} <small>ج.م</small>
+          </span>
+          <span
             v-if="product.discountPercentage || product.discount_percentage"
-            class="old-price mb-1"
-            style="font-size: 13px; color: #999"
+            class="old-price"
           >
             {{ Number(product.price).toLocaleString() }} ج.م
-          </del>
-          <div
-            class="current-price d-flex align-end gap-1"
-            style="line-height: 1"
-          >
-            <span style="font-size: 24px; font-weight: 900">
-              {{ getDiscountedPrice(product) }}
-            </span>
-            <small style="font-size: 14px; font-weight: 800; margin-bottom: 2px"
-              >ج.م</small
-            >
-          </div>
+          </span>
         </div>
       </div>
     </v-card-text>
@@ -249,32 +238,29 @@ const showDetails = (product) => {
 .product-card {
   position: relative;
   background: white;
-  border-radius: 20px !important;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  border: 1px solid rgba(0, 0, 0, 0.03) !important;
+  border-radius: 16px !important;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid #eee !important;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
-  border-color: rgba(var(--v-theme-primary), 0.15) !important;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
 }
 
 /* ================= Media Section ================= */
 .card-media-wrapper {
   position: relative;
   overflow: hidden;
-  border-radius: 20px 20px 0 0;
 }
 
 .product-img {
-  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+  transition: transform 0.8s ease;
 }
 
 .product-card:hover .product-img {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .media-overlay {
@@ -283,13 +269,12 @@ const showDetails = (product) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  backdrop-filter: blur(2px);
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
   z-index: 2;
 }
 
@@ -301,154 +286,115 @@ const showDetails = (product) => {
   background: white !important;
   color: black !important;
   border-radius: 50px !important;
-  font-weight: 900 !important;
-  padding: 0 28px !important;
-  height: 46px !important;
-  font-size: 13px !important;
-  transform: translateY(20px);
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
-}
-
-.product-card:hover .quick-view-btn {
-  transform: translateY(0);
+  font-weight: 800 !important;
+  padding: 0 20px !important;
+  height: 40px !important;
 }
 
 /* ================= Badge System ================= */
 .badge-container {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 12px;
+  right: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   z-index: 3;
 }
 
 .discount-badge {
-  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  background: #ff4757;
   color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 900;
-  font-size: 13px;
-  box-shadow: 0 5px 15px rgba(255, 71, 87, 0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
 }
 
 .new-badge {
-  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  background: #2ecc71;
   color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 900;
-  font-size: 13px;
-  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 12px;
 }
 
 /* ================= Floating Actions ================= */
 .floating-actions {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 12px;
+  left: 12px;
   z-index: 3;
 }
 
 .action-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: white;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
   color: #444;
 }
 
 .action-btn:hover {
-  transform: rotate(10deg) scale(1.1);
-  background: white;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+  color: #ff4757;
 }
 
-.action-btn.active {
+.action-btn.fav-btn.active {
   color: #ff4757;
-  background: white;
-  border-color: rgba(255, 71, 87, 0.2);
 }
 
 /* ================= Content Section ================= */
 .category-text {
-  font-size: 10px;
-  color: #fb923c;
-  font-weight: 900;
+  font-size: 11px;
+  color: #999;
+  font-weight: 700;
   text-transform: uppercase;
-  background: rgba(251, 146, 60, 0.1);
-  padding: 3px 10px;
-  border-radius: 6px;
-  letter-spacing: 0.5px;
-  display: inline-block;
-  width: fit-content;
 }
 
 .product-title {
-  font-size: 17px;
-  font-weight: 900;
-  color: #1a1a1a;
-  line-height: 1.5;
-  height: 50px;
-  overflow: hidden;
-  cursor: pointer;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.product-title:hover {
-  color: rgb(var(--v-theme-primary));
+  font-size: 16px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.4;
+  height: 44px;
 }
 
 .current-price {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
-  color: #ff4757 !important;
+  color: rgb(var(--v-theme-primary));
 }
 
 .old-price {
   font-size: 14px;
-  color: #999;
+  color: #aaa;
   text-decoration: line-through;
 }
 
-/* ================= Buttons ================= */
+/* ================= Professional Solid Buttons ================= */
 .add-to-cart-btn {
-  border-radius: 14px !important;
+  border-radius: 10px !important;
   font-weight: 900 !important;
-  font-size: 14px !important;
-  letter-spacing: 0.5px !important;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
+  transition: all 0.2s ease !important;
   text-transform: none !important;
-  box-shadow: 0 4px 15px rgba(var(--v-theme-primary), 0.2) !important;
 }
 
 .add-to-cart-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(var(--v-theme-primary), 0.35) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(var(--v-theme-primary), 0.25) !important;
 }
 
 .details-icon-btn {
   border: 1px solid rgba(var(--v-theme-primary), 0.1) !important;
-  background: rgba(var(--v-theme-primary), 0.03) !important;
-  border-radius: 14px !important;
-}
-
-.details-icon-btn:hover {
-  background: rgba(var(--v-theme-primary), 0.08) !important;
-  transform: translateY(-2px);
 }
 
 /* Tooltip */

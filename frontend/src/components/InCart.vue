@@ -147,7 +147,10 @@
           </div>
 
           <div class="text-primary font-weight-black mt-1 text-body-1">
-            {{ item.price }} ج.م
+            {{
+              Math.ceil(item.price * (1 - (item.discountPercentage || 0) / 100))
+            }}
+            ج.م
           </div>
 
           <div class="d-flex align-center justify-space-between mt-auto pt-2">
@@ -181,7 +184,14 @@
             </div>
 
             <div class="text-caption text-grey-darken-1 font-weight-bold">
-              {{ item.price * item.quantity }} ج.م
+              {{
+                Math.ceil(
+                  item.price *
+                    (1 - (item.discountPercentage || 0) / 100) *
+                    item.quantity
+                )
+              }}
+              ج.م
             </div>
           </div>
         </div>
@@ -238,15 +248,19 @@
 import { computed, defineEmits } from "vue";
 import { useI18n } from "vue-i18n";
 import { AddInCart } from "@/store/Cart";
+import { useSettingsStore } from "@/store/Settings";
 
 const { locale } = useI18n();
 const cartStore = AddInCart();
+const settingsStore = useSettingsStore();
 
 // Using computed so we don't lose reactivity when Pinia overwrites the array during fetch!
 const CartItem = computed(() => cartStore.CartItem);
 
 // Threshold for free shipping
-const FREE_SHIPPING_THRESHOLD = 1000;
+const FREE_SHIPPING_THRESHOLD = computed(
+  () => settingsStore.freeShippingThreshold || 1000
+);
 
 // زيادة كمية
 const increase = (item) => {
@@ -272,16 +286,25 @@ const totalItems = computed(() =>
 
 // إجمالي السعر
 const totalPrice = computed(() =>
-  CartItem.value.reduce((acc, item) => acc + item.price * item.quantity, 0)
+  CartItem.value.reduce(
+    (acc, item) =>
+      acc +
+      Math.ceil(item.price * (1 - (item.discountPercentage || 0) / 100)) *
+        item.quantity,
+    0
+  )
 );
 
 // Progress bar logic
 const freeShippingRemaining = computed(() => {
-  return Math.max(0, FREE_SHIPPING_THRESHOLD - totalPrice.value);
+  return Math.max(0, FREE_SHIPPING_THRESHOLD.value - totalPrice.value);
 });
 
 const progressPercent = computed(() => {
-  return Math.min(100, (totalPrice.value / FREE_SHIPPING_THRESHOLD) * 100);
+  return Math.min(
+    100,
+    (totalPrice.value / FREE_SHIPPING_THRESHOLD.value) * 100
+  );
 });
 
 // Dynamic icon position style depending on language RTL/LTR

@@ -69,7 +69,12 @@
                 </div>
                 <div class="d-flex align-center mt-2">
                   <span class="text-h6 text-primary font-weight-black"
-                    >{{ item.price }} {{ $t("products.currency") }}</span
+                    >{{
+                      Math.ceil(
+                        item.price * (1 - (item.discountPercentage || 0) / 100)
+                      )
+                    }}
+                    {{ $t("products.currency") }}</span
                   >
                 </div>
               </v-col>
@@ -101,6 +106,7 @@
                     density="compact"
                     size="small"
                     @click="updateQuantity(item, 1)"
+                    :disabled="item.quantity >= (item.stock || 999)"
                   ></v-btn>
                 </div>
               </v-col>
@@ -138,9 +144,45 @@
 
             <div class="d-flex justify-space-between mb-4 text-body-1">
               <span class="text-grey-darken-1">{{ $t("cart.shipping") }}</span>
-              <v-chip size="small" color="success" variant="flat">{{
-                $t("cart.free_shipping")
-              }}</v-chip>
+              <v-chip
+                v-if="freeShippingReached"
+                size="small"
+                color="success"
+                variant="flat"
+                >{{ $t("cart.free_shipping") }}</v-chip
+              >
+              <span v-else class="text-caption text-grey-darken-1">{{
+                locale === "ar" ? "يُحسب عند الدفع" : "Calculated at checkout"
+              }}</span>
+            </div>
+
+            <!-- Free Shipping Progress -->
+            <div class="mt-4 mb-2">
+              <div
+                class="d-flex justify-space-between text-caption font-weight-bold mb-1"
+                :class="freeShippingReached ? 'text-success' : 'text-primary'"
+              >
+                <span>{{
+                  freeShippingReached
+                    ? locale === "ar"
+                      ? "تهانينا! لقد حصلت على شحن مجاني"
+                      : "Congratulations! You get Free Shipping"
+                    : locale === "ar"
+                    ? `أضف ${amountNeededForFreeShipping} ${$t(
+                        "products.currency"
+                      )} للشحن المجاني`
+                    : `Add ${amountNeededForFreeShipping} ${$t(
+                        "products.currency"
+                      )} for Free Shipping`
+                }}</span>
+              </div>
+              <v-progress-linear
+                :model-value="freeShippingProgress"
+                :color="freeShippingReached ? 'success' : 'primary'"
+                height="8"
+                rounded
+                striped
+              ></v-progress-linear>
             </div>
 
             <v-divider class="my-6"></v-divider>
@@ -185,16 +227,24 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 const { locale } = useI18n();
 import { AddInCart } from "@/store/Cart";
+import { useSettingsStore } from "@/store/Settings";
 import { useRouter } from "vue-router";
 
 // 1. Store Setup
 const cartStore = AddInCart();
+const settingsStore = useSettingsStore();
 const cartItems = computed(() => cartStore.CartItem || []);
 const router = useRouter();
+
+onMounted(async () => {
+  if (!settingsStore.freeShippingThreshold) {
+    await settingsStore.fetchSettings();
+  }
+});
 
 // 2. State Variables
 const isLoading = ref(false);
@@ -215,13 +265,33 @@ const handleCheckoutAction = () => {
 
 // 5. Calculations
 const cartTotal = computed(() => {
-  return cartItems.value
-    .reduce((total, item) => total + item.price * item.quantity, 0)
-    .toFixed(2);
+  return cartItems.value.reduce(
+    (total, item) =>
+      total +
+      Math.ceil(item.price * (1 - (item.discountPercentage || 0) / 100)) *
+        item.quantity,
+    0
+  );
 });
 
 const finalTotal = computed(() => {
   return parseFloat(cartTotal.value).toFixed(2);
+});
+
+const freeShippingThreshold = computed(
+  () => settingsStore.freeShippingThreshold || 0
+);
+
+const freeShippingProgress = computed(() => {
+  if (freeShippingThreshold.value <= 0) return 100;
+  return Math.min(100, (cartTotal.value / freeShippingThreshold.value) * 100);
+});
+
+const freeShippingReached = computed(() => freeShippingProgress.value >= 100);
+
+const amountNeededForFreeShipping = computed(() => {
+  const needed = freeShippingThreshold.value - cartTotal.value;
+  return needed > 0 ? parseFloat(needed).toFixed(2) : 0;
 });
 </script>
 

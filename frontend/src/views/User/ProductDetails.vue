@@ -155,7 +155,7 @@
             >
               <div class="d-flex align-end gap-3 flex-wrap mb-2">
                 <span class="final-display-price">
-                  {{ discountedPrice.toLocaleString() }}
+                  {{ (discountedPrice * quantity).toLocaleString() }}
                   <small>ج.م</small>
                 </span>
                 <del
@@ -163,7 +163,9 @@
                   class="original-display-price"
                 >
                   {{
-                    Number(productDetails.productDetails.price).toLocaleString()
+                    Number(
+                      productDetails.productDetails.price * quantity
+                    ).toLocaleString()
                   }}
                   ج.م
                 </del>
@@ -175,7 +177,8 @@
                 وفرت
                 {{
                   (
-                    productDetails.productDetails.price - discountedPrice
+                    (productDetails.productDetails.price - discountedPrice) *
+                    quantity
                   ).toLocaleString()
                 }}
                 ج.م من السعر الأصلي

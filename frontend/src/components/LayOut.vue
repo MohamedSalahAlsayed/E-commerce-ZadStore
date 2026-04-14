@@ -8,19 +8,19 @@
       <slot></slot>
     </v-main>
 
-    <FooterApp v-if="!$route.meta.hideNavFooter" />
+    <GuestFooter v-if="!$route.meta.hideNavFooter" />
   </div>
 </template>
 
 <script>
 import NavApp from "./NavApp.vue";
-import FooterApp from "./FooterApp.vue";
+import GuestFooter from "./GuestFooter.vue";
 import DroWer from "./DroWer.vue";
 
 export default {
   components: {
     NavApp,
-    FooterApp,
+    GuestFooter,
     DroWer,
   },
 };

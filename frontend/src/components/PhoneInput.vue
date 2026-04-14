@@ -3,7 +3,7 @@
     v-model="phoneNumber"
     :label="label"
     :placeholder="placeholder"
-    :rules="rules"
+    :rules="combinedRules"
     variant="outlined"
     density="comfortable"
     color="primary"
@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 
 const props = defineProps({
   modelValue: {
@@ -75,28 +75,38 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const countries = [
-  { name: "مصر", code: "EG", dialCode: "+20", flag: "🇪🇬" },
-  { name: "السعودية", code: "SA", dialCode: "+966", flag: "🇸🇦" },
-  { name: "الإمارات", code: "AE", dialCode: "+971", flag: "🇦🇪" },
-  { name: "الكويت", code: "KW", dialCode: "+965", flag: "🇰🇼" },
-  { name: "قطر", code: "QA", dialCode: "+974", flag: "🇶🇦" },
-  { name: "عمان", code: "OM", dialCode: "+968", flag: "🇴🇲" },
-  { name: "البحرين", code: "BH", dialCode: "+973", flag: "🇧🇭" },
-  { name: "الأردن", code: "JO", dialCode: "+962", flag: "🇯🇴" },
-  { name: "فلسطين", code: "PS", dialCode: "+970", flag: "🇵🇸" },
-  { name: "لبنان", code: "LB", dialCode: "+961", flag: "🇱🇧" },
-  { name: "سوريا", code: "SY", dialCode: "+963", flag: "🇸🇾" },
-  { name: "العراق", code: "IQ", dialCode: "+964", flag: "🇮🇶" },
-  { name: "المغرب", code: "MA", dialCode: "+212", flag: "🇲🇦" },
-  { name: "تونس", code: "TN", dialCode: "+216", flag: "🇹🇳" },
-  { name: "الجزائر", code: "DZ", dialCode: "+213", flag: "🇩🇿" },
-  { name: "ليبيا", code: "LY", dialCode: "+218", flag: "🇱🇾" },
-  { name: "السودان", code: "SD", dialCode: "+249", flag: "🇸🇩" },
-  { name: "اليمن", code: "YE", dialCode: "+967", flag: "🇾🇪" },
+  { name: "مصر", code: "EG", dialCode: "+20", flag: "🇪🇬", length: 10 },
+  { name: "السعودية", code: "SA", dialCode: "+966", flag: "🇸🇦", length: 9 },
+  { name: "الإمارات", code: "AE", dialCode: "+971", flag: "🇦🇪", length: 9 },
+  { name: "الكويت", code: "KW", dialCode: "+965", flag: "🇰🇼", length: 8 },
+  { name: "قطر", code: "QA", dialCode: "+974", flag: "🇶🇦", length: 8 },
+  { name: "عمان", code: "OM", dialCode: "+968", flag: "🇴🇲", length: 8 },
+  { name: "البحرين", code: "BH", dialCode: "+973", flag: "🇧🇭", length: 8 },
+  { name: "الأردن", code: "JO", dialCode: "+962", flag: "🇯🇴", length: 9 },
+  { name: "فلسطين", code: "PS", dialCode: "+970", flag: "🇵🇸", length: 9 },
+  { name: "لبنان", code: "LB", dialCode: "+961", flag: "🇱🇧", length: 8 },
+  { name: "سوريا", code: "SY", dialCode: "+963", flag: "🇸🇾", length: 9 },
+  { name: "العراق", code: "IQ", dialCode: "+964", flag: "🇮🇶", length: 10 },
+  { name: "المغرب", code: "MA", dialCode: "+212", flag: "🇲🇦", length: 9 },
+  { name: "تونس", code: "TN", dialCode: "+216", flag: "🇹🇳", length: 8 },
+  { name: "الجزائر", code: "DZ", dialCode: "+213", flag: "🇩🇿", length: 9 },
+  { name: "ليبيا", code: "LY", dialCode: "+218", flag: "🇱🇾", length: 9 },
+  { name: "السودان", code: "SD", dialCode: "+249", flag: "🇸🇩", length: 9 },
+  { name: "اليمن", code: "YE", dialCode: "+967", flag: "🇾🇪", length: 9 },
 ];
 
 const menu = ref(false);
 const selectedCountry = ref(countries[0]);
+
+const combinedRules = computed(() => {
+  const internalRules = [
+    (v) => !!v || "رقم الهاتف مطلوب",
+    (v) =>
+      (v && v.length === selectedCountry.value.length) ||
+      `الرقم يجب أن يكون ${selectedCountry.value.length} أرقام لـ ${selectedCountry.value.name}`,
+  ];
+  return [...internalRules, ...props.rules];
+});
 
 // Parse initial value if it contains a dial code
 const getInitialValue = () => {

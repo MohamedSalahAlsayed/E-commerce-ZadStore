@@ -125,11 +125,12 @@
                       <span class="text-h4 font-weight-black text-primary">
                         {{
                           Math.ceil(
-                            productDetails.productDetails.price -
+                            (productDetails.productDetails.price -
                               productDetails.productDetails.price *
                                 (productDetails.productDetails
                                   .discountPercentage /
-                                  100)
+                                  100)) *
+                              quantity
                           ).toLocaleString()
                         }}
                         <small class="text-h6">ج.م</small>
@@ -140,7 +141,7 @@
                       >
                         {{
                           Number(
-                            productDetails.productDetails.price
+                            productDetails.productDetails.price * quantity
                           ).toLocaleString()
                         }}
                         ج.م
@@ -155,7 +156,8 @@
                         Math.ceil(
                           productDetails.productDetails.price *
                             (productDetails.productDetails.discountPercentage /
-                              100)
+                              100) *
+                            quantity
                         ).toLocaleString()
                       }}
                       ج.م

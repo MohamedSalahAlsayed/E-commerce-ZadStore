@@ -241,9 +241,8 @@
                       >
                         {{
                           Math.ceil(
-                            item.price -
-                              item.price *
-                                ((item.discountPercentage || 0) / 100)
+                            item.price *
+                              (1 - (item.discountPercentage || 0) / 100)
                           )
                         }}
                         {{ $t("products.currency") }}
@@ -342,12 +341,38 @@
                 <span class="text-body-2">{{
                   $t("checkout.shipping_delivery")
                 }}</span>
-                <span class="text-body-2" v-if="selectedZone"
-                  >{{ shippingCost }} {{ $t("products.currency") }}</span
-                >
-                <span class="text-caption text-error font-weight-bold" v-else>{{
-                  $t("checkout.select_zone_first")
-                }}</span>
+                <div class="d-flex flex-column align-end">
+                  <span
+                    class="text-body-2 font-weight-bold"
+                    :class="{ 'text-success': isFreeShipping }"
+                  >
+                    <template v-if="isFreeShipping">
+                      {{ locale === "ar" ? "شحن مجاني" : "Free Shipping" }}
+                    </template>
+                    <template v-else-if="selectedZone">
+                      {{ shippingCost }} {{ $t("products.currency") }}
+                    </template>
+                    <template v-else>
+                      {{ $t("checkout.select_zone_first") }}
+                    </template>
+                  </span>
+                  <span
+                    v-if="
+                      !isFreeShipping && settingsStore.freeShippingThreshold
+                    "
+                    class="text-caption text-grey"
+                  >
+                    {{
+                      locale === "ar"
+                        ? `أضف بقيمة ${
+                            settingsStore.freeShippingThreshold - subtotal
+                          } ج.م للحصول على شحن مجاني`
+                        : `Add ${
+                            settingsStore.freeShippingThreshold - subtotal
+                          } EGP for free shipping`
+                    }}
+                  </span>
+                </div>
               </div>
 
               <v-divider class="mb-4"></v-divider>
@@ -386,6 +411,7 @@ import { useRouter } from "vue-router";
 import { AddInCart } from "../../store/Cart";
 import api from "../../axios";
 import { useAuthStore } from "@/store/auth/LogIn";
+import { useSettingsStore } from "@/store/Settings";
 import { inject } from "vue";
 import PhoneInput from "@/components/PhoneInput.vue";
 
@@ -394,6 +420,7 @@ const emitter = inject("emitter");
 const router = useRouter();
 const cartStore = AddInCart();
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 
 const shippingZones = ref([]);
 const activeCoupon = ref(null);
@@ -431,6 +458,7 @@ onMounted(async () => {
   }
 
   try {
+    await settingsStore.fetchSettings();
     const res = await api.get("/shipping-zones");
     shippingZones.value = res.data;
   } catch (e) {
@@ -470,7 +498,7 @@ const cartItems = computed(() => cartStore.CartItem || []);
 const subtotal = computed(() => {
   return cartItems.value.reduce((total, item) => {
     const discountedPrice = Math.ceil(
-      item.price - item.price * ((item.discountPercentage || 0) / 100)
+      item.price * (1 - (item.discountPercentage || 0) / 100)
     );
     return total + discountedPrice * item.quantity;
   }, 0);
@@ -484,9 +512,15 @@ const selectedZone = computed(() => {
   );
 });
 
-const shippingCost = computed(() =>
-  selectedZone.value ? selectedZone.value.fee : 0
-);
+const isFreeShipping = computed(() => {
+  return subtotal.value >= (settingsStore.freeShippingThreshold || 1000);
+});
+
+const shippingCost = computed(() => {
+  if (!selectedZone.value || isFreeShipping.value) return 0;
+  return selectedZone.value.fee;
+});
+
 const total = computed(
   () => Math.max(0, subtotal.value - discountAmount.value) + shippingCost.value
 );

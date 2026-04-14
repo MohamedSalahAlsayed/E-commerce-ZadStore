@@ -294,6 +294,7 @@
     }
   },
   "products": {
+    "all_products": "All Products",
     "quick_view": "Quick View",
     "discount": "{percentage}% OFF",
     "stock": "Stock:",
@@ -473,6 +474,8 @@
     "delivered": "Delivered",
     "cancelled": "Cancelled",
     "returned": "Returned",
+    "processing": "Processing",
+    "add_to_cart_success": "Product added to cart successfully!",
     "search_placeholder": "Search order number or product...",
     "no_orders_found": "No matching orders found",
     "no_orders_hint": "Try changing filters or browse products to add new orders.",
@@ -980,7 +983,13 @@
     "shop": "Shop",
     "quick_links": "Quick Links",
     "all_rights_reserved": "All rights reserved {year} ©",
-    "description": "The best online shopping experience. Guaranteed products, great offers, and fast delivery everywhere. We always strive for your satisfaction."
+    "description": "The best online shopping experience. Guaranteed products, great offers, and fast delivery everywhere. We always strive for your satisfaction.",
+    "newsletter_title": "Join ZadStore Elite",
+    "newsletter_subtitle": "Be the first to get exclusive offers and rare items",
+    "email_placeholder": "Your Email Address",
+    "subscribe_btn": "Subscribe Now",
+    "shopping": "Premium Shopping",
+    "contact_us_label": "Contact Us"
   },
   "guest_nav": {
     "home": "Home",
@@ -998,6 +1007,7 @@
       "general": "Store Information",
       "contact": "Contact Details",
       "social": "Social Media",
+      "footer": "Footer Settings",
       "landing": "Guest Landing Page",
       "advanced": "System Settings"
     },
@@ -1020,6 +1030,15 @@
       "phone": "Customer Service Phone",
       "whatsapp": "WhatsApp Number",
       "address": "Physical Address (Headquarters)"
+    },
+    "footer": {
+      "title": "Footer Customization",
+      "about_label": "Footer 'About' Text",
+      "about_placeholder": "Write a short bio about the store that appears in the footer...",
+      "copyright_label": "Copyright Text",
+      "copyright_placeholder": "All rights reserved - ZadStore",
+      "show_social": "Show Social Media Links in Footer",
+      "show_contact": "Show Contact Info in Footer"
     },
     "social": {
       "title": "Social Media Links",

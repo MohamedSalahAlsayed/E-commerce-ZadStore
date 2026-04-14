@@ -6,56 +6,84 @@
   >
     <v-row>
       <v-col cols="12" md="4">
-        <v-card class="promo-card small-promo bg-blue-gradient">
+        <v-card
+          class="promo-card small-promo"
+          :class="`bg-${settingsStore.promoOffers.small1.color}-gradient`"
+        >
           <div class="promo-content">
-            <span class="promo-category">أجهزة ألعاب</span>
-            <h3 class="promo-title">اشتري 2 واحصل على 1</h3>
-            <span class="promo-offer">مجاناً</span>
+            <span class="promo-category">{{
+              settingsStore.promoOffers.small1.category
+            }}</span>
+            <h3 class="promo-title">
+              {{ settingsStore.promoOffers.small1.title }}
+            </h3>
+            <span class="promo-offer">{{
+              settingsStore.promoOffers.small1.offer
+            }}</span>
           </div>
-          <img
-            src="https://pngimg.com/uploads/gamepad/gamepad_PNG41.png"
-            class="promo-img small-img"
-          />
+          :src="settingsStore.promoOffers.small1.image" class="promo-img
+          small-img" />
         </v-card>
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card class="promo-card small-promo bg-purple-gradient">
+        <v-card
+          class="promo-card small-promo"
+          :class="`bg-${settingsStore.promoOffers.small2.color}-gradient`"
+        >
           <div class="promo-content">
-            <span class="promo-category">مكبرات صوت</span>
-            <h3 class="promo-title">خصم هائل يصل إلى</h3>
-            <span class="promo-offer">75%</span>
+            <span class="promo-category">{{
+              settingsStore.promoOffers.small2.category
+            }}</span>
+            <h3 class="promo-title">
+              {{ settingsStore.promoOffers.small2.title }}
+            </h3>
+            <span class="promo-offer">{{
+              settingsStore.promoOffers.small2.offer
+            }}</span>
           </div>
-          <img
-            src="https://pngimg.com/uploads/audio_speakers/audio_speakers_PNG50720.png"
-            class="promo-img small-img audio-img"
-          />
+          :src="settingsStore.promoOffers.small2.image" class="promo-img
+          small-img audio-img" />
         </v-card>
       </v-col>
 
       <v-col cols="12" md="4">
-        <v-card class="promo-card small-promo bg-green-gradient">
+        <v-card
+          class="promo-card small-promo"
+          :class="`bg-${settingsStore.promoOffers.small3.color}-gradient`"
+        >
           <div class="promo-content">
-            <span class="promo-category">كراسي استرخاء</span>
-            <h3 class="promo-title">تخفيضات مذهلة</h3>
-            <span class="promo-offer">50%</span>
+            <span class="promo-category">{{
+              settingsStore.promoOffers.small3.category
+            }}</span>
+            <h3 class="promo-title">
+              {{ settingsStore.promoOffers.small3.title }}
+            </h3>
+            <span class="promo-offer">{{
+              settingsStore.promoOffers.small3.offer
+            }}</span>
           </div>
-          <img
-            src="https://pngimg.com/uploads/armchair/armchair_PNG7048.png"
-            class="promo-img small-img chair-img"
-          />
+          :src="settingsStore.promoOffers.small3.image" class="promo-img
+          small-img chair-img" />
         </v-card>
       </v-col>
     </v-row>
 
     <v-row class="mt-4">
       <v-col cols="12" md="6">
-        <v-card class="promo-card large-promo bg-yellow-gradient">
+        <v-card
+          class="promo-card large-promo"
+          :class="`bg-${settingsStore.promoOffers.large1.color}-gradient`"
+        >
           <div class="promo-text">
-            <span class="promo-label text-white">الأكثر مبيعاً 🔥</span>
-            <h2 class="promo-title-large text-white">هاتف إكس برو</h2>
+            <span class="promo-label text-white">{{
+              settingsStore.promoOffers.large1.label
+            }}</span>
+            <h2 class="promo-title-large text-white">
+              {{ settingsStore.promoOffers.large1.title }}
+            </h2>
             <p class="promo-desc text-white">
-              أداء استثنائي وتصميم عصري يناسبك.
+              {{ settingsStore.promoOffers.large1.desc }}
             </p>
             <v-btn
               class="shop-btn font-weight-black mt-2"
@@ -68,19 +96,26 @@
             </v-btn>
           </div>
           <img
-            src="https://pngimg.com/uploads/smartphone/smartphone_PNG8514.png"
+            :src="settingsStore.promoOffers.large1.image"
             class="promo-img large-img phone-img"
           />
         </v-card>
       </v-col>
 
       <v-col cols="12" md="6">
-        <v-card class="promo-card large-promo bg-pink-gradient">
+        <v-card
+          class="promo-card large-promo"
+          :class="`bg-${settingsStore.promoOffers.large2.color}-gradient`"
+        >
           <div class="promo-text">
-            <span class="promo-label text-white">الأكثر شهرة ⭐</span>
-            <h2 class="promo-title-large text-white">لابتوب ألترا</h2>
+            <span class="promo-label text-white">{{
+              settingsStore.promoOffers.large2.label
+            }}</span>
+            <h2 class="promo-title-large text-white">
+              {{ settingsStore.promoOffers.large2.title }}
+            </h2>
             <p class="promo-desc text-white">
-              قوة هائلة تنجز كل مهامك اليومية بسهولة.
+              {{ settingsStore.promoOffers.large2.desc }}
             </p>
             <v-btn
               class="shop-btn font-weight-black mt-2"
@@ -93,7 +128,7 @@
             </v-btn>
           </div>
           <img
-            src="https://pngimg.com/uploads/macbook/macbook_PNG65.png"
+            :src="settingsStore.promoOffers.large2.image"
             class="promo-img large-img laptop-img"
           />
         </v-card>
@@ -105,9 +140,11 @@
 <script setup>
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { useSettingsStore } from "@/store/Settings";
 
 const { locale } = useI18n();
 const router = useRouter();
+const settingsStore = useSettingsStore();
 
 const handleShopClick = () => {
   if (!localStorage.getItem("auth_token")) {

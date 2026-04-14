@@ -199,11 +199,32 @@ class AdminSupplementalController extends Controller
         return response()->json($settings);
     }
     public function updateSettings(Request $request) {
-        $settings = $request->except('logo_file');
+        $settings = $request->except(['logo_file', 'promo_small1_img', 'promo_small2_img', 'promo_small3_img', 'promo_large1_img', 'promo_large2_img']);
         
         if ($request->hasFile('logo_file')) {
             $path = $request->file('logo_file')->store('settings', 'public');
             $settings['logoPreview'] = url('storage/' . $path);
+        }
+
+        // Handle Promo Offers distinct image uploads
+        if (isset($settings['promo_offers']) && is_string($settings['promo_offers'])) {
+            $promoOffers = json_decode($settings['promo_offers'], true);
+            $imgKeys = [
+                'promo_small1_img' => 'small1',
+                'promo_small2_img' => 'small2',
+                'promo_small3_img' => 'small3',
+                'promo_large1_img' => 'large1',
+                'promo_large2_img' => 'large2'
+            ];
+            foreach ($imgKeys as $fileKey => $jsonKey) {
+                if ($request->hasFile($fileKey)) {
+                    $path = $request->file($fileKey)->store('promos', 'public');
+                    if (isset($promoOffers[$jsonKey])) {
+                        $promoOffers[$jsonKey]['image'] = url('storage/' . $path);
+                    }
+                }
+            }
+            $settings['promo_offers'] = json_encode($promoOffers);
         }
 
         foreach ($settings as $key => $value) {

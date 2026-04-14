@@ -624,6 +624,15 @@
                           color="primary"
                           :label="$t('products_mang.fields.best_seller')"
                           hide-details
+                          class="mb-1"
+                        ></v-switch>
+                        <v-switch
+                          v-model="editedItem.isNew"
+                          color="success"
+                          :label="
+                            locale === 'ar' ? 'تمييز كمنتج جديد' : 'Mark as New'
+                          "
+                          hide-details
                         ></v-switch>
                       </v-card>
                     </v-col>
@@ -916,6 +925,7 @@ const defaultItem = {
   thumbnail: "",
   isFlashDeal: false,
   isBestSeller: false,
+  isNew: false,
   is_active: true,
   meta_title: "",
   meta_description: "",
@@ -990,6 +1000,7 @@ const editItem = (item) => {
     ...item,
     isFlashDeal: !!item.is_flash_deal,
     isBestSeller: !!item.is_best_seller,
+    isNew: !!item.is_new,
     meta_title: item.meta_title || "",
     meta_description: item.meta_description || "",
     meta_keywords: item.meta_keywords || "",
@@ -1028,6 +1039,7 @@ const saveItem = async () => {
     payload.append("stock", editedItem.value.stock || 0);
     payload.append("is_flash_deal", editedItem.value.isFlashDeal ? 1 : 0);
     payload.append("is_best_seller", editedItem.value.isBestSeller ? 1 : 0);
+    payload.append("is_new", editedItem.value.isNew ? 1 : 0);
     payload.append("meta_title", editedItem.value.meta_title || "");
     payload.append("meta_description", editedItem.value.meta_description || "");
     payload.append("meta_keywords", editedItem.value.meta_keywords || "");

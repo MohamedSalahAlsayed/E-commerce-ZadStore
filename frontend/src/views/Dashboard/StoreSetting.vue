@@ -80,6 +80,13 @@
               {{ $t("settings.tabs.social") }}
             </v-tab>
             <v-tab
+              value="footer"
+              class="text-right font-weight-bold d-flex justify-start px-6 py-3"
+            >
+              <v-icon right class="ml-3">mdi-page-layout-footer</v-icon>
+              {{ $t("settings.tabs.footer") }}
+            </v-tab>
+            <v-tab
               value="landing"
               class="text-right font-weight-bold d-flex justify-start px-6 py-3"
             >
@@ -93,6 +100,13 @@
               <v-icon right class="ml-3">mdi-tune-vertical</v-icon>
               {{ $t("settings.tabs.advanced") }}
             </v-tab>
+            <v-tab
+              value="promos"
+              class="text-right font-weight-bold d-flex justify-start px-6 py-3"
+            >
+              <v-icon right class="ml-3">mdi-star-shooting</v-icon>
+              عروض الواجهة (Top Offers)
+            </v-tab>
           </v-tabs>
 
           <v-window v-model="activeTab" class="flex-grow-1 pa-6">
@@ -101,8 +115,10 @@
                 'general',
                 'contact',
                 'social',
+                'footer',
                 'landing',
                 'advanced',
+                'promos',
               ]"
               :key="tab"
               :value="tab"
@@ -367,6 +383,67 @@
                         color="#1DA1F2"
                         dir="ltr"
                       ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </div>
+                <div v-else-if="activeTab === 'footer'">
+                  <h3
+                    class="text-h6 font-weight-bold mb-6"
+                    style="color: rgb(var(--v-theme-primary))"
+                  >
+                    {{ $t("settings.footer.title") }}
+                  </h3>
+                  <v-row v-if="isLoading">
+                    <v-col cols="12" md="6" v-for="i in 3" :key="i">
+                      <v-skeleton-loader type="list-item" />
+                    </v-col>
+                  </v-row>
+                  <v-row v-else>
+                    <v-col cols="12">
+                      <v-textarea
+                        v-model="settings.footerAbout"
+                        :label="$t('settings.footer.about_label')"
+                        :placeholder="$t('settings.footer.about_placeholder')"
+                        variant="outlined"
+                        color="primary"
+                        rows="3"
+                        prepend-inner-icon="mdi-text-box-outline"
+                      ></v-textarea>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                      <v-text-field
+                        v-model="settings.footerCopyright"
+                        :label="$t('settings.footer.copyright_label')"
+                        :placeholder="
+                          $t('settings.footer.copyright_placeholder')
+                        "
+                        variant="outlined"
+                        color="primary"
+                        prepend-inner-icon="mdi-copyright"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-divider class="my-4"></v-divider>
+                      <v-row>
+                        <v-col cols="12" md="6">
+                          <v-switch
+                            v-model="settings.footerShowSocial"
+                            :label="$t('settings.footer.show_social')"
+                            color="primary"
+                            inset
+                            hide-details
+                          ></v-switch>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                          <v-switch
+                            v-model="settings.footerShowContact"
+                            :label="$t('settings.footer.show_contact')"
+                            color="primary"
+                            inset
+                            hide-details
+                          ></v-switch>
+                        </v-col>
+                      </v-row>
                     </v-col>
                   </v-row>
                 </div>
@@ -929,6 +1006,19 @@
                         prepend-inner-icon="mdi-alert-box-outline"
                       ></v-text-field>
                     </v-col>
+                    <v-col cols="12" md="4">
+                      <v-text-field
+                        v-model.number="settings.freeShippingThreshold"
+                        :label="
+                          locale === 'ar' ? 'حد الشحن المجاني' : 'Free Shipping'
+                        "
+                        type="number"
+                        variant="outlined"
+                        color="primary"
+                        prepend-inner-icon="mdi-truck-check"
+                        prefix="ج.م"
+                      ></v-text-field>
+                    </v-col>
                   </v-row>
 
                   <v-divider class="my-6"></v-divider>
@@ -1002,6 +1092,172 @@
                     </div>
                   </v-card>
                 </div>
+                <div v-else-if="activeTab === 'promos'">
+                  <h3
+                    class="text-h6 font-weight-bold mb-4"
+                    style="color: rgb(var(--v-theme-primary))"
+                  >
+                    <v-icon left size="28" class="mr-2"
+                      >mdi-star-shooting</v-icon
+                    >
+                    تخصيص عروض الواجهة (5 كروت)
+                  </h3>
+                  <p class="text-subtitle-2 text-grey-darken-1 mb-6">
+                    يمكنك تعديل النصوص، الألوان، وصور كروت العروض الموجودة
+                    بالصفحة الرئيسية.
+                  </p>
+
+                  <!-- Small Promos -->
+                  <h4 class="font-weight-bold mb-4 mt-8 d-flex align-center">
+                    <v-icon color="secondary" class="mr-2"
+                      >mdi-numeric-3-box-multiple</v-icon
+                    >
+                    الكروت الصغيرة (العلوي)
+                  </h4>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="4"
+                      v-for="key in ['small1', 'small2', 'small3']"
+                      :key="key"
+                    >
+                      <v-card
+                        class="pa-4 border rounded-xl bg-grey-lighten-4"
+                        elevation="0"
+                      >
+                        <v-text-field
+                          v-model="settings.promoOffers[key].category"
+                          label="التصنيف (أصفر)"
+                          density="compact"
+                          variant="outlined"
+                          color="primary"
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="settings.promoOffers[key].title"
+                          label="العنوان الرئيسي"
+                          density="compact"
+                          variant="outlined"
+                          color="primary"
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="settings.promoOffers[key].offer"
+                          label="عرض مميز (خط كبير)"
+                          density="compact"
+                          variant="outlined"
+                          color="primary"
+                        ></v-text-field>
+                        <v-select
+                          v-model="settings.promoOffers[key].color"
+                          :items="['blue', 'purple', 'green', 'yellow', 'pink']"
+                          label="لون التدرج (الخلفية)"
+                          density="compact"
+                          variant="outlined"
+                        ></v-select>
+                        <div class="mb-2 d-flex align-center gap-2">
+                          <v-avatar size="32" class="border">
+                            <v-img
+                              :src="settings.promoOffers[key].image"
+                            ></v-img>
+                          </v-avatar>
+                          <v-file-input
+                            density="compact"
+                            variant="outlined"
+                            hide-details
+                            prepend-icon=""
+                            prepend-inner-icon="mdi-camera"
+                            label="تغيير الصورة"
+                            accept="image/*"
+                            @change="
+                              (e) => {
+                                if (key === 'small1')
+                                  promoSmall1Img = e.target.files[0];
+                                if (key === 'small2')
+                                  promoSmall2Img = e.target.files[0];
+                                if (key === 'small3')
+                                  promoSmall3Img = e.target.files[0];
+                              }
+                            "
+                          ></v-file-input>
+                        </div>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <!-- Large Promos -->
+                  <h4 class="font-weight-bold mb-4 mt-8 d-flex align-center">
+                    <v-icon color="secondary" class="mr-2"
+                      >mdi-dock-window</v-icon
+                    >
+                    الكروت الكبيرة (السفلي)
+                  </h4>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="6"
+                      v-for="key in ['large1', 'large2']"
+                      :key="key"
+                    >
+                      <v-card
+                        class="pa-4 border rounded-xl bg-grey-lighten-4"
+                        elevation="0"
+                      >
+                        <v-text-field
+                          v-model="settings.promoOffers[key].label"
+                          label="شارة (أعلى يمين مائلة)"
+                          density="compact"
+                          variant="outlined"
+                          color="primary"
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="settings.promoOffers[key].title"
+                          label="العنوان الرئيسي"
+                          density="compact"
+                          variant="outlined"
+                          color="primary"
+                        ></v-text-field>
+                        <v-textarea
+                          v-model="settings.promoOffers[key].desc"
+                          label="الوصف"
+                          density="compact"
+                          variant="outlined"
+                          color="primary"
+                          rows="2"
+                        ></v-textarea>
+                        <v-select
+                          v-model="settings.promoOffers[key].color"
+                          :items="['blue', 'purple', 'green', 'yellow', 'pink']"
+                          label="لون التدرج (الخلفية)"
+                          density="compact"
+                          variant="outlined"
+                        ></v-select>
+                        <div class="mb-2 d-flex align-center gap-2">
+                          <v-avatar size="32" class="border">
+                            <v-img
+                              :src="settings.promoOffers[key].image"
+                            ></v-img>
+                          </v-avatar>
+                          <v-file-input
+                            density="compact"
+                            variant="outlined"
+                            hide-details
+                            prepend-icon=""
+                            prepend-inner-icon="mdi-camera"
+                            label="تغيير الصورة"
+                            accept="image/*"
+                            @change="
+                              (e) => {
+                                if (key === 'large1')
+                                  promoLarge1Img = e.target.files[0];
+                                if (key === 'large2')
+                                  promoLarge2Img = e.target.files[0];
+                              }
+                            "
+                          ></v-file-input>
+                        </div>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+                </div>
               </v-container>
             </v-window-item>
           </v-window>
@@ -1057,11 +1313,59 @@ const settings = ref({
   taxRate: 0,
   orderPrefix: "ZAD-",
   lowStockThreshold: 5,
+  freeShippingThreshold: 1000,
   codEnabled: true,
   maintenanceMode: false,
   primaryColor: "#f97316",
+  footerCopyright: "",
+  footerShowSocial: true,
+  footerShowContact: true,
   guestHome: mergeGuestHome(null),
+  promoOffers: {
+    small1: {
+      category: "أجهزة ألعاب",
+      title: "اشتري 2 واحصل على 1",
+      offer: "مجاناً",
+      image: "https://pngimg.com/uploads/gamepad/gamepad_PNG41.png",
+      color: "blue",
+    },
+    small2: {
+      category: "مكبرات صوت",
+      title: "خصم هائل يصل إلى",
+      offer: "75%",
+      image:
+        "https://pngimg.com/uploads/audio_speakers/audio_speakers_PNG50720.png",
+      color: "purple",
+    },
+    small3: {
+      category: "كراسي استرخاء",
+      title: "تخفيضات مذهلة",
+      offer: "50%",
+      image: "https://pngimg.com/uploads/armchair/armchair_PNG7048.png",
+      color: "green",
+    },
+    large1: {
+      label: "الأكثر مبيعاً 🔥",
+      title: "هاتف إكس برو",
+      desc: "أداء استثنائي وتصميم عصري يناسبك.",
+      image: "https://pngimg.com/uploads/smartphone/smartphone_PNG8514.png",
+      color: "yellow",
+    },
+    large2: {
+      label: "الأكثر شهرة ⭐",
+      title: "لابتوب ألترا",
+      desc: "قوة هائلة تنجز كل مهامك اليومية بسهولة.",
+      image: "https://pngimg.com/uploads/macbook/macbook_PNG65.png",
+      color: "pink",
+    },
+  },
 });
+
+const promoSmall1Img = ref(null);
+const promoSmall2Img = ref(null);
+const promoSmall3Img = ref(null);
+const promoLarge1Img = ref(null);
+const promoLarge2Img = ref(null);
 
 const hasChanges = computed(() => {
   if (!initialSettings.value) return false;
@@ -1159,6 +1463,10 @@ const loadSettings = async () => {
     if (data.order_prefix) settings.value.orderPrefix = data.order_prefix;
     if (data.low_stock_threshold)
       settings.value.lowStockThreshold = Number(data.low_stock_threshold);
+    if (data.free_shipping_threshold)
+      settings.value.freeShippingThreshold = Number(
+        data.free_shipping_threshold
+      );
     if (data.cod_enabled)
       settings.value.codEnabled = data.cod_enabled === "true";
     if (data.maintenanceMode)
@@ -1167,6 +1475,21 @@ const loadSettings = async () => {
 
     if (data.guest_home) {
       settings.value.guestHome = mergeGuestHome(data.guest_home);
+    }
+
+    if (data.promo_offers) {
+      try {
+        const parsed =
+          typeof data.promo_offers === "string"
+            ? JSON.parse(data.promo_offers)
+            : data.promo_offers;
+        settings.value.promoOffers = {
+          ...settings.value.promoOffers,
+          ...parsed,
+        };
+      } catch (e) {
+        console.error("Error parsing promo offers in settings", e);
+      }
     }
 
     // Capture initial state for change detection
@@ -1187,9 +1510,14 @@ const saveSettings = async () => {
         payload.append("guest_home", JSON.stringify(val));
         return;
       }
+      if (key === "promoOffers") {
+        payload.append("promo_offers", JSON.stringify(val));
+        return;
+      }
       let keyMapping = {
         orderPrefix: "order_prefix",
         lowStockThreshold: "low_stock_threshold",
+        freeShippingThreshold: "free_shipping_threshold",
         codEnabled: "cod_enabled",
       };
       let finalKey = keyMapping[key] || key;
@@ -1210,6 +1538,17 @@ const saveSettings = async () => {
     if (file) {
       payload.append("logo_file", file);
     }
+
+    if (promoSmall1Img.value)
+      payload.append("promo_small1_img", promoSmall1Img.value);
+    if (promoSmall2Img.value)
+      payload.append("promo_small2_img", promoSmall2Img.value);
+    if (promoSmall3Img.value)
+      payload.append("promo_small3_img", promoSmall3Img.value);
+    if (promoLarge1Img.value)
+      payload.append("promo_large1_img", promoLarge1Img.value);
+    if (promoLarge2Img.value)
+      payload.append("promo_large2_img", promoLarge2Img.value);
 
     await axios.post("/admin/settings", payload, {
       headers: { "Content-Type": "multipart/form-data" },
