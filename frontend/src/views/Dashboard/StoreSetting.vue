@@ -109,7 +109,12 @@
             </v-tab>
           </v-tabs>
 
-          <v-window v-model="activeTab" class="flex-grow-1 pa-6">
+          <v-window
+            v-model="activeTab"
+            class="flex-grow-1 pa-6"
+            transition="fade-transition"
+            reverse-transition="fade-transition"
+          >
             <v-window-item
               v-for="tab in [
                 'general',

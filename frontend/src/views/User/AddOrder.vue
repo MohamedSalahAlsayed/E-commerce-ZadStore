@@ -60,15 +60,57 @@
                     </v-col>
                     <v-col cols="12" md="6">
                       <v-select
-                        v-model="orderData.shipping_zone_id"
-                        :items="shippingZones"
-                        item-title="name"
+                        v-model="orderData.governorate_id"
+                        :items="governorates"
+                        :item-title="locale === 'ar' ? 'name_ar' : 'name_en'"
                         item-value="id"
-                        :label="$t('checkout.shipping_zone')"
+                        :label="$t('checkout.governorate')"
                         variant="outlined"
                         density="comfortable"
                         :rules="[(v) => !!v || $t('checkout.required')]"
                       ></v-select>
+                    </v-col>
+
+                    <v-col cols="12" md="6" v-if="orderData.governorate_id">
+                      <v-select
+                        v-model="orderData.shipping_method_id"
+                        :items="shippingMethods"
+                        :item-title="locale === 'ar' ? 'name_ar' : 'name_en'"
+                        item-value="id"
+                        :label="$t('checkout.shipping_method')"
+                        variant="outlined"
+                        density="comfortable"
+                        :rules="[(v) => !!v || $t('checkout.required')]"
+                        :hint="selectedMethod?.delivery_time"
+                        persistent-hint
+                      >
+                        <template v-slot:item="{ props, item }">
+                          <v-list-item
+                            v-bind="props"
+                            :subtitle="item.raw.delivery_time"
+                          >
+                            <template v-slot:append>
+                              <span class="font-weight-bold text-primary"
+                                >{{ item.raw.fee }}
+                                {{ $t("products.currency") }}</span
+                              >
+                            </template>
+                          </v-list-item>
+                        </template>
+                      </v-select>
+                    </v-col>
+
+                    <v-col cols="12" v-if="totalWeight > 0" class="pt-0">
+                      <v-chip
+                        size="small"
+                        variant="tonal"
+                        color="grey"
+                        class="text-caption"
+                      >
+                        <v-icon start size="14">mdi-weight-kilogram</v-icon>
+                        {{ $t("checkout.weight_total") }}
+                        {{ totalWeight.toFixed(2) }} {{ $t("checkout.kg") }}
+                      </v-chip>
                     </v-col>
                     <v-col cols="12">
                       <v-btn
@@ -349,11 +391,11 @@
                     <template v-if="isFreeShipping">
                       {{ locale === "ar" ? "شحن مجاني" : "Free Shipping" }}
                     </template>
-                    <template v-else-if="selectedZone">
+                    <template v-else-if="selectedMethod">
                       {{ shippingCost }} {{ $t("products.currency") }}
                     </template>
                     <template v-else>
-                      {{ $t("checkout.select_zone_first") }}
+                      {{ $t("checkout.select_gov") }}
                     </template>
                   </span>
                   <span
@@ -404,7 +446,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useI18n } from "vue-i18n";
 const { locale, t } = useI18n();
 import { useRouter } from "vue-router";
@@ -422,7 +464,8 @@ const cartStore = AddInCart();
 const authStore = useAuthStore();
 const settingsStore = useSettingsStore();
 
-const shippingZones = ref([]);
+const governorates = ref([]);
+const shippingMethods = ref([]);
 const activeCoupon = ref(null);
 const couponCodeInput = ref("");
 const discountAmount = ref(0);
@@ -438,7 +481,8 @@ const orderData = ref({
   name: "",
   phone: "",
   address: "",
-  shipping_zone_id: null,
+  governorate_id: null,
+  shipping_method_id: null,
 });
 
 onMounted(async () => {
@@ -459,12 +503,33 @@ onMounted(async () => {
 
   try {
     await settingsStore.fetchSettings();
-    const res = await api.get("/shipping-zones");
-    shippingZones.value = res.data;
+    const govRes = await api.get("/governorates");
+    governorates.value = govRes.data;
   } catch (e) {
     console.error(e);
   }
 });
+
+// Watch governorate selection to fetch methods
+watch(
+  () => orderData.value.governorate_id,
+  async (newVal) => {
+    if (!newVal) {
+      shippingMethods.value = [];
+      orderData.value.shipping_method_id = null;
+      return;
+    }
+    try {
+      const res = await api.get(`/shipping-methods?governorate_id=${newVal}`);
+      shippingMethods.value = res.data;
+      if (shippingMethods.value.length > 0) {
+        orderData.value.shipping_method_id = shippingMethods.value[0].id;
+      }
+    } catch (err) {
+      console.error("Error fetching methods:", err);
+    }
+  }
+);
 
 const applyCoupon = async () => {
   if (!couponCodeInput.value) return;
@@ -504,10 +569,16 @@ const subtotal = computed(() => {
   }, 0);
 });
 
-const selectedZone = computed(() => {
+const totalWeight = computed(() => {
+  return cartItems.value.reduce((total, item) => {
+    return total + (Number(item.weight_kg) || 0) * item.quantity;
+  }, 0);
+});
+
+const selectedMethod = computed(() => {
   return (
-    shippingZones.value.find(
-      (z) => z.id === orderData.value.shipping_zone_id
+    shippingMethods.value.find(
+      (m) => m.id === orderData.value.shipping_method_id
     ) || null
   );
 });
@@ -517,8 +588,19 @@ const isFreeShipping = computed(() => {
 });
 
 const shippingCost = computed(() => {
-  if (!selectedZone.value || isFreeShipping.value) return 0;
-  return selectedZone.value.fee;
+  if (!selectedMethod.value || isFreeShipping.value) return 0;
+
+  let cost = Number(selectedMethod.value.fee);
+
+  if (selectedMethod.value.is_weight_aware) {
+    const extraWeight = Math.max(
+      0,
+      totalWeight.value - Number(selectedMethod.value.base_weight)
+    );
+    cost += extraWeight * Number(selectedMethod.value.extra_weight_fee);
+  }
+
+  return Math.ceil(cost);
 });
 
 const total = computed(
@@ -545,12 +627,15 @@ const submitOrder = async () => {
     customer_name: orderData.value.name,
     phone: orderData.value.phone,
     address: orderData.value.address,
-    shipping_zone_id: orderData.value.shipping_zone_id,
+    governorate_id: orderData.value.governorate_id,
+    shipping_method_id: orderData.value.shipping_method_id,
     coupon_code: activeCoupon.value ? activeCoupon.value.code : null,
     items: cartItems.value.map((item) => ({
       product_id: item.id,
       quantity: item.quantity,
     })),
+    total_shipping_cost: shippingCost.value,
+    total_weight: totalWeight.value,
   };
 
   try {

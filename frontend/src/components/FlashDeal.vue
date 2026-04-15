@@ -59,13 +59,12 @@
       <swiper
         v-else
         :modules="modules"
-        :slides-per-view="1.2"
+        :slides-per-view="1"
         :space-between="15"
         :navigation="true"
         :autoplay="{ delay: 3500, disableOnInteraction: false }"
         :breakpoints="{
-          480: { slidesPerView: 1.5, spaceBetween: 15 },
-          768: { slidesPerView: 2.5, spaceBetween: 20 },
+          600: { slidesPerView: 2, spaceBetween: 15 },
           960: { slidesPerView: 3, spaceBetween: 24 },
           1280: { slidesPerView: 4, spaceBetween: 24 },
         }"
@@ -77,9 +76,7 @@
           :key="product.id"
           class="pb-5 pt-2 px-2"
         >
-          <div style="max-width: 280px; width: 100%; margin: 0 auto">
-            <ProductCard :product="product" />
-          </div>
+          <ProductCard :product="product" />
         </swiper-slide>
       </swiper>
     </v-container>

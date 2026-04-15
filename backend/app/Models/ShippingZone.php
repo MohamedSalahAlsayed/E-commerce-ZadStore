@@ -11,9 +11,15 @@ class ShippingZone extends Model
     use SyncToMysql;
     use HasFactory;
 
-    protected $fillable = ['name', 'fee', 'is_active', 'delivery_time', 'cod_fee'];
+    protected $fillable = ['name', 'is_active'];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    public function governorates()
+    {
+        return $this->hasMany(Governorate::class);
+    }
+
+    public function methods()
+    {
+        return $this->hasMany(ShippingMethod::class);
+    }
 }

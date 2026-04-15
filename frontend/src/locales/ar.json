@@ -69,7 +69,12 @@
     "guest_customer": "زائر",
     "sales_legend": "المبيعات",
     "admin_role": "مدير النظام",
-    "advanced_reports": "التقارير المتقدمة"
+    "advanced_reports": "التقارير المتقدمة",
+    "name": "الاسم",
+    "actions_th": "الإجراءات",
+    "error_loading": "حدث خطأ أثناء تحميل البيانات",
+    "error_occurred": "حدث خطأ",
+    "delete_error": "حدث خطأ أثناء الحذف"
   },
   "nav": {
     "home": "الرئيسية",
@@ -427,7 +432,13 @@
     "review_warning": "تأكد من مراجعة تفاصيل الشحن قبل تأكيد الطلب.",
     "empty_cart_msg": "سلة المشتريات فارغة. الرجاء إضافة منتجات أولاً.",
     "order_success_msg": "تم تأكيد طلبك بنجاح! شكراً لتسوقك معنا.",
-    "login_required_checkout": "يجب أن تكون مسجلاً للدخول لإتمام الطلب أو حدث خطأ آخر."
+    "login_required_checkout": "يجب أن تكون مسجلاً للدخول لإتمام الطلب أو حدث خطأ آخر.",
+    "governorate": "المحافظة",
+    "select_gov": "اختر المحافظة",
+    "shipping_method": "طريقة الشحن",
+    "select_method": "اختر طريقة الشحن",
+    "weight_total": "إجمالي الوزن:",
+    "kg": "كجم"
   },
   "success": {
     "title": "تم استلام طلبك بنجاح!",
@@ -965,7 +976,21 @@
     "update_success": "تم تحديث المنطقة بنجاح",
     "delete_success": "تم حذف المنطقة بنجاح",
     "save_settings_error": "حدث خطأ في حفظ الإعدادات",
-    "save_settings_success": "تم حفظ إعدادات الشحن بنجاح"
+    "save_settings_success": "تم حفظ إعدادات الشحن بنجاح",
+    "governorates_assigned": "المحافظات المشمولة",
+    "manage_methods": "إدارة طرق الشحن",
+    "add_method": "إضافة طريقة شحن",
+    "method_name_ar": "اسم الطريقة (بالعربية)",
+    "method_name_en": "اسم الطريقة (بالإنجليزية)",
+    "driver": "نوع الرابط (Driver)",
+    "assign_govs": "تعيين المحافظات لهذه المنطقة",
+    "select_all_govs": "تحديد الكل",
+    "total_methods": "عدد الطرق",
+    "base_cost": "التكلفة الأساسية",
+    "weight_aware": "حساب بالوزن",
+    "extra_weight_fee": "رسوم الوزن الزائد (لكل كجم)",
+    "base_weight": "الوزن الأساسي (كجم)",
+    "assigned_to_another": "معينة لمنطقة أخرى بالفعل"
   },
   "maintenance": {
     "title": "الموقع في حالة صيانة",

@@ -2,15 +2,15 @@
   <v-footer class="pa-0 flex-column border-0 bg-transparent">
     <!-- Newsletter Section (Floating design) -->
     <v-container
-      class="newsletter-container mb-n12 position-relative z-index-10"
+      class="newsletter-container mb-n8 mb-md-n12 position-relative z-index-10"
     >
       <v-card
         class="newsletter-card rounded-xl border-0 overflow-hidden"
         elevation="24"
       >
         <div class="newsletter-grid">
-          <div class="newsletter-content pa-8 pa-md-12 text-white">
-            <h3 class="text-h4 font-weight-black mb-2 animate-up">
+          <div class="newsletter-content pa-6 pa-md-12 text-white">
+            <h3 class="newsletter-title font-weight-black mb-2 animate-up">
               {{ $t("footer.newsletter_title") || "انضم لنخبة ZadStore" }}
             </h3>
             <p class="text-subtitle-1 opacity-80 mb-0">
@@ -21,7 +21,7 @@
             </p>
           </div>
           <div
-            class="newsletter-action pa-8 pa-md-12 bg-white-opacity-10 backdrop-blur d-flex align-center"
+            class="newsletter-action pa-6 pa-md-12 bg-white-opacity-10 backdrop-blur d-flex align-center"
           >
             <v-form @submit.prevent class="w-100 d-flex gap-3">
               <v-text-field
@@ -68,7 +68,7 @@
                 <v-icon v-else color="primary" size="48" class="me-3 glow-icon"
                   >mdi-shopping</v-icon
                 >
-                <h2 class="text-h3 font-weight-black text-white brand-text">
+                <h2 class="brand-text font-weight-black text-white">
                   {{ settingsStore.storeName || "ZadStore" }}
                 </h2>
               </div>
@@ -173,7 +173,7 @@
             <h4 class="footer-heading mb-8">
               {{ $t("footer.contact_us") || "تواصل معنا" }}
             </h4>
-            <div class="contact-glass pa-6 mb-8">
+            <div class="contact-glass pa-5 pa-md-6 mb-8">
               <div v-if="settingsStore.footerShowContact" class="contact-rows">
                 <div class="d-flex align-center mb-6 contact-item">
                   <div class="icon-box me-4 shadow-primary">
@@ -322,6 +322,11 @@ const filteredSocials = computed(() => {
   );
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
+@media (max-width: 600px) {
+  .newsletter-card {
+    border-radius: 20px !important;
+  }
+}
 
 .newsletter-grid {
   display: grid;
@@ -343,14 +348,23 @@ const filteredSocials = computed(() => {
 }
 
 .brand-text {
+  font-size: clamp(1.25rem, 3.5vw, 2.25rem); /* Slightly smaller */
   letter-spacing: -0.5px;
   background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.7));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.newsletter-title {
+  font-size: clamp(1.15rem, 3.2vw, 1.85rem);
+}
 
 .lh-relaxed {
-  line-height: 1.8;
+  line-height: 1.6; /* More compact for mobile */
+}
+@media (min-width: 960px) {
+  .lh-relaxed {
+    line-height: 1.8;
+  }
 }
 
 .footer-heading {
@@ -360,6 +374,7 @@ const filteredSocials = computed(() => {
   letter-spacing: 1px;
   position: relative;
   padding-bottom: 12px;
+  font-size: clamp(0.95rem, 2.2vw, 1.15rem); /* Scaled down */
 }
 
 .footer-heading::after {
@@ -387,10 +402,10 @@ const filteredSocials = computed(() => {
 .nav-link {
   color: #9e9e9e;
   text-decoration: none;
-  font-size: 1rem;
+  font-size: clamp(0.85rem, 1.7vw, 0.95rem); /* Scaled down */
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   display: flex;
-  align-center: center;
+  align-items: center;
 }
 
 .nav-link .icon-dot {
@@ -489,5 +504,31 @@ const filteredSocials = computed(() => {
 
 .animate-up {
   animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Supplemental Responsive Overrides */
+.text-body-1 {
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem) !important;
+  line-height: 1.6;
+}
+
+.text-subtitle-1 {
+  font-size: clamp(0.875rem, 2vw, 1rem) !important;
+}
+
+.copyright-text {
+  font-size: clamp(0.7rem, 1.6vw, 0.8rem) !important;
+}
+
+@media (max-width: 600px) {
+  .footer-nav {
+    gap: 12px;
+  }
+  .newsletter-content {
+    text-align: center;
+  }
+  .social-wrap {
+    justify-content: center;
+  }
 }
 </style>

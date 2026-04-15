@@ -245,8 +245,8 @@ const showDetails = (product) => {
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* ================= Media Section ================= */
@@ -389,8 +389,8 @@ const showDetails = (product) => {
 }
 
 .add-to-cart-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(var(--v-theme-primary), 0.25) !important;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(var(--v-theme-primary), 0.3) !important;
 }
 
 .details-icon-btn {

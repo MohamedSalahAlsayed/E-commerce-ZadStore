@@ -47,7 +47,8 @@ class UserController extends Controller
             'customer_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
-            'shipping_zone_id' => 'required|exists:shipping_zones,id',
+            'governorate_id' => 'required|exists:governorates,id',
+            'shipping_method_id' => 'required|exists:shipping_methods,id',
             'coupon_code' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -59,6 +60,7 @@ class UserController extends Controller
         try {
             $subtotal = 0;
             $itemsData = [];
+            $total_weight = 0;
 
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
@@ -73,6 +75,7 @@ class UserController extends Controller
                 }
 
                 $subtotal += $price * $item['quantity'];
+                $total_weight += ($product->weight_kg ?? 0) * $item['quantity'];
 
                 $itemsData[] = [
                     'product_id' => $product->id,
@@ -81,15 +84,27 @@ class UserController extends Controller
                     'quantity' => $item['quantity'],
                     'image' => $product->thumbnail,
                     'purchase_price' => $product->purchase_price,
-                    // Note: In real scenarios, deduct stock here or later
                 ];
 
                 $product->decrement('stock', $item['quantity']);
             }
 
             // Secure Shipping Evaluation
-            $shipping_zone = \App\Models\ShippingZone::findOrFail($request->shipping_zone_id);
-            $shipping_fee = $shipping_zone->fee;
+            $governorate = \App\Models\Governorate::with('zone')->findOrFail($request->governorate_id);
+            $method = \App\Models\ShippingMethod::findOrFail($request->shipping_method_id);
+            
+            // Re-calculate shipping fee to prevent frontend manipulation
+            $settings = \App\Models\StoreSetting::all()->pluck('value', 'key');
+            $free_shipping_threshold = $settings['free_shipping_threshold'] ?? 1000;
+            
+            $shipping_fee = 0;
+            if ($subtotal < $free_shipping_threshold) {
+                $shipping_fee = $method->fee;
+                if ($method->is_weight_aware) {
+                    $extra_weight = max(0, $total_weight - $method->base_weight);
+                    $shipping_fee += $extra_weight * $method->extra_weight_fee;
+                }
+            }
 
             // Secure Coupon Evaluation
             $discount_amount = 0;
@@ -99,12 +114,12 @@ class UserController extends Controller
                 if ($coupon && (!$coupon->expires_at || \Carbon\Carbon::now()->lt($coupon->expires_at))) {
                     if (!$coupon->usage_limit || $coupon->used_count < $coupon->usage_limit) {
                         if (!$coupon->min_order_amount || $subtotal >= $coupon->min_order_amount) {
-                             if ($coupon->type === 'percentage') {
-                                 $discount_amount = ($subtotal * $coupon->value) / 100;
-                             } else {
-                                 $discount_amount = $coupon->value;
-                             }
-                             $applied_coupon = $coupon;
+                            if ($coupon->type === 'percentage') {
+                                $discount_amount = ($subtotal * $coupon->value) / 100;
+                            } else {
+                                $discount_amount = $coupon->value;
+                            }
+                            $applied_coupon = $coupon;
                         }
                     }
                 }
@@ -117,11 +132,14 @@ class UserController extends Controller
                 'order_number' => 'ORD-' . strtoupper(Str::random(10)),
                 'customer_name' => $request->customer_name,
                 'phone' => $request->phone,
-                'address' => $request->address . ' - ' . $shipping_zone->name,
+                'address' => $request->address . ' - ' . $governorate->name_ar,
+                'governorate_id' => $governorate->id,
+                'shipping_method_id' => $method->id,
                 'status' => 'pending',
-                'subtotal' => $subtotal - $discount_amount, // Injecting discount visually into final subtotal mapping
+                'subtotal' => $subtotal - $discount_amount,
                 'shipping_fee' => $shipping_fee,
                 'total' => $total,
+                'total_weight' => $total_weight,
             ]);
 
             foreach ($itemsData as $data) {
@@ -145,6 +163,7 @@ class UserController extends Controller
             \Illuminate\Support\Facades\Log::error('createOrder failed', [
                 'user_id' => $request->user()->id,
                 'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return response()->json(['message' => 'حدث خطأ أثناء إنشاء الطلب. حاول مرة أخرى.'], 500);

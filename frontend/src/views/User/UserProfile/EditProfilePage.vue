@@ -356,16 +356,17 @@ const saveChanges = async () => {
   loading.value = true;
   try {
     const data = new FormData();
+    data.append("_method", "PUT"); // Method override for multipart PUT support in Laravel
     data.append("name", formData.value.name);
-    data.append("email", formData.value.email); // إضافة الحقل المفقود
+    data.append("email", formData.value.email);
     data.append("username", formData.value.username);
     data.append("phone", formData.value.phone);
-    data.append("address", formData.value.address);
+    data.append("address", formData.value.address || "");
     data.append(
       "preferred_shipping_company",
-      formData.value.preferred_shipping_company
+      formData.value.preferred_shipping_company || ""
     );
-    data.append("bio", formData.value.bio);
+    data.append("bio", formData.value.bio || "");
 
     if (formData.value.password && formData.value.password.trim() !== "") {
       data.append("password", formData.value.password.trim());
@@ -379,20 +380,18 @@ const saveChanges = async () => {
       data.append("avatar", fileData.value);
     }
 
-    data.append(
-      "notifications[email]",
-      notifications.value.email ? "true" : "false"
-    );
-    data.append(
-      "notifications[sms]",
-      notifications.value.sms ? "true" : "false"
-    );
+    data.append("notifications[email]", notifications.value.email ? "1" : "0");
+    data.append("notifications[sms]", notifications.value.sms ? "1" : "0");
     data.append(
       "notifications[offers]",
-      notifications.value.offers ? "true" : "false"
+      notifications.value.offers ? "1" : "0"
     );
 
-    const { data: responseData } = await api.put("/user/profile", data);
+    const { data: responseData } = await api.post("/user/profile", data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     localStorage.setItem("user", JSON.stringify(responseData.user));
     authStore.currentUser = responseData.user;

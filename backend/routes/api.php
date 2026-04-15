@@ -14,6 +14,8 @@ Route::get('/products/{id}', [PublicController::class, 'getProductDetails']);
 Route::get('/banners', [PublicController::class, 'getBanners']);
 Route::get('/settings', [PublicController::class, 'getSettings']);
 Route::get('/shipping-zones', [PublicController::class, 'getShippingZones']);
+Route::get('/governorates', [PublicController::class, 'getGovernorates']);
+Route::get('/shipping-methods', [PublicController::class, 'getShippingMethods']);
 Route::get('/posts', [PublicController::class, 'getBlogPosts']);
 Route::get('/posts/{slug}', [PublicController::class, 'getBlogPost']);
 Route::post('/apply-coupon', [PublicController::class, 'applyCoupon']);
@@ -142,11 +144,16 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->prefix('admin')->gr
     Route::post('/reviews/{id}/reply', [\App\Http\Controllers\AdminSupplementalController::class, 'replyToReview']);
     Route::delete('/reviews/{id}', [\App\Http\Controllers\AdminSupplementalController::class, 'deleteReview']);
 
-    // Shipping Zones
+    // Shipping Zones & Methods
     Route::get('/shipping-zones', [\App\Http\Controllers\AdminSupplementalController::class, 'getShippingZones']);
     Route::post('/shipping-zones', [\App\Http\Controllers\AdminSupplementalController::class, 'createShippingZone']);
     Route::put('/shipping-zones/{id}', [\App\Http\Controllers\AdminSupplementalController::class, 'updateShippingZone']);
     Route::delete('/shipping-zones/{id}', [\App\Http\Controllers\AdminSupplementalController::class, 'deleteShippingZone']);
+    
+    Route::get('/governorates', [\App\Http\Controllers\AdminSupplementalController::class, 'getGovernorates']);
+    Route::post('/shipping-zones/assign-governorate', [\App\Http\Controllers\AdminSupplementalController::class, 'assignGovernorateToZone']);
+    Route::post('/shipping-zones/{zoneId}/methods', [\App\Http\Controllers\AdminSupplementalController::class, 'manageShippingMethod']);
+    Route::delete('/shipping-methods/{id}', [\App\Http\Controllers\AdminSupplementalController::class, 'deleteShippingMethod']);
 
     // Store Settings
     Route::get('/settings', [\App\Http\Controllers\AdminSupplementalController::class, 'getSettings']);

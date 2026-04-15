@@ -55,19 +55,10 @@ onMounted(async () => {
 });
 </script>
 <style scoped lang="scss">
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: rgb(var(--v-theme-background));
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-h2 {
+.section-title {
   text-align: center;
   color: rgb(var(--v-theme-on-surface));
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  font-weight: 800;
 }
 </style>

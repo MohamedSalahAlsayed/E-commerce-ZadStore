@@ -69,7 +69,12 @@
     "guest_customer": "Guest",
     "sales_legend": "Sales",
     "admin_role": "System Administrator",
-    "advanced_reports": "Advanced Reports"
+    "advanced_reports": "Advanced Reports",
+    "name": "Name",
+    "actions_th": "Actions",
+    "error_loading": "An error occurred while loading data",
+    "error_occurred": "An error occurred",
+    "delete_error": "An error occurred while deleting"
   },
   "nav": {
     "home": "Home",
@@ -427,7 +432,13 @@
     "review_warning": "Be sure to review shipping details before confirming your order.",
     "empty_cart_msg": "Shopping cart is empty. Please add products first.",
     "order_success_msg": "Your order has been confirmed successfully! Thank you for shopping with us.",
-    "login_required_checkout": "You must be logged in to complete the order or another error occurred."
+    "login_required_checkout": "You must be logged in to complete the order or another error occurred.",
+    "governorate": "Governorate",
+    "select_gov": "Select Governorate",
+    "shipping_method": "Shipping Method",
+    "select_method": "Select Shipping Method",
+    "weight_total": "Total Weight:",
+    "kg": "kg"
   },
   "success": {
     "title": "Order Placed Successfully!",
@@ -965,7 +976,21 @@
     "update_success": "Zone updated successfully",
     "delete_success": "Zone deleted successfully",
     "save_settings_error": "Error occurred while saving settings",
-    "save_settings_success": "Shipping settings saved successfully"
+    "save_settings_success": "Shipping settings saved successfully",
+    "governorates_assigned": "Included Governorates",
+    "manage_methods": "Manage Shipping Methods",
+    "add_method": "Add Shipping Method",
+    "method_name_ar": "Method Name (Arabic)",
+    "method_name_en": "Method Name (English)",
+    "driver": "Driver Pattern",
+    "assign_govs": "Assign Governorates to this Zone",
+    "select_all_govs": "Select All",
+    "total_methods": "Methods Count",
+    "base_cost": "Base Shipping cost",
+    "weight_aware": "Weight-aware Calculation",
+    "extra_weight_fee": "Extra Weight Fee (per kg)",
+    "base_weight": "Base Weight (kg)",
+    "assigned_to_another": "Already assigned to another zone"
   },
   "maintenance": {
     "title": "Site under maintenance",

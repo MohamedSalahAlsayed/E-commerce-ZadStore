@@ -109,8 +109,29 @@ class PublicController extends Controller
 
     public function getShippingZones()
     {
-        $zones = \App\Models\ShippingZone::where('is_active', true)->get();
+        $zones = \App\Models\ShippingZone::with(['methods', 'governorates'])->where('is_active', true)->get();
         return response()->json($zones);
+    }
+
+    public function getGovernorates()
+    {
+        return response()->json(\App\Models\Governorate::orderBy('name_ar', 'asc')->get());
+    }
+
+    public function getShippingMethods(Request $request)
+    {
+        $request->validate(['governorate_id' => 'required|exists:governorates,id']);
+        
+        $governorate = \App\Models\Governorate::find($request->governorate_id);
+        if (!$governorate || !$governorate->shipping_zone_id) {
+            return response()->json([]);
+        }
+
+        $methods = \App\Models\ShippingMethod::where('shipping_zone_id', $governorate->shipping_zone_id)
+            ->where('is_active', true)
+            ->get();
+
+        return response()->json($methods);
     }
 
     public function applyCoupon(Request $request)

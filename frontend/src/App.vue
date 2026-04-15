@@ -36,7 +36,11 @@
     </v-overlay>
 
     <component :is="currentLayout" v-if="!showMaintenance || isAdmin">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <v-fade-transition mode="out-in">
+          <component :is="Component" />
+        </v-fade-transition>
+      </router-view>
 
       <v-snackbar
         v-model="bar"
@@ -239,14 +243,40 @@ const applyTheme = (data) => {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Cairo", "Inter", "Tajawal", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
 }
+
+/* Fluid Typography System */
+:root {
+  --step--2: clamp(0.61rem, calc(0.58rem + 0.13vw), 0.69rem);
+  --step--1: clamp(0.73rem, calc(0.67rem + 0.28vw), 0.9rem);
+  --step-0: clamp(0.88rem, calc(0.77rem + 0.5vw), 1.15rem);
+  --step-1: clamp(1.05rem, calc(0.88rem + 0.83vw), 1.5rem);
+  --step-2: clamp(1.26rem, calc(1.01rem + 1.25vw), 1.9rem);
+  --step-3: clamp(1.51rem, calc(1.15rem + 1.83vw), 2.5rem);
+}
+
 body {
-  overflow: hidden;
-  font-family: "Cairo", sans-serif;
+  overflow-x: hidden;
+  font-family: inherit;
+  background-color: rgb(var(--v-theme-background));
+  line-height: 1.6;
+}
+
+.text-h3 {
+  font-size: var(--step-3) !important;
+}
+.text-h4 {
+  font-size: var(--step-2) !important;
+}
+.text-h5 {
+  font-size: var(--step-1) !important;
+}
+.text-h6 {
+  font-size: var(--step-0) !important;
 }
 nav {
   padding: 30px;

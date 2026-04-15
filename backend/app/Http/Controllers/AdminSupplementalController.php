@@ -7,6 +7,8 @@ use App\Models\Coupon;
 use App\Models\ContactMessage;
 use App\Models\Review;
 use App\Models\ShippingZone;
+use App\Models\Governorate;
+use App\Models\ShippingMethod;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 
@@ -177,20 +179,77 @@ class AdminSupplementalController extends Controller
     }
 
     // --- Shipping Zones ---
-    public function getShippingZones() { return response()->json(ShippingZone::all()); }
+    public function getShippingZones() { 
+        return response()->json(ShippingZone::with(['governorates', 'methods'])->get()); 
+    }
+
+    public function getGovernorates() {
+        return response()->json(Governorate::all());
+    }
+
     public function createShippingZone(Request $request) {
-        $data = $request->validate(['name' => 'required|string', 'fee' => 'required|numeric', 'is_active' => 'boolean']);
+        $data = $request->validate(['name' => 'required|string', 'is_active' => 'boolean']);
         return response()->json(ShippingZone::create($data), 201);
     }
+
     public function updateShippingZone(Request $request, $id) {
         $zone = ShippingZone::findOrFail($id);
-        $data = $request->validate(['name' => 'required|string', 'fee' => 'required|numeric', 'is_active' => 'boolean']);
+        $data = $request->validate(['name' => 'required|string', 'is_active' => 'boolean']);
         $zone->update($data);
-        return response()->json($zone);
+
+        // Optional: Sync governorates if provided
+        if ($request->has('governorate_ids')) {
+            $request->validate(['governorate_ids' => 'array']);
+            Governorate::whereIn('id', $request->governorate_ids)->update(['shipping_zone_id' => $zone->id]);
+        }
+
+        return response()->json($zone->load(['governorates', 'methods']));
     }
+
     public function deleteShippingZone($id) {
         ShippingZone::findOrFail($id)->delete();
         return response()->json(['message' => 'Deleted']);
+    }
+
+    public function assignGovernorateToZone(Request $request) {
+        $data = $request->validate([
+            'governorate_id' => 'required|exists:governorates,id',
+            'shipping_zone_id' => 'nullable|exists:shipping_zones,id'
+        ]);
+
+        $gov = Governorate::findOrFail($data['governorate_id']);
+        $gov->shipping_zone_id = $data['shipping_zone_id'];
+        $gov->save();
+
+        return response()->json($gov);
+    }
+
+    public function manageShippingMethod(Request $request, $zoneId) {
+        $zone = ShippingZone::findOrFail($zoneId);
+        $data = $request->validate([
+            'id' => 'nullable|exists:shipping_methods,id',
+            'name_ar' => 'required|string',
+            'name_en' => 'required|string',
+            'fee' => 'required|numeric',
+            'delivery_time' => 'nullable|string',
+            'is_active' => 'boolean',
+            'driver' => 'string'
+        ]);
+
+        if (isset($data['id'])) {
+            $method = ShippingMethod::findOrFail($data['id']);
+            $method->update($data);
+        } else {
+            $data['shipping_zone_id'] = $zoneId;
+            $method = ShippingMethod::create($data);
+        }
+
+        return response()->json($method);
+    }
+
+    public function deleteShippingMethod($id) {
+        ShippingMethod::findOrFail($id)->delete();
+        return response()->json(['message' => 'Method deleted']);
     }
 
     // --- Store Settings ---

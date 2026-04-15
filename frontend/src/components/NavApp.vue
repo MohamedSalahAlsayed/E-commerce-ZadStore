@@ -7,194 +7,301 @@
       class="mobile-drawer"
       width="300"
     >
-      <div class="user-drawer-header pa-4 mb-2">
-        <div class="d-flex align-center gap-3 mb-3">
-          <v-avatar size="50" border>
-            <v-img :src="userData.avatar" cover></v-img>
-          </v-avatar>
-          <div>
-            <div class="font-weight-bold text-subtitle-1">
-              {{ userData.name }}
+      <div class="drawer-premium-wrapper d-flex flex-column h-100">
+        <!-- Modern Profile Header (Authenticated) -->
+        <div v-if="authStore.isAuthenticated" class="user-drawer-card pa-6">
+          <div class="d-flex justify-end mb-n6">
+            <v-btn
+              icon="mdi-close"
+              variant="text"
+              color="white"
+              size="small"
+              @click="mobileMenu = false"
+            ></v-btn>
+          </div>
+          <div class="d-flex align-center gap-4 pt-4">
+            <v-avatar size="64" class="profile-avatar-premium shadow-lg">
+              <v-img :src="userData.avatar" cover></v-img>
+            </v-avatar>
+            <div class="user-info-text text-white">
+              <div class="text-h6 font-weight-black lh-1 mb-1">
+                {{ userData.name }}
+              </div>
+              <v-chip
+                size="x-small"
+                color="white"
+                variant="tonal"
+                class="font-weight-bold cursor-pointer"
+                label
+                @click="
+                  ['admin', 'moderator'].includes(authStore.currentUser?.role)
+                    ? $router.push('/Dashboard/AdminDashboard')
+                    : null
+                "
+              >
+                {{ userTier }}
+              </v-chip>
             </div>
-            <div class="text-caption text-grey">{{ userTier }}</div>
+          </div>
+          <v-btn
+            size="small"
+            variant="flat"
+            block
+            color="white"
+            class="mt-6 font-weight-black rounded-lg text-primary"
+            prepend-icon="mdi-account-circle"
+            @click="
+              $router.push('/User/UserProfile/EditProfilePage');
+              mobileMenu = false;
+            "
+          >
+            {{ $t("profile") }}
+          </v-btn>
+        </div>
+
+        <!-- Guest Welcome Header -->
+        <div v-else class="user-drawer-card pa-6">
+          <div class="d-flex justify-end mb-n6">
+            <v-btn
+              icon="mdi-close"
+              variant="text"
+              color="white"
+              size="small"
+              @click="mobileMenu = false"
+            ></v-btn>
+          </div>
+          <div class="d-flex align-center gap-4 pt-4 mb-4">
+            <v-avatar size="64" color="white-opacity-20" class="shadow-lg">
+              <v-icon color="white" size="32">mdi-account-outline</v-icon>
+            </v-avatar>
+            <div class="user-info-text text-white">
+              <div class="text-h6 font-weight-black lh-1 mb-1">
+                {{ $t("nav.guest") }}
+              </div>
+              <div class="text-caption opacity-80">
+                {{ $t("nav.welcome_guest") || "أهلاً بك في متجرنا" }}
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <v-btn
+              size="small"
+              variant="flat"
+              block
+              color="white"
+              class="font-weight-black rounded-lg text-primary flex-grow-1"
+              @click="
+                $router.push('/Auth/LogIn');
+                mobileMenu = false;
+              "
+            >
+              {{ $t("guest_nav.login") }}
+            </v-btn>
+            <v-btn
+              size="small"
+              variant="tonal"
+              block
+              color="white"
+              class="font-weight-black rounded-lg flex-grow-1"
+              @click="
+                $router.push('/Auth/RegisterNow');
+                mobileMenu = false;
+              "
+            >
+              {{ $t("guest_nav.register") }}
+            </v-btn>
           </div>
         </div>
-        <v-btn
-          size="small"
-          variant="outlined"
-          block
-          color="primary"
-          prepend-icon="mdi-account-edit"
-          @click="
-            $router.push('/User/UserProfile/EditProfilePage');
-            mobileMenu = false;
-          "
-        >
-          {{ $t("nav.edit_profile") }}
-        </v-btn>
-      </div>
 
-      <v-divider></v-divider>
+        <v-divider class="border-opacity-10"></v-divider>
 
-      <v-list density="compact">
-        <v-list-subheader class="text-uppercase font-weight-bold">{{
-          $t("nav.activity")
-        }}</v-list-subheader>
-
-        <v-list-group value="Notifications">
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" color="primary">
-              <template v-slot:prepend>
-                <v-icon icon="mdi-bell-outline" color="error"></v-icon>
-              </template>
-              <v-list-item-title>{{
-                $t("nav.notifications")
-              }}</v-list-item-title>
-              <template v-slot:append>
-                <v-chip size="x-small" color="error" variant="flat">{{
-                  notificationList.length
-                }}</v-chip>
-              </template>
-            </v-list-item>
-          </template>
-          <v-list-item
-            v-for="(note, i) in notificationList"
-            :key="i"
-            :subtitle="note.time"
-            :title="note.title"
+        <!-- Dynamic Content List -->
+        <v-list class="px-2" density="compact" nav>
+          <v-list-subheader
+            class="text-uppercase font-weight-bold opacity-60 ps-4 pt-4"
           >
-            <template v-slot:prepend
-              ><v-icon size="small" :icon="note.icon"></v-icon
-            ></template>
-          </v-list-item>
-        </v-list-group>
-
-        <v-list-item
-          value="wishlist"
-          @click="
-            $router.push('/User/FavourateProduct');
-            mobileMenu = false;
-          "
-          color="primary"
-        >
-          <template v-slot:prepend>
-            <v-icon icon="mdi-heart-outline"></v-icon>
-          </template>
-          <v-list-item-title>{{ $t("nav.wishlist") }}</v-list-item-title>
-        </v-list-item>
-
-        <!-- Admin Panel Link for Staff -->
-        <v-list-item
-          v-if="['admin', 'moderator'].includes(authStore.currentUser?.role)"
-          @click="
-            $router.push('/Dashboard/AdminDashboard');
-            mobileMenu = false;
-          "
-          color="primary"
-        >
-          <template v-slot:prepend>
-            <v-icon icon="mdi-shield-crown-outline" color="primary"></v-icon>
-          </template>
-          <v-list-item-title class="font-weight-bold">{{
-            $t("nav.administration_panel")
-          }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-
-      <v-divider></v-divider>
-
-      <v-list density="compact" nav>
-        <v-list-subheader class="text-uppercase font-weight-bold">
-          {{ $t("nav.menu") }}
-        </v-list-subheader>
-
-        <template v-for="(item, i) in menuItems" :key="i">
-          <v-list-group
-            v-if="item.children && item.children.length > 0"
-            :value="item.text"
-          >
-            <template v-slot:activator="{ props }">
-              <v-list-item v-bind="props" color="primary" rounded="lg">
-                <template v-slot:prepend>
-                  <v-icon icon="mdi-circle-small" size="small"></v-icon>
-                </template>
-                <v-list-item-title class="font-weight-medium">
-                  {{ item.text }}
-                </v-list-item-title>
-              </v-list-item>
-            </template>
-
-            <v-list-item
-              v-for="(child, j) in item.children"
-              :key="j"
-              :value="child.text"
-              :to="child.link"
-              color="primary"
-              rounded="lg"
-              class="ms-4"
-            >
-              <template v-slot:prepend>
-                <v-icon icon="mdi-minus" size="small"></v-icon>
-              </template>
-              <v-list-item-title class="font-weight-medium">
-                {{ child.text }}
-              </v-list-item-title>
-            </v-list-item>
-          </v-list-group>
+            {{ $t("nav.activity") }}
+          </v-list-subheader>
 
           <v-list-item
-            v-else
-            :value="item.text"
-            :to="item.link"
+            v-if="authStore.isAuthenticated"
+            value="notifications"
             color="primary"
-            rounded="lg"
+            class="rounded-xl mb-1"
+            @click="
+              $router.push('/User/UserProfile/NotificationPage');
+              mobileMenu = false;
+            "
           >
             <template v-slot:prepend>
-              <v-icon icon="mdi-circle-small" size="small"></v-icon>
+              <v-icon icon="mdi-bell-outline" color="primary"></v-icon>
             </template>
-            <v-list-item-title class="font-weight-medium">
-              {{ item.text }}
-            </v-list-item-title>
+            <v-list-item-title class="font-weight-bold">{{
+              $t("nav.notifications")
+            }}</v-list-item-title>
+            <template v-slot:append>
+              <v-chip
+                size="x-small"
+                color="error"
+                variant="flat"
+                class="font-weight-bold"
+              >
+                {{ notificationList.length }}
+              </v-chip>
+            </template>
           </v-list-item>
-        </template>
-      </v-list>
-      <div class="pa-4">
-        <v-select
-          v-model="currentLang"
-          :items="availableLangs"
-          item-title="name"
-          item-value="code"
-          :label="$t('language')"
-          variant="outlined"
-          density="compact"
-          return-object
-          class="mb-2"
-        >
-          <template v-slot:selection="{ item }">
-            <div class="d-flex align-center">
-              <img :src="item.raw.flag" width="20" class="ml-2" />
-              {{ item.raw.name }}
-            </div>
-          </template>
-          <template v-slot:item="{ props, item }">
-            <v-list-item
-              v-bind="props"
-              :prepend-avatar="item.raw.flag"
-              :title="item.raw.name"
-            ></v-list-item>
-          </template>
-        </v-select>
 
-        <!-- Language Switcher only (Theme switcher removed) -->
-        <v-btn
-          block
-          color="error"
-          variant="tonal"
-          prepend-icon="mdi-logout"
-          class="mt-2"
-          @click="$router.push('/Auth/LogOut')"
-          >{{ $t("logout") }}</v-btn
-        >
+          <v-list-item
+            v-if="authStore.isAuthenticated"
+            value="wishlist"
+            @click="
+              $router.push('/User/FavourateProduct');
+              mobileMenu = false;
+            "
+            color="primary"
+            class="rounded-xl mb-1"
+          >
+            <template v-slot:prepend>
+              <v-icon icon="mdi-heart-outline" color="error"></v-icon>
+            </template>
+            <v-list-item-title class="font-weight-bold">{{
+              $t("nav.wishlist")
+            }}</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item
+            v-if="isAdmin && authStore.isAuthenticated"
+            @click="
+              $router.push('/Dashboard/AdminDashboard');
+              mobileMenu = false;
+            "
+            color="primary"
+            class="rounded-xl mb-1 admin-item-premium"
+          >
+            <template v-slot:prepend>
+              <v-icon icon="mdi-shield-crown-outline" color="warning"></v-icon>
+            </template>
+            <v-list-item-title class="font-weight-black">{{
+              $t("nav.administration_panel")
+            }}</v-list-item-title>
+          </v-list-item>
+
+          <v-divider class="my-4 border-opacity-10"></v-divider>
+
+          <v-list-subheader
+            class="text-uppercase font-weight-bold opacity-60 ps-4"
+          >
+            {{ $t("nav.menu") }}
+          </v-list-subheader>
+
+          <template v-for="(item, i) in menuItems" :key="i">
+            <v-list-group
+              v-if="item.children && item.children.length > 0"
+              :value="item.text"
+            >
+              <template v-slot:activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  color="primary"
+                  class="rounded-xl mb-1"
+                >
+                  <template v-slot:prepend>
+                    <v-icon
+                      :icon="item.icon || 'mdi-circle-medium'"
+                      color="primary"
+                    ></v-icon>
+                  </template>
+                  <v-list-item-title class="font-weight-bold">{{
+                    item.text
+                  }}</v-list-item-title>
+                </v-list-item>
+              </template>
+
+              <v-list-item
+                v-for="(child, j) in item.children"
+                :key="j"
+                :to="child.link"
+                color="primary"
+                class="rounded-xl mb-1 ps-8"
+              >
+                <v-list-item-title class="font-weight-medium">{{
+                  child.text
+                }}</v-list-item-title>
+              </v-list-item>
+            </v-list-group>
+
+            <v-list-item
+              v-else
+              :to="item.link"
+              color="primary"
+              class="rounded-xl mb-1"
+            >
+              <template v-slot:prepend>
+                <v-icon
+                  :icon="item.icon || 'mdi-circle-medium'"
+                  color="primary"
+                ></v-icon>
+              </template>
+              <v-list-item-title class="font-weight-bold">{{
+                item.text
+              }}</v-list-item-title>
+            </v-list-item>
+          </template>
+        </v-list>
+
+        <!-- Fixed Footer Actions -->
+        <div class="pa-4 drawer-footer border-t bg-white">
+          <div class="mb-4">
+            <div
+              class="text-caption font-weight-black text-uppercase opacity-40 mb-2 ps-1"
+            >
+              {{ $t("language") }}
+            </div>
+            <v-item-group
+              v-model="currentLangCode"
+              mandatory
+              class="d-flex gap-2"
+              @update:model-value="(val) => onLangChange(val)"
+            >
+              <v-item
+                v-for="lang in availableLangs"
+                :key="lang.code"
+                :value="lang.code"
+                v-slot="{ isSelected, toggle }"
+              >
+                <v-btn
+                  :variant="isSelected ? 'flat' : 'tonal'"
+                  :color="isSelected ? 'primary' : 'grey-lighten-3'"
+                  class="flex-grow-1 rounded-lg font-weight-black h-40"
+                  @click="toggle"
+                  size="small"
+                >
+                  <v-img
+                    :src="lang.flag"
+                    width="18"
+                    class="me-2 rounded-xs"
+                  ></v-img>
+                  {{ lang.name }}
+                </v-btn>
+              </v-item>
+            </v-item-group>
+          </div>
+          <v-btn
+            block
+            color="error"
+            variant="flat"
+            prepend-icon="mdi-logout"
+            class="rounded-lg font-weight-black shadow-none h-48"
+            @click="$router.push('/Auth/LogOut')"
+          >
+            {{ $t("logout") }}
+          </v-btn>
+          <div
+            class="text-center mt-4 opacity-30 text-caption font-weight-bold"
+          >
+            ZADSTORE v2.5.0
+          </div>
+        </div>
       </div>
     </v-navigation-drawer>
 
@@ -220,53 +327,6 @@
               style="opacity: 0.4; height: 18px"
             ></v-divider>
 
-            <div class="d-flex align-center gap-1">
-              <v-btn
-                v-if="settingsStore.facebook"
-                icon
-                size="x-small"
-                variant="text"
-                color="white"
-                style="opacity: 0.8"
-                :href="settingsStore.facebook"
-                target="_blank"
-                ><v-icon size="18">mdi-facebook</v-icon></v-btn
-              >
-              <v-btn
-                v-if="settingsStore.instagram"
-                icon
-                size="x-small"
-                variant="text"
-                color="white"
-                style="opacity: 0.8"
-                :href="settingsStore.instagram"
-                target="_blank"
-                ><v-icon size="18">mdi-instagram</v-icon></v-btn
-              >
-              <v-btn
-                v-if="settingsStore.twitter"
-                icon
-                size="x-small"
-                variant="text"
-                color="white"
-                style="opacity: 0.8"
-                :href="settingsStore.twitter"
-                target="_blank"
-                ><v-icon size="18">mdi-twitter</v-icon></v-btn
-              >
-              <v-btn
-                v-if="settingsStore.tiktok"
-                icon
-                size="x-small"
-                variant="text"
-                color="white"
-                style="opacity: 0.8"
-                :href="settingsStore.tiktok"
-                target="_blank"
-                ><v-icon size="18">mdi-music-note</v-icon></v-btn
-              >
-            </div>
-
             <v-btn
               v-if="
                 ['admin', 'moderator'].includes(authStore.currentUser?.role)
@@ -284,12 +344,57 @@
           </div>
         </div>
 
-        <v-app-bar-nav-icon
-          class="d-md-none text-white"
-          variant="text"
-          density="compact"
-          @click.stop="mobileMenu = !mobileMenu"
-        ></v-app-bar-nav-icon>
+        <!-- Social Media Icons (Now visible on mobile in place of the redundant menu icon) -->
+        <div class="d-flex align-center gap-1">
+          <v-btn
+            v-if="settingsStore.facebook"
+            icon
+            size="x-small"
+            variant="text"
+            color="white"
+            class="social-btn-hover"
+            :href="settingsStore.facebook"
+            target="_blank"
+          >
+            <v-icon size="18">mdi-facebook</v-icon>
+          </v-btn>
+          <v-btn
+            v-if="settingsStore.instagram"
+            icon
+            size="x-small"
+            variant="text"
+            color="white"
+            class="social-btn-hover"
+            :href="settingsStore.instagram"
+            target="_blank"
+          >
+            <v-icon size="18">mdi-instagram</v-icon>
+          </v-btn>
+          <v-btn
+            v-if="settingsStore.twitter"
+            icon
+            size="x-small"
+            variant="text"
+            color="white"
+            class="social-btn-hover"
+            :href="settingsStore.twitter"
+            target="_blank"
+          >
+            <v-icon size="18">mdi-twitter</v-icon>
+          </v-btn>
+          <v-btn
+            v-if="settingsStore.tiktok"
+            icon
+            size="x-small"
+            variant="text"
+            color="white"
+            class="social-btn-hover"
+            :href="settingsStore.tiktok"
+            target="_blank"
+          >
+            <v-icon size="18">mdi-music-note</v-icon>
+          </v-btn>
+        </div>
       </v-container>
     </v-app-bar>
 
@@ -297,7 +402,7 @@
       :elevation="isScrolled ? 4 : 0"
       color="primary"
       height="65"
-      class="px-2 px-md-4 position-fixed transition-app-bar border-bottom"
+      class="px-2 px-md-4 position-fixed transition-app-bar border-bottom premium-app-bar"
       :style="{ top: isScrolled ? '0px' : '40px', zIndex: 999 }"
     >
       <div class="d-flex justify-space-between align-center w-100">
@@ -595,11 +700,21 @@
               elevation="3"
               class="rounded-lg mt-2"
             >
-              <v-list-item :title="userData.name" :subtitle="userTier">
-                <template v-slot:prepend
-                  ><v-avatar size="30"
-                    ><v-img :src="userData.avatar"></v-img></v-avatar
-                ></template>
+              <v-list-item
+                :title="userData.name"
+                :subtitle="userTier"
+                class="user-profile-item"
+                @click="
+                  ['admin', 'moderator'].includes(authStore.currentUser?.role)
+                    ? $router.push('/Dashboard/AdminDashboard')
+                    : null
+                "
+              >
+                <template v-slot:prepend>
+                  <v-avatar size="30">
+                    <v-img :src="userData.avatar"></v-img>
+                  </v-avatar>
+                </template>
               </v-list-item>
               <v-divider class="my-1"></v-divider>
               <v-list-item
@@ -735,6 +850,33 @@ const cartStore = AddInCart();
 const settingsStore = useSettingsStore();
 const authStore = useAuthStore();
 
+const availableLangs = [
+  { code: "en", name: "English", flag: "https://flagcdn.com/w40/us.png" },
+  { code: "ar", name: "العربية", flag: "https://flagcdn.com/w40/eg.png" },
+];
+
+const currentLangCode = ref(locale.value);
+const currentLang = computed(
+  () =>
+    availableLangs.find((l) => l.code === currentLangCode.value) ||
+    availableLangs[1]
+);
+
+const changeLang = (lang) => {
+  currentLangCode.value = lang.code;
+  locale.value = lang.code;
+  localStorage.setItem("lang", lang.code);
+  vuetifyLocale.value = lang.code;
+  document.dir = lang.code === "ar" ? "rtl" : "ltr";
+  document.documentElement.lang = lang.code;
+  document.documentElement.dir = lang.code === "ar" ? "rtl" : "ltr";
+};
+
+const onLangChange = (code) => {
+  const lang = availableLangs.find((l) => l.code === code);
+  if (lang) changeLang(lang);
+};
+
 // Dynamic categories/brands for dropdown
 const categoryChildren = computed(() =>
   (productStore.categories || []).map((cat) => ({
@@ -842,26 +984,6 @@ const markAllAsRead = async () => {
   } catch (error) {
     console.error("Failed to mark notifications as read", error);
   }
-};
-
-// --- Language Logic ---
-const availableLangs = [
-  { code: "en", name: "English", flag: "https://flagcdn.com/w40/us.png" },
-  { code: "ar", name: "العربية", flag: "https://flagcdn.com/w40/eg.png" },
-];
-
-const currentLang = computed(() => {
-  return (
-    availableLangs.find((l) => l.code === locale.value) || availableLangs[1]
-  );
-});
-
-const changeLang = (lang) => {
-  locale.value = lang.code;
-  vuetifyLocale.value = lang.code;
-  localStorage.setItem("lang", lang.code);
-  document.documentElement.lang = lang.code;
-  document.documentElement.dir = lang.code === "ar" ? "rtl" : "ltr";
 };
 
 // Methods
@@ -1182,21 +1304,100 @@ onUnmounted(() => {
   }
 }
 
+.user-drawer-card {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgb(var(--v-theme-primary)) 80%, black) 0%,
+    rgb(var(--v-theme-primary)) 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.user-drawer-card::before {
+  content: "";
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.profile-avatar-premium {
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.lh-1 {
+  line-height: 1.2;
+}
+
+.admin-item-premium {
+  background: rgba(var(--v-theme-primary), 0.05);
+}
+
+.h-40 {
+  height: 40px !important;
+}
+
+.h-48 {
+  height: 48px !important;
+}
+
+.drawer-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}
+
+/* Scrollbar styling */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 4px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.2);
+  border-radius: 10px;
+}
+
+.premium-app-bar {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--v-theme-primary)) 0%,
+    #1a237e 100%
+  ) !important;
+}
+
 @media (max-width: 600px) {
+  .premium-app-bar {
+    background: linear-gradient(
+      135deg,
+      #0d1117 0%,
+      rgb(var(--v-theme-primary)) 100%
+    ) !important;
+  }
   .support-fab-container {
     bottom: 20px;
     inset-inline-end: 15px;
   }
   .support-text {
-    display: none; /* إخفاء النص في الموبايل لتقليل الزحمة */
+    display: none;
   }
   .support-fab {
     width: 52px !important;
     padding: 0 !important;
     border-radius: 50% !important;
   }
-  .support-fab :deep(.v-btn__content) {
-    justify-content: center;
-  }
+}
+.social-btn-hover {
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+.social-btn-hover:hover {
+  opacity: 1;
+  transform: translateY(-2px);
 }
 </style>

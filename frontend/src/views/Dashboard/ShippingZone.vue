@@ -153,13 +153,10 @@
                 {{ $t("shipping.zone_th") }}
               </th>
               <th class="text-center font-weight-bold">
-                {{ $t("shipping.fee_th") }}
+                {{ $t("shipping.governorates_assigned") }}
               </th>
               <th class="text-center font-weight-bold">
-                {{ $t("shipping.delivery_time_th") }}
-              </th>
-              <th class="text-center font-weight-bold">
-                {{ $t("shipping.cod_fee_th") }}
+                {{ $t("shipping.total_methods") }}
               </th>
               <th class="text-center font-weight-bold">
                 {{ $t("dashboard.status_th") }}
@@ -176,10 +173,7 @@
                   <v-skeleton-loader type="list-item" />
                 </td>
                 <td class="px-2">
-                  <v-skeleton-loader type="text" width="60" class="mx-auto" />
-                </td>
-                <td class="px-2">
-                  <v-skeleton-loader type="text" width="80" class="mx-auto" />
+                  <v-skeleton-loader type="text" width="120" class="mx-auto" />
                 </td>
                 <td class="px-2">
                   <v-skeleton-loader type="text" width="60" class="mx-auto" />
@@ -197,95 +191,218 @@
               </tr>
             </template>
             <tr v-else-if="zones.length === 0">
-              <td colspan="4" class="text-center pa-6 text-grey-darken-1">
+              <td colspan="5" class="text-center pa-6 text-grey-darken-1">
                 {{ $t("shipping.no_zones") }}
               </td>
             </tr>
 
-            <tr v-for="zone in zones" :key="zone.id" class="hover-row" v-else>
-              <td
-                class="font-weight-bold py-3 text-subtitle-2"
-                style="color: rgb(var(--v-theme-primary))"
-              >
-                <v-icon color="primary" size="20" class="mr-1 ml-2"
-                  >mdi-map-marker-radius</v-icon
+            <template v-for="zone in zones" :key="zone.id" v-else>
+              <tr class="hover-row">
+                <td
+                  class="font-weight-bold py-3 text-subtitle-2"
+                  style="color: rgb(var(--v-theme-primary))"
                 >
-                {{ zone.name }}
-              </td>
+                  <v-icon color="primary" size="20" class="mr-1 ml-2"
+                    >mdi-map-marker-radius</v-icon
+                  >
+                  {{ zone.name }}
+                </td>
 
-              <td class="text-center">
-                <span
-                  class="font-weight-black text-subtitle-1"
-                  :class="zone.fee == 0 ? 'text-success' : 'text-primary'"
-                >
-                  {{
-                    zone.fee == 0
-                      ? $t("shipping.free")
-                      : zone.fee + " " + $t("products.currency")
-                  }}
-                </span>
-              </td>
+                <td class="text-center">
+                  <v-chip
+                    v-if="zone.governorates?.length"
+                    color="primary"
+                    variant="tonal"
+                    size="small"
+                    class="font-weight-bold"
+                    @click="openGovsDialog(zone)"
+                  >
+                    {{ zone.governorates.length }}
+                    {{ $t("shipping.zones_unit") }}
+                    <v-icon end size="14">mdi-chevron-down</v-icon>
+                  </v-chip>
+                  <v-btn
+                    v-else
+                    variant="text"
+                    color="grey"
+                    size="small"
+                    prepend-icon="mdi-plus"
+                    @click="openGovsDialog(zone)"
+                  >
+                    {{ $t("shipping.assign_govs") }}
+                  </v-btn>
+                </td>
 
-              <td class="text-center text-grey-darken-1">
-                {{ zone.delivery_time || $t("shipping.undefined") }}
-              </td>
+                <td class="text-center">
+                  <v-chip
+                    color="orange"
+                    variant="tonal"
+                    size="small"
+                    class="font-weight-bold"
+                  >
+                    {{ zone.methods?.length || 0 }}
+                  </v-chip>
+                </td>
 
-              <td class="text-center text-error font-weight-bold">
-                {{
-                  zone.cod_fee
-                    ? zone.cod_fee + " " + $t("products.currency")
-                    : "0"
-                }}
-              </td>
+                <td class="text-center">
+                  <v-switch
+                    v-model="zone.is_active"
+                    color="success"
+                    hide-details
+                    density="compact"
+                    class="d-inline-flex"
+                    :disabled="processingIds.includes(zone.id)"
+                    @change="toggleZoneStatus(zone)"
+                  ></v-switch>
+                </td>
 
-              <td class="text-center">
-                <v-switch
-                  v-model="zone.is_active"
-                  color="success"
-                  hide-details
-                  density="compact"
-                  class="d-inline-flex"
-                  :disabled="processingIds.includes(zone.id)"
-                  @change="toggleZoneStatus(zone)"
-                ></v-switch>
-              </td>
-
-              <td class="text-center">
-                <v-btn
-                  icon
-                  size="small"
-                  color="primary"
-                  variant="text"
-                  @click="editItem(zone)"
-                  :title="$t('dashboard.edit')"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-                <v-btn
-                  icon
-                  size="small"
-                  color="error"
-                  variant="text"
-                  :disabled="processingIds.includes(zone.id)"
-                  @click="openDeleteDialog(zone)"
-                  :title="$t('dashboard.delete')"
-                >
-                  <v-progress-circular
-                    v-if="
-                      processingIds.includes(zone.id) && lastAction === 'delete'
-                    "
-                    indeterminate
-                    size="16"
-                  ></v-progress-circular>
-                  <v-icon v-else>mdi-delete</v-icon>
-                </v-btn>
-              </td>
-            </tr>
+                <td class="text-center">
+                  <v-btn
+                    icon
+                    size="small"
+                    color="primary"
+                    variant="text"
+                    @click="editItem(zone)"
+                    :title="$t('dashboard.edit')"
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn
+                    icon
+                    size="small"
+                    color="error"
+                    variant="text"
+                    :disabled="processingIds.includes(zone.id)"
+                    @click="openDeleteDialog(zone)"
+                    :title="$t('dashboard.delete')"
+                  >
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </td>
+              </tr>
+              <!-- Sub-Table for Methods -->
+              <tr v-if="zone.methods?.length" class="bg-grey-lighten-5">
+                <td colspan="5" class="pa-0">
+                  <v-expand-transition>
+                    <div class="px-10 py-4 border-bottom">
+                      <div
+                        class="d-flex justify-space-between align-center mb-3"
+                      >
+                        <h4
+                          class="text-subtitle-1 font-weight-bold text-primary"
+                        >
+                          <v-icon start size="20">mdi-truck-delivery</v-icon>
+                          {{ $t("shipping.manage_methods") }}
+                        </h4>
+                        <v-btn
+                          size="small"
+                          color="primary"
+                          prepend-icon="mdi-plus"
+                          variant="flat"
+                          @click="openAddMethod(zone)"
+                        >
+                          {{ $t("shipping.add_method") }}
+                        </v-btn>
+                      </div>
+                      <v-table density="compact" class="bg-transparent">
+                        <thead>
+                          <tr>
+                            <th class="text-right">
+                              {{ $t("dashboard.name") }}
+                            </th>
+                            <th class="text-center">
+                              {{ $t("shipping.driver") }}
+                            </th>
+                            <th class="text-center">
+                              {{ $t("shipping.base_cost") }}
+                            </th>
+                            <th class="text-center">
+                              {{ $t("shipping.weight_aware") }}
+                            </th>
+                            <th class="text-center">
+                              {{ $t("dashboard.actions_th") }}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="method in zone.methods" :key="method.id">
+                            <td class="font-weight-medium">
+                              {{
+                                locale === "ar"
+                                  ? method.name_ar
+                                  : method.name_en
+                              }}
+                            </td>
+                            <td class="text-center">
+                              <v-chip
+                                size="x-small"
+                                label
+                                color="grey-darken-1"
+                                >{{ method.driver }}</v-chip
+                              >
+                            </td>
+                            <td class="text-center font-weight-bold">
+                              {{ method.fee }}
+                              {{ $t("products.currency") }}
+                            </td>
+                            <td class="text-center">
+                              <v-icon
+                                :color="
+                                  method.is_weight_aware ? 'success' : 'grey'
+                                "
+                              >
+                                {{
+                                  method.is_weight_aware
+                                    ? "mdi-check-circle"
+                                    : "mdi-minus-circle"
+                                }}
+                              </v-icon>
+                            </td>
+                            <td class="text-center">
+                              <v-btn
+                                icon
+                                size="x-small"
+                                color="primary"
+                                variant="text"
+                                @click="editMethod(zone, method)"
+                                ><v-icon>mdi-pencil</v-icon></v-btn
+                              >
+                              <v-btn
+                                icon
+                                size="x-small"
+                                color="error"
+                                variant="text"
+                                @click="removeMethod(method.id)"
+                                ><v-icon>mdi-delete</v-icon></v-btn
+                              >
+                            </td>
+                          </tr>
+                        </tbody>
+                      </v-table>
+                    </div>
+                  </v-expand-transition>
+                </td>
+              </tr>
+              <tr v-else class="bg-grey-lighten-5">
+                <td colspan="5" class="text-center py-4">
+                  <v-btn
+                    size="small"
+                    variant="tonal"
+                    color="primary"
+                    prepend-icon="mdi-plus"
+                    @click="openAddMethod(zone)"
+                  >
+                    {{ $t("shipping.add_method") }}
+                  </v-btn>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </v-table>
       </div>
     </v-card>
 
+    <!-- Zone Edit/Add Dialog -->
     <v-dialog v-model="dialog" max-width="500px" persistent>
       <v-card class="rounded-xl pa-2">
         <v-card-title
@@ -299,7 +416,6 @@
           }}
         </v-card-title>
         <v-divider class="my-3"></v-divider>
-
         <v-card-text>
           <v-form ref="form" v-model="validForm">
             <v-row>
@@ -312,40 +428,7 @@
                   :rules="[(v) => !!v || $t('shipping.zone_name_required')]"
                 ></v-text-field>
               </v-col>
-
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model.number="editedItem.fee"
-                  :label="$t('shipping.fee_label')"
-                  type="number"
-                  variant="outlined"
-                  color="primary"
-                  :rules="[
-                    (v) =>
-                      (v !== null && v !== '') || $t('shipping.fee_required'),
-                  ]"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  v-model.number="editedItem.cod_fee"
-                  :label="$t('shipping.cod_fee_label')"
-                  type="number"
-                  variant="outlined"
-                  color="primary"
-                ></v-text-field>
-              </v-col>
-
               <v-col cols="12">
-                <v-text-field
-                  v-model="editedItem.delivery_time"
-                  :label="$t('shipping.delivery_time_label')"
-                  variant="outlined"
-                  color="primary"
-                ></v-text-field>
-              </v-col>
-
-              <v-col cols="12" v-if="!isEditing">
                 <v-switch
                   v-model="editedItem.is_active"
                   color="success"
@@ -355,7 +438,6 @@
             </v-row>
           </v-form>
         </v-card-text>
-
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
           <v-btn
@@ -375,6 +457,151 @@
           >
             {{ $t("dashboard.save") }}
           </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Governorates Assignment Dialog -->
+    <v-dialog v-model="dialogGovs" max-width="600px" scrollable>
+      <v-card class="rounded-xl">
+        <v-card-title class="pa-4 font-weight-bold d-flex align-center">
+          <v-icon color="primary" class="mr-2 ml-2">mdi-google-maps</v-icon>
+          {{ $t("shipping.assign_govs") }}: {{ activeZone?.name }}
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text class="pa-0" style="height: 400px">
+          <v-list class="pa-2">
+            <v-list-item
+              v-for="gov in governorates"
+              :key="gov.id"
+              :active="selectedGovIds.includes(gov.id)"
+            >
+              <template v-slot:prepend>
+                <v-checkbox
+                  v-model="selectedGovIds"
+                  :value="gov.id"
+                  hide-details
+                  density="compact"
+                ></v-checkbox>
+              </template>
+              <v-list-item-title class="font-weight-medium">{{
+                locale === "ar" ? gov.name_ar : gov.name_en
+              }}</v-list-item-title>
+              <v-list-item-subtitle
+                v-if="
+                  gov.shipping_zone_id &&
+                  gov.shipping_zone_id !== activeZone?.id
+                "
+                class="text-error"
+              >
+                {{ $t("shipping.assigned_to_another") }}
+              </v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions class="pa-4">
+          <v-spacer></v-spacer>
+          <v-btn variant="tonal" @click="dialogGovs = false">{{
+            $t("dashboard.cancel")
+          }}</v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            :loading="saving"
+            @click="saveGovsAssignment"
+            >{{ $t("dashboard.save") }}</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Shipping Method Dialog -->
+    <v-dialog v-model="dialogMethod" max-width="600px">
+      <v-card class="rounded-xl">
+        <v-card-title class="pa-4 font-weight-bold">
+          {{ isEditing ? $t("dashboard.edit") : $t("shipping.add_method") }}
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-form ref="methodForm" v-model="validMethodForm">
+            <v-row>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="editedMethod.name_ar"
+                  :label="$t('shipping.method_name_ar')"
+                  variant="outlined"
+                  :rules="[(v) => !!v || 'Required']"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model="editedMethod.name_en"
+                  :label="$t('shipping.method_name_en')"
+                  variant="outlined"
+                  :rules="[(v) => !!v || 'Required']"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-select
+                  v-model="editedMethod.driver"
+                  :items="['local', 'aramex', 'bosta']"
+                  :label="$t('shipping.driver')"
+                  variant="outlined"
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  v-model.number="editedMethod.fee"
+                  :label="$t('shipping.base_cost')"
+                  type="number"
+                  variant="outlined"
+                  prefix="EGP"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-switch
+                  v-model="editedMethod.is_weight_aware"
+                  :label="$t('shipping.weight_aware')"
+                  color="primary"
+                  hide-details
+                ></v-switch>
+              </v-col>
+              <template v-if="editedMethod.is_weight_aware">
+                <v-col cols="12" sm="4">
+                  <v-text-field
+                    v-model.number="editedMethod.base_weight"
+                    :label="$t('shipping.base_weight')"
+                    type="number"
+                    variant="outlined"
+                    suffix="KG"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="12" sm="8">
+                  <v-text-field
+                    v-model.number="editedMethod.extra_weight_fee"
+                    :label="$t('shipping.extra_weight_fee')"
+                    type="number"
+                    variant="outlined"
+                    suffix="EGP/KG"
+                  ></v-text-field>
+                </v-col>
+              </template>
+            </v-row>
+          </v-form>
+        </v-card-text>
+        <v-card-actions class="pa-4">
+          <v-spacer></v-spacer>
+          <v-btn variant="tonal" @click="dialogMethod = false">{{
+            $t("dashboard.cancel")
+          }}</v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            :loading="saving"
+            @click="saveMethod"
+            >{{ $t("dashboard.save") }}</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -436,6 +663,7 @@ import { useI18n } from "vue-i18n";
 const { t, locale } = useI18n();
 
 const zones = ref([]);
+const governorates = ref([]);
 const loading = ref(true);
 const processingIds = ref([]);
 const lastAction = ref("");
@@ -458,21 +686,39 @@ const savingSettings = ref(false);
 
 const dialog = ref(false);
 const dialogDelete = ref(false);
+const dialogGovs = ref(false);
+const dialogMethod = ref(false);
+
 const isEditing = ref(false);
 const validForm = ref(false);
+const validMethodForm = ref(false);
+
 const saving = ref(false);
 const deleting = ref(false);
 const itemToDelete = ref(null);
 
+const activeZone = ref(null);
+const selectedGovIds = ref([]);
+
 const defaultItem = {
   id: null,
   name: "",
-  fee: 0,
-  delivery_time: "",
-  cod_fee: 0,
   is_active: true,
 };
 const editedItem = ref({ ...defaultItem });
+
+const defaultMethod = {
+  id: null,
+  name_ar: "",
+  name_en: "",
+  driver: "local",
+  is_active: true,
+  is_weight_aware: false,
+  fee: 0,
+  extra_weight_fee: 0,
+  base_weight: 0,
+};
+const editedMethod = ref({ ...defaultMethod });
 
 // --- Polling & Visibility Logic ---
 const pollingInterval = ref(null);
@@ -504,13 +750,14 @@ const handleVisibilityChange = () => {
 const fetchZonesAndSettings = async (quiet = false) => {
   if (!quiet) loading.value = true;
   try {
-    const [zonesRes, settingsRes] = await Promise.all([
+    const [zonesRes, settingsRes, govsRes] = await Promise.all([
       axios.get("/admin/shipping-zones"),
       axios.get("/admin/settings"),
+      axios.get("/admin/governorates"),
     ]);
     zones.value = zonesRes.data;
+    governorates.value = govsRes.data;
 
-    // settings payload returns an object mapping key to value
     if (settingsRes.data) {
       isFreeShippingEnabled.value =
         settingsRes.data.free_shipping_enabled === "true";
@@ -527,8 +774,17 @@ const fetchZonesAndSettings = async (quiet = false) => {
 
 const averageShippingCost = computed(() => {
   if (zones.value.length === 0) return 0;
-  const total = zones.value.reduce((sum, zone) => sum + Number(zone.fee), 0);
-  return Math.round(total / zones.value.length);
+  let totalCost = 0;
+  let methodCount = 0;
+  zones.value.forEach((zone) => {
+    if (zone.methods && zone.methods.length > 0) {
+      zone.methods.forEach((m) => {
+        totalCost += Number(m.fee);
+        methodCount++;
+      });
+    }
+  });
+  return methodCount > 0 ? Math.round(totalCost / methodCount) : 0;
 });
 
 const saveShippingSettings = async () => {
@@ -566,13 +822,11 @@ const closeDialog = () => {
 };
 
 const saveItem = async () => {
+  if (!validForm.value) return;
   saving.value = true;
   try {
     const payload = {
       name: editedItem.value.name,
-      fee: editedItem.value.fee,
-      delivery_time: editedItem.value.delivery_time,
-      cod_fee: editedItem.value.cod_fee,
       is_active: editedItem.value.is_active,
     };
 
@@ -582,7 +836,8 @@ const saveItem = async () => {
         payload
       );
       const index = zones.value.findIndex((z) => z.id === editedItem.value.id);
-      if (index !== -1) zones.value[index] = res.data;
+      if (index !== -1)
+        zones.value[index] = { ...zones.value[index], ...res.data };
       showMessage(t("shipping.update_success"));
     } else {
       const res = await axios.post("/admin/shipping-zones", payload);
@@ -592,7 +847,7 @@ const saveItem = async () => {
     closeDialog();
   } catch (err) {
     console.error("Error saving zone:", err);
-    showMessage(err.response?.data?.message || "حدث خطأ أثناء الحفظ", "error");
+    showMessage(err.response?.data?.message || "Error saving zone", "error");
   } finally {
     saving.value = false;
   }
@@ -603,7 +858,7 @@ const toggleZoneStatus = async (zone) => {
   lastAction.value = "toggle";
   try {
     await axios.put(`/admin/shipping-zones/${zone.id}`, {
-      ...zone,
+      name: zone.name,
       is_active: zone.is_active,
     });
     showMessage(
@@ -647,6 +902,77 @@ const confirmDelete = async () => {
         (id) => id !== itemToDelete.value.id
       );
     }
+  }
+};
+
+// --- Governorates & Methods Action ---
+const openGovsDialog = (zone) => {
+  activeZone.value = zone;
+  selectedGovIds.value = zone.governorates
+    ? zone.governorates.map((g) => g.id)
+    : [];
+  dialogGovs.value = true;
+};
+
+const saveGovsAssignment = async () => {
+  saving.value = true;
+  try {
+    await axios.post("/admin/shipping-zones/assign-governorate", {
+      zone_id: activeZone.value.id,
+      governorate_ids: selectedGovIds.value,
+    });
+    showMessage(t("shipping.update_success"));
+    fetchZonesAndSettings(true);
+    dialogGovs.value = false;
+  } catch (err) {
+    console.error(err);
+    showMessage(t("dashboard.error_occurred"), "error");
+  } finally {
+    saving.value = false;
+  }
+};
+
+const openAddMethod = (zone) => {
+  activeZone.value = zone;
+  isEditing.value = false;
+  editedMethod.value = { ...defaultMethod };
+  dialogMethod.value = true;
+};
+
+const editMethod = (zone, method) => {
+  activeZone.value = zone;
+  isEditing.value = true;
+  editedMethod.value = { ...method };
+  dialogMethod.value = true;
+};
+
+const saveMethod = async () => {
+  if (!validMethodForm.value) return;
+  saving.value = true;
+  try {
+    await axios.post(`/admin/shipping-zones/${activeZone.value.id}/methods`, {
+      ...editedMethod.value,
+      id: isEditing.value ? editedMethod.value.id : null,
+    });
+    showMessage(t("shipping.update_success"));
+    fetchZonesAndSettings(true);
+    dialogMethod.value = false;
+  } catch (err) {
+    console.error(err);
+    showMessage(t("dashboard.error_occurred"), "error");
+  } finally {
+    saving.value = false;
+  }
+};
+
+const removeMethod = async (methodId) => {
+  if (!confirm(t("shipping.delete_confirm_title"))) return;
+  try {
+    await axios.delete(`/admin/shipping-methods/${methodId}`);
+    showMessage(t("shipping.delete_success"));
+    fetchZonesAndSettings(true);
+  } catch (err) {
+    showMessage(t("dashboard.delete_error"), "error");
   }
 };
 

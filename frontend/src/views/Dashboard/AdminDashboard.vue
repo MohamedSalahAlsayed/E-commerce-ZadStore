@@ -1,7 +1,7 @@
 <template>
   <div
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
-    class="pa-6 bg-grey-lighten-4"
+    class="pa-4 pa-md-6 bg-grey-lighten-4"
     style="min-height: 100vh"
   >
     <!-- Header Section -->

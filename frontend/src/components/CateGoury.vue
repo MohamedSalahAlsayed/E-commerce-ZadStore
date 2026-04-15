@@ -8,10 +8,11 @@
 
     <swiper
       :modules="modules"
-      :slides-per-view="2"
+      :slides-per-view="1"
       :space-between="15"
       :navigation="true"
       :breakpoints="{
+        450: { slidesPerView: 2, spaceBetween: 15 },
         600: { slidesPerView: 3, spaceBetween: 20 },
         960: { slidesPerView: 5, spaceBetween: 20 },
         1280: { slidesPerView: 7, spaceBetween: 24 },

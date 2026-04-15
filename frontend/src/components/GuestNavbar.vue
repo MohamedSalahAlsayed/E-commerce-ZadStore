@@ -8,6 +8,7 @@
       {
         'border-bottom': !isHome,
         'position-absolute top-0 w-100': isHome,
+        'premium-mobile-bar': $vuetify.display.xs || $vuetify.display.sm,
       },
     ]"
     height="75"
@@ -51,14 +52,36 @@
 
       <!-- Action Buttons & Lang Switcher -->
       <div class="d-none d-sm-flex align-center gap-3">
+        <v-btn
+          variant="outlined"
+          color="primary"
+          class="font-weight-bold rounded-lg px-6 h-40"
+          to="/Auth/LogIn"
+        >
+          {{ $t("guest_nav.login") }}
+        </v-btn>
+        <v-btn
+          variant="flat"
+          color="primary"
+          class="font-weight-bold rounded-lg px-6 h-40 elevation-2"
+          to="/Auth/RegisterNow"
+        >
+          {{ $t("guest_nav.register") }}
+        </v-btn>
+
+        <v-divider
+          vertical
+          class="mx-1"
+          style="height: 25px; align-self: center"
+        ></v-divider>
+
         <v-menu location="bottom end" transition="scale-transition">
           <template v-slot:activator="{ props }">
             <v-btn
               color="primary"
               variant="text"
-              class="text-capitalize px-1 mr-1 font-weight-bold"
+              class="text-capitalize px-1 font-weight-bold rounded-lg"
               v-bind="props"
-              rounded
               style="min-width: auto"
             >
               <v-avatar size="22" class="ml-1 border">
@@ -69,7 +92,7 @@
             </v-btn>
           </template>
 
-          <v-list density="compact" nav elevation="3" class="rounded-lg">
+          <v-list density="compact" nav elevation="3" class="rounded-lg mt-2">
             <v-list-item
               v-for="(lang, i) in availableLangs"
               :key="i"
@@ -90,105 +113,135 @@
             </v-list-item>
           </v-list>
         </v-menu>
-
-        <v-btn
-          variant="outlined"
-          color="primary"
-          class="font-weight-bold rounded-lg px-6"
-          to="/Auth/LogIn"
-        >
-          {{ $t("guest_nav.login") }}
-        </v-btn>
-        <v-btn
-          variant="flat"
-          color="primary"
-          class="font-weight-bold rounded-lg px-6"
-          elevation="2"
-          to="/Auth/RegisterNow"
-        >
-          {{ $t("guest_nav.register") }}
-        </v-btn>
       </div>
 
-      <!-- Mobile Menu Button -->
-      <v-btn icon class="d-md-none" @click="mobileMenu = !mobileMenu">
-        <v-icon>mdi-menu</v-icon>
+      <!-- Mobile Menu Button (Improved Visibility) -->
+      <v-btn
+        icon
+        class="d-md-none mobile-menu-btn"
+        @click="mobileMenu = !mobileMenu"
+        variant="flat"
+        :color="isHome ? 'rgba(255,255,255,0.2)' : 'grey-lighten-4'"
+      >
+        <v-icon :color="isHome ? 'white' : 'primary'">mdi-menu</v-icon>
       </v-btn>
     </v-container>
+  </v-app-bar>
 
-    <!-- Mobile Drawer -->
-    <v-navigation-drawer
-      v-model="mobileMenu"
-      temporary
-      location="right"
-      width="250"
-    >
-      <v-list density="comfortable" nav class="mt-4">
+  <!-- Mobile Drawer (Moved outside v-app-bar for better stability) -->
+  <v-navigation-drawer
+    v-model="mobileMenu"
+    temporary
+    :location="currentLang.code === 'ar' ? 'right' : 'left'"
+    width="280"
+    class="guest-mobile-drawer"
+  >
+    <div class="d-flex flex-column h-100 pa-4 overflow-y-auto">
+      <div class="d-flex justify-space-between align-center mb-6">
+        <h3 class="font-weight-black text-primary">{{ $t("nav.menu") }}</h3>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          size="small"
+          @click="mobileMenu = false"
+        ></v-btn>
+      </div>
+
+      <!-- NEW: Primary Mobile Actions At TOP -->
+      <div class="auth-buttons-mobile mb-4 px-1">
+        <v-btn
+          block
+          color="primary"
+          variant="tonal"
+          to="/Auth/LogIn"
+          class="mb-3 rounded-lg font-weight-black h-48"
+          @click="mobileMenu = false"
+          >{{ $t("guest_nav.login") }}</v-btn
+        >
+        <v-btn
+          block
+          color="primary"
+          variant="flat"
+          to="/Auth/RegisterNow"
+          class="rounded-lg font-weight-black h-48 elevation-2"
+          @click="mobileMenu = false"
+          >{{ $t("guest_nav.register") }}</v-btn
+        >
+      </div>
+
+      <!-- NEW: Language Grid TOP -->
+      <div class="mb-4 px-1">
+        <div
+          class="text-caption font-weight-black text-uppercase opacity-40 mb-3 ps-1"
+        >
+          {{ $t("language") }}
+        </div>
+        <v-item-group
+          v-model="currentLangCode"
+          mandatory
+          class="d-flex gap-2"
+          @update:model-value="(val) => onLangChange(val)"
+        >
+          <v-item
+            v-for="lang in availableLangs"
+            :key="lang.code"
+            :value="lang.code"
+            v-slot="{ isSelected, toggle }"
+          >
+            <v-btn
+              :variant="isSelected ? 'flat' : 'tonal'"
+              :color="isSelected ? 'primary' : 'grey-lighten-3'"
+              class="flex-grow-1 rounded-lg font-weight-bold"
+              @click="toggle"
+              size="small"
+              height="40"
+            >
+              <v-img
+                :src="lang.flag"
+                width="18"
+                class="me-2 rounded-xs"
+              ></v-img>
+              {{ lang.name }}
+            </v-btn>
+          </v-item>
+        </v-item-group>
+      </div>
+
+      <v-divider class="my-6"></v-divider>
+
+      <!-- NAVIGATION LINKS -->
+      <v-list density="comfortable" nav class="mb-4">
         <v-list-item
           to="/"
           prepend-icon="mdi-home"
+          class="rounded-lg mb-1"
           :title="$t('guest_nav.home')"
+          @click="mobileMenu = false"
         ></v-list-item>
         <v-list-item
           to="/BlogPage"
           prepend-icon="mdi-post-outline"
+          class="rounded-lg mb-1"
           :title="$t('guest_nav.blog')"
+          @click="mobileMenu = false"
         ></v-list-item>
         <v-list-item
           to="/AboutPage"
           prepend-icon="mdi-information-outline"
+          class="rounded-lg mb-1"
           :title="$t('guest_nav.about_us')"
+          @click="mobileMenu = false"
         ></v-list-item>
         <v-list-item
           to="/ContactPage"
           prepend-icon="mdi-phone-outline"
+          class="rounded-lg mb-1"
           :title="$t('guest_nav.contact')"
+          @click="mobileMenu = false"
         ></v-list-item>
       </v-list>
-      <v-divider class="my-4"></v-divider>
-
-      <!-- Mobile Language Switcher -->
-      <div class="px-4 pb-2">
-        <v-select
-          v-model="currentLangCode"
-          :items="availableLangs"
-          item-title="name"
-          item-value="code"
-          :label="$t('guest_nav.language_label')"
-          variant="outlined"
-          density="compact"
-          color="primary"
-          @update:modelValue="onLangChange($event)"
-        >
-          <template v-slot:selection="{ item }">
-            <div class="d-flex align-center">
-              <img
-                :src="item.raw.flag"
-                width="20"
-                class="ml-2"
-                style="border-radius: 2px"
-              />
-              {{ item.raw.name }}
-            </div>
-          </template>
-        </v-select>
-      </div>
-
-      <div class="px-4 pb-4">
-        <v-btn
-          block
-          color="primary"
-          variant="outlined"
-          to="/Auth/LogIn"
-          class="mb-3"
-          >{{ $t("guest_nav.login") }}</v-btn
-        >
-        <v-btn block color="primary" variant="flat" to="/Auth/RegisterNow">{{
-          $t("guest_nav.register")
-        }}</v-btn>
-      </div>
-    </v-navigation-drawer>
-  </v-app-bar>
+    </div>
+  </v-navigation-drawer>
 </template>
 
 <script setup>
@@ -248,5 +301,30 @@ onMounted(() => {
 }
 .gap-3 {
   gap: 12px;
+}
+.h-40 {
+  height: 40px !important;
+}
+.h-48 {
+  height: 48px !important;
+}
+.mobile-menu-btn {
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+.guest-mobile-drawer {
+  border-radius: 20px 0 0 20px !important;
+}
+
+.premium-mobile-bar {
+  background: linear-gradient(
+    135deg,
+    #0d1117 0%,
+    rgb(var(--v-theme-primary)) 100%
+  ) !important;
+}
+.premium-mobile-bar :deep(.v-btn),
+.premium-mobile-bar :deep(.logo-text) {
+  color: white !important;
 }
 </style>
