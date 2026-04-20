@@ -1294,7 +1294,7 @@ import axios from "@/axios";
 import { mergeGuestHome } from "@/utils/guestHomeDefaults";
 import PhoneInput from "@/components/PhoneInput.vue";
 
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const theme = useTheme();
 const hoveredSection = ref(null);
 const activeTab = ref("general");
@@ -1322,6 +1322,7 @@ const settings = ref({
   codEnabled: true,
   maintenanceMode: false,
   primaryColor: "#f97316",
+  footerAbout: "",
   footerCopyright: "",
   footerShowSocial: true,
   footerShowContact: true,
@@ -1477,6 +1478,13 @@ const loadSettings = async () => {
     if (data.maintenanceMode)
       settings.value.maintenanceMode = data.maintenanceMode === "true";
     if (data.primaryColor) settings.value.primaryColor = data.primaryColor;
+    if (data.footerAbout) settings.value.footerAbout = data.footerAbout;
+    if (data.footerCopyright)
+      settings.value.footerCopyright = data.footerCopyright;
+    if (data.footerShowSocial)
+      settings.value.footerShowSocial = data.footerShowSocial === "true";
+    if (data.footerShowContact)
+      settings.value.footerShowContact = data.footerShowContact === "true";
 
     if (data.guest_home) {
       settings.value.guestHome = mergeGuestHome(data.guest_home);
@@ -1529,7 +1537,10 @@ const saveSettings = async () => {
 
       payload.append(
         finalKey,
-        key === "maintenanceMode" || key === "codEnabled"
+        key === "maintenanceMode" ||
+          key === "codEnabled" ||
+          key === "footerShowSocial" ||
+          key === "footerShowContact"
           ? val
             ? "true"
             : "false"
@@ -1559,47 +1570,20 @@ const saveSettings = async () => {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
-    showMessage(
-      locale.value === "ar"
-        ? "تم حفظ الإعدادات بنجاح! سيتم تحديث الموقع..."
-        : "Settings saved successfully! Refreshing..."
-    );
+    showMessage(t("settings.messages.save_success"));
     setTimeout(() => {
       window.location.reload();
     }, 1500);
   } catch (error) {
     console.error("Error saving settings:", error);
-    showMessage(
-      locale.value === "ar"
-        ? "حدث خطأ أثناء حفظ الإعدادات"
-        : "Error saving settings",
-      "error"
-    );
+    showMessage(t("settings.messages.save_error"), "error");
   } finally {
     isSaving.value = false;
   }
 };
 
 const getSectionLabel = (section) => {
-  const labels = {
-    BannerHome:
-      locale.value === "ar" ? "البانر الرئيسي (Slider)" : "Main Banner",
-    TopOffer:
-      locale.value === "ar" ? "عروض اليوم (Top Offer)" : "Today's Offer",
-    FlashDeal: locale.value === "ar" ? "العروض (Offers)" : "Offers",
-    NewProduct:
-      locale.value === "ar" ? "أحدث المنتجات (New Products)" : "New Products",
-    Categoury: locale.value === "ar" ? "التصنيفات (Categories)" : "Categories",
-    BestSeller: locale.value === "ar" ? "الأكثر مبيعاً" : "Best Sellers",
-    QualityFeature:
-      locale.value === "ar" ? "مميزات الجودة" : "Quality Features",
-    FaqSection: locale.value === "ar" ? "الأسئلة الشائعة" : "FAQ Section",
-    ShopWithUs: locale.value === "ar" ? "لماذا تشتري منا؟" : "Shop With Us",
-    BrandS: locale.value === "ar" ? "الماركات" : "Brands",
-    CtaSection:
-      locale.value === "ar" ? "قسم دعوة التسجيل (CTA)" : "Registration CTA",
-  };
-  return labels[section] || section;
+  return t(`settings.sections.${section}`) || section;
 };
 
 const getSectionToggleKey = (section) => {

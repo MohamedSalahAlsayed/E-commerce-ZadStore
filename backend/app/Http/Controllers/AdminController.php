@@ -477,7 +477,8 @@ class AdminController extends Controller
             
             $order->load('items');
             foreach ($order->items as $item) {
-                $p = \App\Models\Product::findOrFail($item->product_id);
+                $p = \App\Models\Product::find($item->product_id);
+                if (!$p) continue;
                 $oldS = $p->stock;
                 $p->increment('stock', $item->quantity);
                 
@@ -496,7 +497,8 @@ class AdminController extends Controller
             
             $order->load('items');
             foreach ($order->items as $item) {
-                $p = \App\Models\Product::findOrFail($item->product_id);
+                $p = \App\Models\Product::find($item->product_id);
+                if (!$p) continue;
                 $oldS = $p->stock;
                 $p->decrement('stock', $item->quantity);
 
@@ -560,7 +562,8 @@ class AdminController extends Controller
                 $order->status = 'returned';
                 $order->load('items');
                 foreach ($order->items as $item) {
-                    $p = \App\Models\Product::findOrFail($item->product_id);
+                    $p = \App\Models\Product::find($item->product_id);
+                    if (!$p) continue;
                     $oldS = $p->stock;
                     $p->increment('stock', $item->quantity);
 

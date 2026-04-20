@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    class="promo-section py-8"
+    class="promo-section pt-0 pb-4"
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
     <v-row>

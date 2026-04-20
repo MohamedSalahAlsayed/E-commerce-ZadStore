@@ -81,7 +81,7 @@ export const ProductModule = defineStore("ProductModule", {
         // If categories in dummyjson was an array of strings like ["smartphones", "laptops"]
         // we map it. If it was objects, we leave it. We'll map to strings to be safe for old logic, or just objects.
         // Assuming original logic wanted objects or strings. We'll return objects but keep 'name'.
-        this.categories = res.data;
+        this.categories = res.data?.data || res.data || [];
       } catch (err) {
         console.error(err);
       }

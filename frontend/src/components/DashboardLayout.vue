@@ -508,7 +508,7 @@
               <v-list-item
                 prepend-icon="mdi-account"
                 :title="$t('profile')"
-                to="/Dashboard/StoreSetting"
+                to="/Dashboard/Profile"
               ></v-list-item>
               <v-list-item
                 prepend-icon="mdi-logout"

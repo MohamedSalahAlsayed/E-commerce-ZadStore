@@ -309,13 +309,13 @@
       <v-container fluid class="d-flex align-center justify-space-between py-0">
         <div class="d-none d-md-flex align-center gap-6 right-actions">
           <div
-            class="d-flex align-center justify-between gap-2 text-white phone-info"
+            class="d-flex align-center justify-space-between w-100 text-white phone-info"
           >
             <span class="d-flex align-center">
-              <v-icon size="18" class="ml-2">mdi-phone</v-icon>
+              <v-icon size="16" class="ml-1">mdi-phone</v-icon>
               <span
                 class="small-text font-weight-bold"
-                style="direction: ltr"
+                style="direction: ltr; font-size: 11px"
                 >{{ settingsStore.phone || "+20 123 456 7890" }}</span
               >
             </span>
@@ -344,40 +344,55 @@
           </div>
         </div>
 
-        <!-- Social Media Icons (Now visible on mobile in place of the redundant menu icon) -->
+        <!-- Social Media Icons & Search -->
         <div class="d-flex align-center gap-1">
+          <!-- New: Top Bar Search (Desktop Only) -->
+          <div class="d-none d-md-flex align-center top-search-wrapper ms-4">
+            <input
+              v-model="searchQuery"
+              @keyup.enter="performSearch"
+              type="text"
+              :placeholder="$t('nav.search_placeholder')"
+              class="top-search-input"
+            />
+            <v-btn
+              icon="mdi-magnify"
+              size="x-small"
+              variant="text"
+              color="white"
+              @click="performSearch"
+            ></v-btn>
+          </div>
+
           <v-btn
-            v-if="settingsStore.facebook"
             icon
             size="x-small"
             variant="text"
             color="white"
             class="social-btn-hover"
-            :href="settingsStore.facebook"
+            :href="settingsStore.facebook || 'https://facebook.com'"
             target="_blank"
           >
             <v-icon size="18">mdi-facebook</v-icon>
           </v-btn>
           <v-btn
-            v-if="settingsStore.instagram"
             icon
             size="x-small"
             variant="text"
             color="white"
             class="social-btn-hover"
-            :href="settingsStore.instagram"
+            :href="settingsStore.instagram || 'https://instagram.com'"
             target="_blank"
           >
             <v-icon size="18">mdi-instagram</v-icon>
           </v-btn>
           <v-btn
-            v-if="settingsStore.twitter"
             icon
             size="x-small"
             variant="text"
             color="white"
             class="social-btn-hover"
-            :href="settingsStore.twitter"
+            :href="settingsStore.twitter || 'https://twitter.com'"
             target="_blank"
           >
             <v-icon size="18">mdi-twitter</v-icon>
@@ -507,21 +522,16 @@
         </div>
 
         <div class="d-flex align-center justify-end gap-1">
-          <div class="d-flex align-center">
-            <div :class="['search-wrapper', { 'search-open': searchOpen }]">
-              <input
-                ref="searchInput"
-                v-model="searchQuery"
-                @keyup.enter="performSearch"
-                type="text"
-                :placeholder="$t('nav.search_placeholder')"
-                class="custom-search-input"
-              />
-            </div>
-            <v-btn icon color="white" variant="text" @click="toggleSearch">
-              <v-icon>{{ searchOpen ? "mdi-close" : "mdi-magnify" }}</v-icon>
-            </v-btn>
-          </div>
+          <!-- Main Search Button (Mobile Only) -->
+          <v-btn
+            icon
+            color="white"
+            variant="text"
+            @click="toggleSearch"
+            class="d-md-none"
+          >
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
 
           <div class="d-none d-md-flex align-center">
             <v-btn
@@ -761,7 +771,7 @@
                 <v-avatar size="22" class="ml-1">
                   <v-img :src="currentLang.flag" cover></v-img>
                 </v-avatar>
-                <span class="d-none d-sm-inline">{{ currentLang.code }}</span>
+                <span class="d-none d-sm-inline">{{ currentLang.name }}</span>
                 <v-icon size="small">mdi-chevron-down</v-icon>
               </v-btn>
             </template>
@@ -791,6 +801,52 @@
       </div>
     </v-app-bar>
   </div>
+
+  <!-- Premium Search Overlay -->
+  <v-fade-transition>
+    <div v-if="searchOpen" class="search-full-overlay">
+      <v-container class="h-100 d-flex flex-column justify-center align-center">
+        <div class="d-flex justify-end w-100 mb-4 px-4">
+          <v-btn
+            icon="mdi-close"
+            color="white"
+            variant="text"
+            size="large"
+            @click="searchOpen = false"
+            class="close-btn-shadow"
+          ></v-btn>
+        </div>
+
+        <div class="search-input-container w-100 px-4 max-width-800">
+          <div class="d-flex align-center overlay-search-box flex-nowrap">
+            <input
+              ref="searchInput"
+              v-model="searchQuery"
+              @keyup.enter="performSearch"
+              type="text"
+              :placeholder="$t('nav.search_placeholder')"
+              class="overlay-search-field"
+              autofocus
+            />
+            <!-- Mobile Specific Search Button -->
+            <v-btn
+              class="d-sm-none ms-3 rounded-lg font-weight-black shadow-none"
+              color="warning"
+              min-width="80"
+              height="50"
+              @click="performSearch"
+            >
+              {{ $t("nav.search_btn") || "بحث" }}
+            </v-btn>
+          </div>
+          <div class="search-line"></div>
+          <p class="text-white opacity-60 mt-4 text-center">
+            {{ $t("search_hint") || "اضغط Enter للبحث عن منتجك المفضل..." }}
+          </p>
+        </div>
+      </v-container>
+    </div>
+  </v-fade-transition>
 
   <!-- الروبوت الذكي والدعم الفني -->
   <v-fade-transition>
@@ -915,14 +971,13 @@ const menuItems = computed(() => [
   { text: t("nav.add_order"), link: "/User/AddOrder", badge: null },
 ]);
 
+import api from "@/axios";
+
 const mobileMenu = ref(false);
 const searchOpen = ref(false);
 const searchQuery = ref("");
 const isScrolled = ref(false);
 const searchInput = ref(null);
-
-const isRtl = computed(() => locale.value === "ar");
-import api from "@/axios";
 
 // --- User Data ---
 const userData = computed(() => {
@@ -1069,30 +1124,96 @@ onUnmounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Search Animation */
-.search-wrapper {
-  width: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: width 0.4s ease, opacity 0.3s ease;
-}
-.search-wrapper.search-open {
-  width: 200px;
-  opacity: 1;
-  margin-right: 8px;
-}
-.custom-search-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.15);
+/* ================= Top Bar Search (Desktop) ================= */
+.top-search-wrapper {
+  background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 20px;
-  padding: 6px 15px;
-  color: white;
-  outline: none;
+  padding: 0px 12px; /* Thinner */
+  display: flex;
+  align-items: center;
+  width: 350px; /* Wider start */
+  transition: all 0.3s ease;
+  height: 28px; /* Fixed thinner height */
 }
-.custom-search-input:focus {
-  background: rgba(255, 255, 255, 0.25);
+
+.top-search-wrapper:focus-within {
+  background: rgba(255, 255, 255, 0.2);
   border-color: #ffca28;
+  width: 450px; /* Wider expanded */
+}
+
+.top-search-input {
+  border: none;
+  background: transparent;
+  color: white;
+  width: 100%;
+  outline: none;
+  font-size: 12px; /* Slightly smaller font for thinner bar */
+  padding: 0;
+}
+
+.top-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ================= Premium Search Overlay ================= */
+.search-full-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(var(--v-theme-primary), 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 10000; /* Over everything */
+  color: white;
+}
+
+.overlay-search-box {
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.max-width-800 {
+  max-width: 800px;
+}
+
+.overlay-search-field {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: clamp(18px, 4vw, 32px);
+  font-weight: 700;
+  padding: 10px 0;
+  outline: none;
+  text-align: inherit;
+}
+
+.search-line {
+  height: 2px;
+  width: 0;
+  background: #ffca28;
+  margin: 5px 0 0;
+  transition: width 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.overlay-search-field:focus + .search-line {
+  width: 100%;
+}
+
+.overlay-search-field::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 600px) {
+  .overlay-search-field {
+    font-size: 20px;
+  }
 }
 
 /* Navigation Items */
@@ -1252,7 +1373,7 @@ onUnmounted(() => {
   position: fixed;
   bottom: 25px;
   inset-inline-end: 25px;
-  z-index: 999;
+  z-index: 20000; /* Much higher */
   gap: 12px;
 }
 
@@ -1393,11 +1514,17 @@ onUnmounted(() => {
   }
 }
 .social-btn-hover {
-  opacity: 0.8;
+  opacity: 0.9;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin: 0 2px;
 }
 .social-btn-hover:hover {
   opacity: 1;
   transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.phone-info {
+  flex-shrink: 0;
 }
 </style>

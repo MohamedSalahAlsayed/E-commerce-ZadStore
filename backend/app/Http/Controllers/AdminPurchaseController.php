@@ -113,6 +113,7 @@ class AdminPurchaseController extends Controller
             if ($newStatus === 'received') {
                 foreach ($purchase->items as $item) {
                     $p = Product::find($item->product_id);
+                    if (!$p) continue;
                     $oldS = $p->stock;
                     $p->increment('stock', $item->quantity);
 
@@ -132,6 +133,7 @@ class AdminPurchaseController extends Controller
             elseif ($oldStatus === 'received' && $newStatus !== 'received') {
                 foreach ($purchase->items as $item) {
                     $p = Product::find($item->product_id);
+                    if (!$p) continue;
                     $oldS = $p->stock;
                     $p->decrement('stock', $item->quantity);
 
@@ -159,6 +161,7 @@ class AdminPurchaseController extends Controller
             if ($purchase->status === 'received') {
                 foreach ($purchase->items as $item) {
                     $p = Product::find($item->product_id);
+                    if (!$p) continue;
                     $oldS = $p->stock;
                     $p->decrement('stock', $item->quantity);
 

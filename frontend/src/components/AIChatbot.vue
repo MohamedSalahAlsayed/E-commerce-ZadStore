@@ -152,9 +152,13 @@
 import { ref, onMounted, nextTick, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
+import { useSettingsStore } from "@/store/Settings";
+import { ProductModule } from "@/store/Products";
 
 const { t } = useI18n();
 const router = useRouter();
+const settingsStore = useSettingsStore();
+const productStore = ProductModule();
 
 const isOpen = ref(false);
 const userInput = ref("");
@@ -204,61 +208,84 @@ const sendMessage = async () => {
   userInput.value = "";
   isTyping.value = true;
 
-  // Mock AI Logic
+  // Dynamics Context-Aware AI Logic
   setTimeout(() => {
     let botResponse = "";
     const text = userText.toLowerCase();
 
+    // Knowledge Base Construction
+    const storeName = settingsStore.storeName || "زاّد ستور";
+    const categoriesData = productStore.categories || [];
+    const categoriesList =
+      categoriesData.map((c) => c.name).join("، ") || "أقسام متنوعة";
+    const brandsList =
+      productStore.brands?.map((b) => b.name).join("، ") || "ماركات عالمية";
+
+    // Intelligence Matrix
     if (
       text.includes("سعر") ||
       text.includes("بكام") ||
       text.includes("فلوس")
     ) {
-      botResponse =
-        'أسعارنا تنافسية للغاية وهدفنا توفير أفضل ربح للمسوقين! يمكنك تصفح قسم المنتجات لمعرفة سعر كل منتج وعمولتك المقدرة، ولا تنسَ متابعة عروض "الفلاش ديل" الحصرية.';
+      botResponse = `بصفتنا ${storeName}، بنوفر لك أفضل سعر للمستهلك وأعلى عمولة للمسوق. تقدر تشوف أسعار كل قسم زي ${
+        categoriesList.split("،")[0]
+      } من صفحة المنتجات.`;
     } else if (
       text.includes("توصيل") ||
       text.includes("شحن") ||
       text.includes("وقت") ||
-      text.includes("متى")
+      text.includes("متى") ||
+      text.includes("محافظة")
     ) {
-      botResponse =
-        "نحن نشحن لجميع محافظات مصر! مدة التوصيل تتراوح بين 24 إلى 48 ساعة من تأكيد طلبك، ويمكنك تتبع حالة الشحنة مباشرة من صفحة طلباتك.";
+      const threshold = settingsStore.free_shipping_threshold;
+      botResponse = `بنوصّل لكل محافظات مصر في خلال 48 ساعة بحد أقصى. متاح شحن مجاني لو طلبت بأكتر من ${
+        threshold || 1000
+      } جنيّه!`;
+    } else if (
+      text.includes("ماركة") ||
+      text.includes("براند") ||
+      text.includes("ماركات")
+    ) {
+      botResponse = `عندنا براندات كتير قوية زي: ${brandsList}. كل الماركات دي أصلية وعليها ضمان.`;
+    } else if (
+      text.includes("قسم") ||
+      text.includes("تصنيف") ||
+      text.includes("أقسام")
+    ) {
+      botResponse = `المنصة فيها أقسام كتير زي: ${categoriesList}. إيه هو أكتر قسم بتهتم بيه في شغلك؟`;
     } else if (
       text.includes("مشكلة") ||
       text.includes("شكوى") ||
       text.includes("عطل") ||
-      text.includes("خطأ")
+      text.includes("بايظ")
     ) {
       botResponse =
-        'نأسف جداً لأي إزعاج! يرجى الضغط على زر "تحدث مع الدعم الفني" بالأسفل لفتح تذكرة دعم، وسيتواصل معك أحد ممثلينا خلال دقائق لحل المشكلة.';
+        'أنا آسف جداً.. ياريت تضغط على "تحدث مع الدعم الفني" تحت وهيفتح لك شات مباشر مع موظف خدمة العملاء يحل لك المشكلة فوراً.';
     } else if (
       text.includes("ربح") ||
       text.includes("عمولة") ||
-      text.includes("رصيد") ||
-      text.includes("سحب")
+      text.includes("سحب") ||
+      text.includes("فلوسي")
+    ) {
+      botResponse = `عمولتك بتنزل في محفظتك في ${storeName} أول ما العميل يستلم. السحب سهل جداً ومتاح بكل الطرق اللي تناسبك.`;
+    } else if (
+      text.includes("شغل") ||
+      text.includes("ازاي") ||
+      text.includes("أبدأ") ||
+      text.includes("طريقة")
     ) {
       botResponse =
-        "أرباحك في أمان مع ZadStore! يتم إضافة العمولة لمحفظتك فور استلام العميل للطلب، ويمكنك سحب أرباحك عند وصولها للحد الأدنى عبر الوسيلة التي تفضلها.";
+        "كل اللي عليك إنك تختار منتجات وتعمل لها 'إضافة لمتجري' أو تسوق بروابطك، وإحنا علينا الشحن والتحصيل وإنت عليك الربح!";
     } else if (
       text.includes("سلام") ||
       text.includes("شكرا") ||
       text.includes("مرحبا") ||
-      text.includes("اهلا")
+      text.includes("اهلا") ||
+      text.includes("ازيك")
     ) {
-      botResponse =
-        "أهلاً بك في ZadStore! أنا هنا لمساعدتك في أي استفسار يخص المنتجات أو الربح أو النظام. كيف يمكنني خدمتك اليوم؟";
-    } else if (
-      text.includes("تاجر") ||
-      text.includes("مسوق") ||
-      text.includes("شغل") ||
-      text.includes("عمل")
-    ) {
-      botResponse =
-        "ZadStore هي المنصة الأفضل للمسوقين في مصر! نحن نوفر لك المنتجات والشحن والتحصيل، ومهمتك هي التسويق فقط وجني الأرباح. ابدأ الآن بإضافة منتجات لمتجرك!";
+      botResponse = `أهلاً بيك! أنا مساعد ${storeName} الذكي. إيه الأخبار؟ حابب تسأل عن الشحن، العمولات، ولا براندات معينة؟`;
     } else {
-      botResponse =
-        "عذراً، لم أفهم استفسارك بدقة. هل تود الاستفسار عن (الأسعار، الشحن، الأرباح، أو تبليغ عن مشكلة)؟ يمكنني أيضاً تحويلك للدعم الفني البشري إذا أردت.";
+      botResponse = `حاليًا أنا بتعلم أكتر عن ${storeName}.. ممكن تسألني عن الأسعار، الشحن، الماركات، أو الأقسام المتاحة. أو لو حابب تكلمنا واتساب أو دعم فني.`;
     }
 
     messages.value.push({
@@ -270,7 +297,7 @@ const sendMessage = async () => {
       }),
     });
     isTyping.value = false;
-  }, 1500);
+  }, 1000);
 };
 
 const goToSupport = () => {
@@ -296,17 +323,22 @@ onMounted(() => {
 .chat-window {
   position: absolute;
   bottom: 70px;
-  right: 0;
-  max-height: 500px;
+  inset-inline-end: 0;
+  max-height: 420px; /* Reduced height */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid rgba(var(--v-theme-primary), 0.1);
-  transform-origin: bottom right;
+  transform-origin: bottom right; /* Standard origin */
+}
+
+/* Adjust for RTL logic if needed, though inset-inline-end handles most */
+[dir="rtl"] .chat-window {
+  transform-origin: bottom left;
 }
 
 .chat-messages {
-  height: 350px;
+  height: 280px; /* Reduced message area */
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--v-theme-primary), 0.2) transparent;

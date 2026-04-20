@@ -3,10 +3,13 @@
     class="cart-page bg-grey-lighten-4 py-10"
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
-    <v-container>
+    <v-container class="pt-6">
       <v-row>
         <v-col cols="12">
-          <h2 class="text-h4 font-weight-black mb-5 text-grey-darken-4">
+          <h2
+            class="text-h4 font-weight-black mb-8 text-grey-darken-4"
+            style="font-size: var(--step-2) !important"
+          >
             {{ $t("cart.title", { count: cartItems.length }) }}
           </h2>
         </v-col>

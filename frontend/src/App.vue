@@ -257,6 +257,14 @@ const applyTheme = (data) => {
   --step-1: clamp(1.05rem, calc(0.88rem + 0.83vw), 1.5rem);
   --step-2: clamp(1.26rem, calc(1.01rem + 1.25vw), 1.9rem);
   --step-3: clamp(1.51rem, calc(1.15rem + 1.83vw), 2.5rem);
+
+  /* Global Spacing Scale - Compacted for better rhythm */
+  --v-section-margin: clamp(20px, 4vw, 50px);
+  --v-content-gap: clamp(12px, 2vw, 24px);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -293,27 +301,69 @@ nav {
 .nav-text {
   font-size: 0.8rem !important;
 }
-/* تنسيق عنوان القسم */
-.section-title {
-  position: relative;
-  display: inline-block;
-  padding-bottom: 15px;
-  margin-bottom: 10px;
-  font-weight: 800;
-  color: rgb(var(--v-theme-primary));
-  letter-spacing: 0.5px;
+/* Shared Section Header Redesign */
+.custom-section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.section-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 60px; /* تقصير الخط ليكون أكثر أناقة */
-  height: 4px;
-  background: rgb(var(--v-theme-primary));
-  border-radius: 10px;
+.custom-badge {
+  background-color: rgba(var(--v-theme-primary), 0.1) !important;
+  color: rgb(var(--v-theme-primary)) !important;
+  font-size: 0.9rem !important;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  padding: 0 24px;
+  margin-bottom: 16px;
 }
+
+.custom-main-title {
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem) !important;
+  color: rgb(var(--v-theme-primary));
+  font-weight: 900 !important;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.custom-divider {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.custom-divider .bar {
+  height: 6px;
+  background-color: rgb(var(--v-theme-primary));
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.custom-divider .bar.long {
+  width: 100px;
+}
+
+.custom-divider .bar.short {
+  width: 25px;
+}
+
+@media (max-width: 600px) {
+  .custom-main-title {
+    font-size: 2rem !important;
+  }
+  .custom-divider .bar.long {
+    width: 60px;
+  }
+  .custom-divider .bar.short {
+    width: 15px;
+  }
+}
+
 .table-responsive {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

@@ -759,14 +759,13 @@ const exportToCSV = () => {
     o.total,
   ]);
 
+  const BOM = "\uFEFF";
   let csvContent =
-    "data:text/csv;charset=utf-8," +
-    headers.join(",") +
-    "\n" +
-    rows.map((e) => e.join(",")).join("\n");
-  const encodedUri = encodeURI(csvContent);
+    BOM + headers.join(",") + "\n" + rows.map((e) => e.join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
+  link.setAttribute("href", url);
   link.setAttribute(
     "download",
     `orders_${new Date().toISOString().split("T")[0]}.csv`
@@ -913,7 +912,7 @@ const updateOrderStatus = async (order) => {
       orders.value[index].status = order.status;
     }
 
-    showMessage("تم تحديث حالة الطلب بنجاح!");
+    showMessage(t("sales.orders.messages.status_success"));
   } catch (error) {
     console.error("Error updating order status:", error);
     showMessage(
@@ -936,24 +935,21 @@ const handleReturnRequest = async (order, action) => {
 
     // Update local object softly
     const index = orders.value.findIndex((o) => o.id === order.id);
-    if (index !== -1) {
-      orders.value[index].returnStatus =
-        action === "approve" ? "approved" : "rejected";
-      if (action === "approve") {
-        orders.value[index].status = STATUS_MAP_EN_AR["returned"] || "مُرتجع";
-        if (selectedOrder.value && selectedOrder.value.id === order.id) {
-          selectedOrder.value.status = STATUS_MAP_EN_AR["returned"] || "مُرتجع";
-          selectedOrder.value.returnStatus = "approved";
-        }
-      } else {
-        if (selectedOrder.value && selectedOrder.value.id === order.id) {
-          selectedOrder.value.returnStatus = "rejected";
-        }
+    orders.value[index].status = t("sales.orders.status.returned");
+    if (action === "approve") {
+      orders.value[index].status = t("sales.orders.status.returned");
+      if (selectedOrder.value && selectedOrder.value.id === order.id) {
+        selectedOrder.value.status = t("sales.orders.status.returned");
+        selectedOrder.value.returnStatus = "approved";
+      }
+    } else {
+      if (selectedOrder.value && selectedOrder.value.id === order.id) {
+        selectedOrder.value.returnStatus = "rejected";
       }
     }
   } catch (error) {
     console.error("Error handling return:", error);
-    showMessage("حدث خطأ أثناء معالجة الطلب", "error");
+    showMessage(t("sales.orders.messages.error"), "error");
   } finally {
     savingStatus.value = false;
   }
@@ -977,7 +973,7 @@ const confirmDelete = async () => {
   deleting.value = true;
   try {
     const res = await api.delete(`/admin/orders/${orderToDelete.value.id}`);
-    showMessage(res.data.message || "تم الحذف بنجاح");
+    showMessage(res.data.message || t("sales.orders.messages.delete_success"));
     orders.value = orders.value.filter((o) => o.id !== orderToDelete.value.id);
   } catch (error) {
     console.error("Error deleting order:", error);
@@ -1072,25 +1068,37 @@ const confirmDelete = async () => {
 }
 
 @media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-area,
+  .printable-area * {
+    visibility: visible;
+  }
+  .printable-area {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    background: white !important;
+    z-index: 9999;
+    overflow: visible !important;
+    max-height: none !important;
+  }
   .no-print,
   .v-btn,
   .v-field,
-  .date-input,
-  header,
-  nav {
+  .v-timeline,
+  .v-card-actions {
     display: none !important;
   }
-  .printable-area {
-    display: block !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    max-height: none !important;
-  }
-  .v-card {
+  /* Ensure text is black for printing */
+  .printable-area * {
+    color: black !important;
     box-shadow: none !important;
-    border: none !important;
   }
 }
 

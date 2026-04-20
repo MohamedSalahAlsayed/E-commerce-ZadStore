@@ -285,16 +285,21 @@
       "default_subtitle": "Discounts up to 50%"
     },
     "flash_deal": {
+      "chip": "Limited Time Offers",
       "title": "Offers",
       "ends_in": "Ends in:"
     },
     "best_seller": {
+      "chip": "Top Sellers",
       "title": "Best Sellers"
     },
     "categories": {
-      "title": "Categories"
+      "chip": "Browse by Categories",
+      "title": "Featured Categories",
+      "products_unit": "Products"
     },
     "brands": {
+      "chip": "Top Brands",
       "title": "Brands"
     }
   },
@@ -344,6 +349,8 @@
     "login_to_review": "Log in to be able to add a review and share your opinion.",
     "price_label": "Price:",
     "now_label": "Now",
+    "found_count": "Found {count} products",
+    "loading": "Loading products...",
     "added_to_cart_full": "Added to Cart"
   },
   "tager": {
@@ -688,6 +695,7 @@
     "editing_stock_notice": "Editing is only available by changing status or deleting to ensure stock integrity"
   },
   "features": {
+    "chip": "Why Choose Us?",
     "title": "Our Features",
     "f1_title": "Quality & Savings",
     "f1_desc": "Comprehensive quality control and affordable prices",
@@ -1035,6 +1043,23 @@
       "footer": "Footer Settings",
       "landing": "Guest Landing Page",
       "advanced": "System Settings"
+    },
+    "messages": {
+      "save_success": "Settings saved successfully! Refreshing...",
+      "save_error": "Error saving settings"
+    },
+    "sections": {
+      "BannerHome": "Main Banner (Slider)",
+      "TopOffer": "Today's Offer",
+      "FlashDeal": "Offers",
+      "NewProduct": "New Products",
+      "Categoury": "Categories",
+      "BestSeller": "Best Sellers",
+      "QualityFeature": "Quality Features",
+      "FaqSection": "FAQ Section",
+      "ShopWithUs": "Shop With Us",
+      "BrandS": "Brands",
+      "CtaSection": "Registration CTA"
     },
     "general": {
       "title": "Basic Information & Identity",
@@ -1430,5 +1455,29 @@
       "purchase_cancelled": "Invoice Cancelled",
       "purchase_deletion": "Invoice Deleted"
     }
+  },
+  "profile_page": {
+    "title": "Admin Profile",
+    "general_tab": "General Information",
+    "security_tab": "Security & Password",
+    "full_name": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "bio": "Personal Bio",
+    "permissions_title": "Permissions & Roles",
+    "super_admin": "Super Admin",
+    "admin": "System Admin",
+    "staff": "Staff Member",
+    "save_changes": "Save Changes",
+    "update_password": "Update Password",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "password_mismatch": "Passwords do not match",
+    "update_success": "Profile updated successfully",
+    "password_success": "Password changed successfully",
+    "avatar_success": "Avatar updated successfully",
+    "avatar_error": "Failed to upload image",
+    "unregistered": "Not registered"
   }
 }

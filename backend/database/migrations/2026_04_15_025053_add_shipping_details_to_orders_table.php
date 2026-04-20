@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('governorate_id')->nullable()->after('address')->constrained()->nullOnDelete();
-            $table->decimal('total_weight', 10, 2)->default(0)->after('total');
-        });
+        // Columns already added in 2026_04_15_022512_create_advanced_shipping_tables
     }
 
     /**
@@ -22,9 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('governorate_id');
-            $table->dropColumn('total_weight');
-        });
+        // Columns already dropped in 2026_04_15_022512_create_advanced_shipping_tables
     }
 };

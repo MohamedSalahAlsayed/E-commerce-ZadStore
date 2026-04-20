@@ -238,15 +238,16 @@ const showDetails = (product) => {
 .product-card {
   position: relative;
   background: white;
-  border-radius: 16px !important;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  border: 1px solid #eee !important;
+  border-radius: 20px !important;
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
   overflow: hidden;
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-10px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(var(--v-theme-primary), 0.2) !important;
 }
 
 /* ================= Media Section ================= */
@@ -256,11 +257,11 @@ const showDetails = (product) => {
 }
 
 .product-img {
-  transition: transform 0.8s ease;
+  transition: transform 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
 .product-card:hover .product-img {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .media-overlay {
@@ -269,7 +270,8 @@ const showDetails = (product) => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -284,11 +286,12 @@ const showDetails = (product) => {
 
 .quick-view-btn {
   background: white !important;
-  color: black !important;
+  color: #111 !important;
   border-radius: 50px !important;
   font-weight: 800 !important;
-  padding: 0 20px !important;
-  height: 40px !important;
+  padding: 0 24px !important;
+  height: 44px !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* ================= Badge System ================= */
@@ -305,19 +308,21 @@ const showDetails = (product) => {
 .discount-badge {
   background: #ff4757;
   color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.5px;
 }
 
 .new-badge {
   background: #2ecc71;
   color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 800;
-  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 11px;
+  letter-spacing: 0.5px;
 }
 
 /* ================= Floating Actions ================= */
@@ -329,23 +334,24 @@ const showDetails = (product) => {
 }
 
 .action-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
   background: white;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   color: #444;
 }
 
 .action-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
   color: #ff4757;
+  box-shadow: 0 12px 20px rgba(255, 71, 87, 0.15);
 }
 
 .action-btn.fav-btn.active {
@@ -354,30 +360,43 @@ const showDetails = (product) => {
 
 /* ================= Content Section ================= */
 .category-text {
-  font-size: 11px;
+  font-size: 10px;
   color: #999;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .product-title {
   font-size: 16px;
   font-weight: 800;
-  color: #111;
+  color: #1a1a1a;
   line-height: 1.4;
   height: 44px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.product-title:hover {
+  color: rgb(var(--v-theme-primary));
 }
 
 .current-price {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
   color: rgb(var(--v-theme-primary));
+  letter-spacing: -0.5px;
 }
 
 .old-price {
   font-size: 14px;
-  color: #aaa;
+  color: #bbb;
   text-decoration: line-through;
+  margin-bottom: 2px;
 }
 
 /* ================= Professional Solid Buttons ================= */

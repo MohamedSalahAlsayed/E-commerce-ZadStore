@@ -200,6 +200,9 @@ class AdminSupplementalController extends Controller
         // Optional: Sync governorates if provided
         if ($request->has('governorate_ids')) {
             $request->validate(['governorate_ids' => 'array']);
+            // First, remove this zone from all governorates currently assigned to it
+            Governorate::where('shipping_zone_id', $zone->id)->update(['shipping_zone_id' => null]);
+            // Then, assign this zone to the selected governorates
             Governorate::whereIn('id', $request->governorate_ids)->update(['shipping_zone_id' => $zone->id]);
         }
 

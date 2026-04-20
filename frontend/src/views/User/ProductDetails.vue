@@ -751,25 +751,26 @@ watch(
 }
 
 .product-detail-title {
-  font-size: 32px;
+  font-size: var(--step-2);
   font-weight: 900;
   line-height: 1.2;
   color: #111;
 }
 
 .price-box {
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
 }
 
 .final-display-price {
-  font-size: 42px;
+  font-size: var(--step-3);
   font-weight: 900;
   color: rgb(var(--v-theme-primary));
 }
 
 .original-display-price {
-  font-size: 20px;
-  color: #999;
+  font-size: var(--step-0);
+  color: #aaa;
   text-decoration: line-through;
 }
 
@@ -780,8 +781,8 @@ watch(
 }
 
 .product-description-text {
-  font-size: 16px;
-  color: #666;
+  font-size: var(--step-0);
+  color: #555;
   line-height: 1.8;
 }
 

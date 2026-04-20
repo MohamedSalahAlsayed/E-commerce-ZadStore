@@ -77,6 +77,7 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->prefix('admin')->gr
     Route::get('/staff', [AdminController::class, 'getStaff']);
     Route::post('/staff', [AdminController::class, 'createStaff']);
     Route::put('/users/{id}/role', [AdminController::class, 'updateStaffRole']);
+    Route::put('/users/{id}/permissions', [AdminController::class, 'updateStaffPermissions']);
     Route::put('/users/{id}/status', [AdminController::class, 'toggleUserStatus']);
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
     Route::post('/users/batch-delete', [AdminController::class, 'batchDeleteUsers']);
@@ -105,6 +106,9 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->prefix('admin')->gr
     Route::put('/products/{id}/stock', [AdminController::class, 'updateProductStock']);
     Route::post('/products/batch-delete', [AdminController::class, 'batchDeleteProducts']);
     Route::delete('/products/{id}', [AdminController::class, 'deleteProduct']);
+
+    // Inventory
+    Route::get('/inventory-logs', [AdminController::class, 'getInventoryLogs']);
 
     // Orders
     Route::get('/orders', [AdminController::class, 'getOrders']);

@@ -1,11 +1,14 @@
 <template>
   <v-container class="px-10" :dir="locale === 'ar' ? 'rtl' : 'ltr'">
-    <div class="d-flex align-center justify-center mb-10 mt-10">
-      <div class="section-title-wrapper text-center">
-        <h2 class="text-h4 font-weight-black text-primary mb-1">
-          الماركات المميزة
-        </h2>
-        <div class="title-underline mx-auto"></div>
+    <div class="custom-section-header mb-6 mt-4">
+      <v-chip class="custom-badge" variant="flat" size="large">
+        {{ $t("home.brands.chip") }}
+      </v-chip>
+      <h2 class="custom-main-title">الماركات المميزة</h2>
+      <div class="custom-divider">
+        <span class="bar long"></span>
+        <span class="bar short"></span>
+        <span class="bar short"></span>
       </div>
     </div>
 
@@ -69,12 +72,6 @@ onMounted(async () => {
 
 <style scoped>
 /* ================= Section Header ================= */
-.title-underline {
-  width: 60px;
-  height: 4px;
-  background: rgb(var(--v-theme-primary));
-  border-radius: 2px;
-}
 
 /* ================= Swiper styles ================= */
 .product-swiper {

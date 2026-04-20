@@ -454,6 +454,16 @@ const routes = [
     },
   },
   {
+    path: "/Dashboard/Profile",
+    name: "AdminProfile",
+    component: () => import("../views/Dashboard/AdminProfile.vue"),
+    meta: {
+      layout: "DashboardLayout",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
     path: "/Dashboard/MangBlog",
     name: "MangBlog",
     component: MangBlog,

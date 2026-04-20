@@ -1,12 +1,16 @@
 <template>
   <v-container fluid class="px-10 text-center">
-    <v-container>
-      <h3
-        class="my-10 py-10 section-titl text-h4 font-weight-bold text-primary"
-      >
-        {{ $t("features.title") }}
-      </h3>
-    </v-container>
+    <div class="custom-section-header mb-10">
+      <v-chip class="custom-badge" variant="flat" size="large">
+        {{ $t("features.chip") }}
+      </v-chip>
+      <h2 class="custom-main-title">{{ $t("features.title") }}</h2>
+      <div class="custom-divider">
+        <span class="bar long"></span>
+        <span class="bar short"></span>
+        <span class="bar short"></span>
+      </div>
+    </div>
 
     <v-row class="justify-center">
       <v-col
@@ -17,7 +21,7 @@
         v-for="item in features"
         :key="item.id"
       >
-        <v-card class="cardFeature py-10 h-100 elevation-2 rounded-xl">
+        <v-card class="cardFeature py-6 h-100 elevation-2 rounded-xl">
           <v-icon color="primary" size="40" class="mb-3">
             {{ item.icon }}
           </v-icon>
@@ -90,26 +94,5 @@ const shortText = (text) => {
   background-color: #fff7ed;
   border-color: rgb(var(--v-theme-primary));
   box-shadow: 0 10px 25px rgba(249, 115, 22, 0.12) !important;
-}
-
-.section-title {
-  position: relative;
-  display: inline-block;
-  padding-bottom: 12px;
-  color: rgb(var(--v-theme-primary));
-}
-
-.section-title::before {
-  content: "";
-  position: absolute;
-  right: 0; /* تم التعديل لـ right بدل left عشان العربي من اليمين للشمال */
-  /* أو ممكن نخليها في النص لو العنوان متوسطن */
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: 60px; /* تقصير الخط ليكون أكثر أناقة */
-  height: 4px; /* سُمك الخط */
-  background: rgb(var(--v-theme-primary)); /* لون الخط */
-  border-radius: 4px;
 }
 </style>

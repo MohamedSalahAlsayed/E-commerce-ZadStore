@@ -94,8 +94,10 @@
     "administration_panel": "لوحة الإدارة",
     "activity": "النشاط",
     "menu": "القائمة",
-    "guest": "زائر"
+    "guest": "زائر",
+    "search_btn": "بحث"
   },
+  "search_hint": "اضغط Enter للبحث عن منتجك المفضل...",
   "landing": {
     "hero_chip": "🚀 منصة التجارة الإلكترونية الأكثر نمواً في 2025",
     "hero_title_1": "حقق أرباحك",
@@ -285,16 +287,20 @@
       "default_subtitle": "خصومات تصل إلى 50%"
     },
     "flash_deal": {
+      "chip": "عروض لفترة محدودة",
       "title": "العروض",
       "ends_in": "ينتهي العرض خلال:"
     },
     "best_seller": {
+      "chip": "الأكثر طلباً",
       "title": "الأكثر مبيعا"
     },
     "categories": {
+      "chip": "تصفح حسب التصنيفات",
       "title": "التصنيفات"
     },
     "brands": {
+      "chip": "أفضل العلامات",
       "title": "العلامات التجارية"
     }
   },
@@ -688,6 +694,7 @@
     "editing_stock_notice": "التعديل متاح فقط من خلال تغيير الحالة أو الحذف لضمان سلامة المخزون"
   },
   "features": {
+    "chip": "لماذا تختارنا؟",
     "title": "مميزاتنا",
     "f1_title": "جودة وتوفير",
     "f1_desc": "رقابة شاملة على الجودة وأسعار في متناول الجميع",
@@ -1045,6 +1052,23 @@
       "footer": "تذييل الصفحة (الفوتر)",
       "landing": "صفحة الزوار (الهوم)",
       "advanced": "إعدادات النظام"
+    },
+    "messages": {
+      "save_success": "تم حفظ الإعدادات بنجاح! سيتم تحديث الموقع...",
+      "save_error": "حدث خطأ أثناء حفظ الإعدادات"
+    },
+    "sections": {
+      "BannerHome": "البانر الرئيسي (Slider)",
+      "TopOffer": "عروض اليوم (Top Offer)",
+      "FlashDeal": "العروض (Offers)",
+      "NewProduct": "أحدث المنتجات (New Products)",
+      "Categoury": "التصنيفات (Categories)",
+      "BestSeller": "الأكثر مبيعاً",
+      "QualityFeature": "مميزات الجودة",
+      "FaqSection": "الأسئلة الشائعة",
+      "ShopWithUs": "لماذا تشتري منا؟",
+      "BrandS": "الماركات",
+      "CtaSection": "قسم دعوة التسجيل (CTA)"
     },
     "general": {
       "title": "المعلومات الأساسية والهوية",
@@ -1440,5 +1464,29 @@
       "purchase_cancelled": "إلغاء فاتورة",
       "purchase_deletion": "حذف فاتورة"
     }
+  },
+  "profile_page": {
+    "title": "الملف الشخصي",
+    "general_tab": "المعلومات العامة",
+    "security_tab": "الأمان وكلمة المرور",
+    "full_name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "bio": "نبذة شخصية",
+    "permissions_title": "الأذونات والصلاحيات",
+    "super_admin": "مدير عام",
+    "admin": "مدير النظام",
+    "staff": "موظف إداري",
+    "save_changes": "حفظ التغييرات",
+    "update_password": "تحديث كلمة المرور",
+    "current_password": "كلمة المرور الحالية",
+    "new_password": "كلمة المرور الجديدة",
+    "confirm_password": "تأكيد كلمة المرور",
+    "password_mismatch": "كلمتا المرور غير متطابقتين",
+    "update_success": "تم تحديث الملف الشخصي بنجاح",
+    "password_success": "تم تغيير كلمة المرور بنجاح",
+    "avatar_success": "تم تحديث الصورة الشخصية بنجاح",
+    "avatar_error": "فشل تحميل الصورة",
+    "unregistered": "غير مسجل"
   }
 }

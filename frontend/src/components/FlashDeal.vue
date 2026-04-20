@@ -1,42 +1,45 @@
 <template>
   <div
-    class="flashdeal bg-grey-lighten-4 py-8"
+    class="flashdeal bg-grey-lighten-4 py-4"
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
     <v-container>
-      <div
-        class="d-flex align-center justify-space-between mb-10 w-100 flex-wrap gap-4"
-      >
-        <div class="d-flex align-center">
-          <v-icon color="error" size="36" class="me-3 tilt-shake"
+      <div class="custom-section-header mb-10">
+        <v-chip class="custom-badge" variant="flat" size="large">
+          <v-icon start size="20" class="me-2 tilt-shake" color="error"
             >mdi-lightning-bolt</v-icon
           >
-          <h2 class="text-h4 font-weight-black text-primary">
-            {{ $t("home.flash_deal.title") }}
-          </h2>
+          {{ locale === "ar" ? "عروض لفترة محدودة" : "Limited Time Offers" }}
+        </v-chip>
+        <h2 class="custom-main-title">{{ $t("home.flash_deal.title") }}</h2>
+        <div class="custom-divider">
+          <span class="bar long"></span>
+          <span class="bar short"></span>
+          <span class="bar short"></span>
         </div>
 
         <div
-          class="countdown-wrapper d-flex align-center bg-error-lighten-5 px-4 py-2 rounded-xl border border-error"
+          class="countdown-wrapper d-flex align-center bg-error-lighten-5 px-6 py-3 rounded-xl border border-error mt-8"
         >
-          <span class="text-body-2 font-weight-bold text-error me-3">{{
-            $t("home.flash_deal.ends_in")
-          }}</span>
-          <div class="d-flex align-center gap-2">
+          <span
+            class="text-body-1 font-weight-black text-error me-4 d-none d-sm-inline"
+            >{{ $t("home.flash_deal.ends_in") }}</span
+          >
+          <div class="d-flex align-center gap-3">
             <div
-              class="timer-box bg-error text-white font-weight-black rounded"
+              class="timer-box bg-error text-white font-weight-black rounded-lg"
             >
               {{ hours }}
             </div>
-            <span class="text-error font-weight-bold">:</span>
+            <span class="text-error font-weight-black">:</span>
             <div
-              class="timer-box bg-error text-white font-weight-black rounded"
+              class="timer-box bg-error text-white font-weight-black rounded-lg"
             >
               {{ minutes }}
             </div>
-            <span class="text-error font-weight-bold">:</span>
+            <span class="text-error font-weight-black">:</span>
             <div
-              class="timer-box bg-error text-white font-weight-black rounded"
+              class="timer-box bg-error text-white font-weight-black rounded-lg"
             >
               {{ seconds }}
             </div>
@@ -140,29 +143,47 @@ onUnmounted(() => {
 <style scoped>
 /* Swiper styles */
 .product-swiper {
-  padding-bottom: 20px;
+  padding-bottom: 30px;
 }
+
 :deep(.swiper-button-next),
 :deep(.swiper-button-prev) {
   color: rgb(var(--v-theme-primary)) !important;
-  background: white;
-  width: 44px;
-  height: 44px;
+  background: white !important;
+  width: 50px !important;
+  height: 50px !important;
   border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12) !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+:deep(.swiper-button-next:hover),
+:deep(.swiper-button-prev:hover) {
+  transform: scale(1.1);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+:deep(.swiper-button-next::after),
+:deep(.swiper-button-prev::after) {
+  font-size: 20px !important;
+  font-weight: bold;
 }
 
 /* ================= Timer Styling ================= */
 .timer-box {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .countdown-wrapper {
-  box-shadow: 0 4px 12px rgba(var(--v-theme-error), 0.1);
+  box-shadow: 0 8px 24px rgba(var(--v-theme-error), 0.15) !important;
+  backdrop-filter: blur(4px);
 }
 </style>

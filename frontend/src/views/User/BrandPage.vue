@@ -11,54 +11,11 @@
         </h2>
       </div>
 
-      <v-sheet
-        color="primary"
-        elevation="2"
-        rounded="lg"
-        class="header-container px-4 py-3 mb-6"
-      >
-        <div class="d-flex flex-wrap align-center justify-end w-100 gap-3">
-          <v-menu location="bottom end">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                v-bind="props"
-                variant="text"
-                :color="selectedPrice ? '#ffca28' : 'white'"
-                class="text-body-2 font-weight-medium"
-                append-icon="mdi-chevron-down"
-              >
-                {{
-                  selectedPrice
-                    ? selectedPrice.title
-                    : $t("products.sort_by_price")
-                }}
-              </v-btn>
-            </template>
-            <v-list density="compact" rounded="lg">
-              <v-list-item
-                v-if="selectedPrice"
-                @click="selectedPrice = null"
-                :title="$t('products.cancel_sort')"
-                color="error"
-                class="text-error"
-              >
-                <template v-slot:prepend>
-                  <v-icon icon="mdi-close" color="error"></v-icon>
-                </template>
-              </v-list-item>
-              <v-list-item
-                v-for="item in priceOptions"
-                :key="item.value"
-                :title="item.title"
-                :value="item.value"
-                @click="selectedPrice = item"
-                :active="selectedPrice?.value === item.value"
-                color="primary"
-              ></v-list-item>
-            </v-list>
-          </v-menu>
-        </div>
-      </v-sheet>
+      <!-- Filters & Sorting Header -->
+      <ProductListHeader
+        :count="filteredProducts.length"
+        v-model:selectedPrice="selectedPrice"
+      />
 
       <div class="Product-section">
         <v-row v-if="loading" justify="center" class="py-15">
@@ -125,6 +82,7 @@ import { useRoute } from "vue-router";
 import api from "@/axios";
 import PopUp from "@/components/PopUp.vue";
 import ProductCard from "@/components/ProductCard.vue";
+import ProductListHeader from "@/components/ProductListHeader.vue";
 import { ProductModule } from "@/store/Products";
 
 const route = useRoute();
@@ -188,11 +146,6 @@ onMounted(async () => {
 
 // --- Filter Logic States ---
 const selectedPrice = ref(null);
-const priceOptions = computed(() => [
-  { title: t("products.price_low_high"), value: "asc" },
-  { title: t("products.price_high_low"), value: "desc" },
-]);
-
 // --- Pagination Logic ---
 const currentPage = ref(1);
 const itemsPerPage = 12; // Adjusted to be multiple of 3

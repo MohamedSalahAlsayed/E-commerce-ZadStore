@@ -1,13 +1,19 @@
 <template>
   <div
-    class="flashdeal bg-grey-lighten-4 py-8"
+    class="flashdeal bg-grey-lighten-4 py-4"
     :dir="locale === 'ar' ? 'rtl' : 'ltr'"
   >
     <v-container>
-      <div class="d-flex align-center justify-center mb-10">
-        <h2 class="text-h4 font-weight-black text-primary">
-          {{ $t("home.best_seller.title") }}
-        </h2>
+      <div class="custom-section-header mb-10">
+        <v-chip class="custom-badge" variant="flat" size="large">
+          {{ $t("home.best_seller.chip") }}
+        </v-chip>
+        <h2 class="custom-main-title">{{ $t("home.best_seller.title") }}</h2>
+        <div class="custom-divider">
+          <span class="bar long"></span>
+          <span class="bar short"></span>
+          <span class="bar short"></span>
+        </div>
       </div>
 
       <v-row
