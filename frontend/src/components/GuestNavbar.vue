@@ -2,16 +2,9 @@
   <div class="guest-navbar-wrapper">
     <v-app-bar
       flat
-      :elevation="isHome ? 0 : 2"
-      :color="isHome ? 'transparent' : 'white'"
-      :class="[
-        'guest-navbar',
-        {
-          'border-bottom': !isHome,
-          'position-absolute top-0 w-100': isHome,
-          'premium-mobile-bar': $vuetify.display.xs || $vuetify.display.sm,
-        },
-      ]"
+      elevation="2"
+      color="white"
+      class="guest-navbar position-fixed top-0 w-100"
       height="75"
     >
       <v-container
@@ -30,25 +23,36 @@
             height="45"
             style="object-fit: contain"
           />
-          <h2 class="font-weight-black text-primary logo-text" v-else>
+          <h2 class="font-weight-black logo-text text-primary" v-else>
             {{ settingsStore.storeName || "زاّد ستور" }}
           </h2>
         </div>
 
-        <!-- Centered Links -->
         <div class="d-none d-md-flex gap-6 justify-center flex-grow-1">
-          <v-btn variant="text" class="font-weight-bold" to="/">{{
-            $t("guest_nav.home")
-          }}</v-btn>
-          <v-btn variant="text" class="font-weight-bold" to="/BlogPage">{{
-            $t("guest_nav.blog")
-          }}</v-btn>
-          <v-btn variant="text" class="font-weight-bold" to="/AboutPage">{{
-            $t("guest_nav.about_us")
-          }}</v-btn>
-          <v-btn variant="text" class="font-weight-bold" to="/ContactPage">{{
-            $t("guest_nav.contact")
-          }}</v-btn>
+          <v-btn variant="text" class="font-weight-bold text-black" to="/">
+            {{ $t("guest_nav.home") }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            class="font-weight-bold text-black"
+            to="/BlogPage"
+          >
+            {{ $t("guest_nav.blog") }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            class="font-weight-bold text-black"
+            to="/AboutPage"
+          >
+            {{ $t("guest_nav.about_us") }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            class="font-weight-bold text-black"
+            to="/ContactPage"
+          >
+            {{ $t("guest_nav.contact") }}
+          </v-btn>
         </div>
 
         <!-- Action Buttons & Lang Switcher -->
@@ -79,7 +83,7 @@
           <v-menu location="bottom end" transition="scale-transition">
             <template v-slot:activator="{ props }">
               <v-btn
-                color="primary"
+                color="black"
                 variant="text"
                 class="text-capitalize px-1 font-weight-bold rounded-lg"
                 v-bind="props"
@@ -122,9 +126,9 @@
           class="d-md-none mobile-menu-btn"
           @click="mobileMenu = !mobileMenu"
           variant="flat"
-          :color="isHome ? 'rgba(255,255,255,0.2)' : 'grey-lighten-4'"
+          color="grey-lighten-4"
         >
-          <v-icon :color="isHome ? 'white' : 'primary'">mdi-menu</v-icon>
+          <v-icon color="primary">mdi-menu</v-icon>
         </v-btn>
       </v-container>
     </v-app-bar>
@@ -278,13 +282,9 @@
 import { ref, onMounted, computed } from "vue";
 import { useSettingsStore } from "@/store/Settings";
 import { useI18n } from "vue-i18n";
-import { useRoute } from "vue-router";
 
 const settingsStore = useSettingsStore();
-const route = useRoute();
 const mobileMenu = ref(false);
-
-const isHome = computed(() => route.path === "/");
 
 const { locale } = useI18n();
 

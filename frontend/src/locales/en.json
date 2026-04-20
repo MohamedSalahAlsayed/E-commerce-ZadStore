@@ -94,7 +94,10 @@
     "administration_panel": "Admin Panel",
     "activity": "Activity",
     "menu": "Menu",
-    "guest": "Guest"
+    "guest": "Guest",
+    "welcome_guest": "Welcome to our store",
+    "categories": "Categories",
+    "brands": "Brands"
   },
   "landing": {
     "hero_chip": "🚀 The fastest-growing e-commerce platform in 2025",
@@ -118,8 +121,8 @@
     "stats_products": "Exclusive Products",
     "stats_collection": "Collection Speed",
     "stats_profits": "Profits Paid",
-    "cta_title": "Ready to start and make profits?",
-    "cta_desc": "Join thousands of merchants and marketers and start selling the most demanded products in the market instantly.",
+    "cta_title": "Elevate Your Experience with ZadStore",
+    "cta_desc": "Discover an exclusive collection of carefully selected products tailored to your refined taste. We guarantee quality, security, and an unforgettable shopping experience.",
     "register_free": "Create Your Free Account",
     "step_1_title": "Register Free",
     "step_1_desc": "Create your account in seconds and start your journey without any administrative fees.",
@@ -301,10 +304,17 @@
     "brands": {
       "chip": "Top Brands",
       "title": "Brands"
+    },
+    "new_products": {
+      "chip": "New Arrivals",
+      "title": "Latest Products"
     }
   },
   "products": {
     "all_products": "All Products",
+    "all_categories": "All Categories",
+    "all_brands": "All Brands",
+    "new": "New",
     "quick_view": "Quick View",
     "discount": "{percentage}% OFF",
     "stock": "Stock:",
@@ -585,7 +595,9 @@
     "template_tech": "Technical Issue",
     "template_tech_val": "We apologize for the technical issue you encountered. Our technical team is working on solving it now.",
     "template_suggestion": "Suggestion",
-    "template_suggestion_val": "Thank you for your great suggestion! We always strive to develop our services based on our customers' feedback."
+    "template_suggestion_val": "Thank you for your great suggestion! We always strive to develop our services based on our customers' feedback.",
+    "guest_label": "Unregistered Guest",
+    "registered_label": "Registered Customer"
   },
   "inventory": {
     "inventory_title": "Inventory Management",
@@ -1479,5 +1491,13 @@
     "avatar_success": "Avatar updated successfully",
     "avatar_error": "Failed to upload image",
     "unregistered": "Not registered"
+  },
+  "guest_nav": {
+    "home": "Home",
+    "blog": "Blog",
+    "about_us": "About Us",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register"
   }
 }

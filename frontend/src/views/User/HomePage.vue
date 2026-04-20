@@ -16,6 +16,10 @@
       </section>
 
       <section class="home-section reveal-on-scroll">
+        <NewProduct />
+      </section>
+
+      <section class="home-section reveal-on-scroll">
         <BestSeller />
       </section>
 
@@ -36,7 +40,7 @@ import TopOffer from "@/components/TopOffer.vue";
 import { ProductModule } from "@/store/Products.js";
 import FlashDeal from "@/components/FlashDeal.vue";
 import Categoury from "@/components/CateGoury.vue";
-// import NewProduct from "@/components/NewProduct.vue";
+import NewProduct from "@/components/NewProduct.vue";
 import QualityFeature from "@/components/QualityFeature.vue";
 import BrandS from "@/components/BrandS.vue";
 import BestSeller from "@/components/BestSeller.vue";

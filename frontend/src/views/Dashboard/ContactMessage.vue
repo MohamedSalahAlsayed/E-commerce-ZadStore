@@ -66,8 +66,15 @@
                 </v-avatar>
               </template>
 
-              <v-list-item-title class="font-weight-bold">
+              <v-list-item-title class="font-weight-bold d-flex align-center">
                 {{ conv.name }}
+                <v-icon
+                  v-if="!conv.user_id"
+                  size="14"
+                  color="warning"
+                  class="ms-2"
+                  icon="mdi-account-alert-outline"
+                ></v-icon>
               </v-list-item-title>
               <v-list-item-subtitle
                 class="text-truncate mt-1 text-grey-darken-1"
@@ -119,11 +126,17 @@
                   </h3>
                   <v-chip
                     size="x-small"
-                    color="primary"
+                    :color="
+                      selectedConversation.user_id ? 'primary' : 'warning'
+                    "
                     variant="tonal"
-                    v-if="selectedConversation.email === 'user'"
-                    >عميل مسجل</v-chip
                   >
+                    {{
+                      selectedConversation.user_id
+                        ? $t("messaging.registered_label")
+                        : $t("messaging.guest_label")
+                    }}
+                  </v-chip>
                 </div>
                 <div class="text-caption text-grey">
                   {{ selectedConversation.email }}
@@ -317,6 +330,7 @@ const groupedConversations = computed(() => {
         id: key,
         name: m.name || "زائر",
         email: m.email,
+        user_id: m.user_id,
         messages: [],
         hasUnread: false,
         lastMessage: "",

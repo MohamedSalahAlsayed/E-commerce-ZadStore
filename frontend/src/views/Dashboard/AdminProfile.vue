@@ -274,9 +274,10 @@ const passwordForm = ref({
 const fetchProfile = async () => {
   try {
     const res = await api.get("/user");
+    const user = res.data.user || res.data;
     profileData.value = {
-      ...res.data,
-      permissions: res.data.permissions || [],
+      ...user,
+      permissions: user.permissions || [],
     };
   } catch (err) {
     console.error(err);
@@ -346,10 +347,10 @@ const onAvatarChange = async (e) => {
 
   loading.value = true;
   try {
-    const res = await api.post("/user/profile", formData, {
+    const res = await api.put("/user/profile", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    profileData.value.avatar = res.data.user.avatar;
+    profileData.value.avatar = res.data.user?.avatar || res.data.avatar;
     emitter.emit("showMessage", {
       text: t("profile_page.avatar_success"),
       color: "success",

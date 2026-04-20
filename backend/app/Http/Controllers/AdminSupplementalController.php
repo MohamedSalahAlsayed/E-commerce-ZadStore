@@ -11,6 +11,8 @@ use App\Models\Governorate;
 use App\Models\ShippingMethod;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ContactReplyMail;
 
 class AdminSupplementalController extends Controller
 {
@@ -106,8 +108,16 @@ class AdminSupplementalController extends Controller
         $msg->reply_text = $data['reply_text'];
         $msg->replied_at = now();
         $msg->is_read = true;
-        $msg->is_user_read = false; // تظهر إشعار جديد للمستخدم
+        $msg->is_user_read = false;
         $msg->save();
+
+        // Send email to the sender (guest or registered user)
+        try {
+            $storeName = StoreSetting::where('key', 'storeName')->value('value') ?? 'ZadStore';
+            Mail::to($msg->email)->send(new ContactReplyMail($msg, $data['reply_text'], $storeName));
+        } catch (\Exception $e) {
+            \Log::warning('Failed to send reply email: ' . $e->getMessage());
+        }
 
         if ($msg->user_id) {
             \App\Models\UserNotification::create([

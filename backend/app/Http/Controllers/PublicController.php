@@ -101,6 +101,7 @@ class PublicController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'message' => $data['message'],
+            'user_id' => auth('sanctum')->id(),
             'is_read' => false
         ]);
 
