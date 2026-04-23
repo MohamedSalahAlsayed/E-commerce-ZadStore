@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkzadstore"]=self["webpackChunkzadstore"]||[]).push([[5509],{5509:function(r,e,u){u.r(e),u.d(e,{default:function(){return o}});var n=u(6768);function t(r,e){return(0,n.uX)(),(0,n.CE)("div",null,[((0,n.uX)(),(0,n.Wv)((0,n.$y)("router-view")))])}var a=u(1241);const s={},c=(0,a.A)(s,[["render",t]]);var o=c}}]);
+//# sourceMappingURL=5509.fb815ded.js.map
