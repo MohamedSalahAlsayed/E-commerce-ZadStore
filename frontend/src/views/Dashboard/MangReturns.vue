@@ -138,6 +138,9 @@
                 {{ $t("returns.reason_th") }}
               </th>
               <th class="text-right font-weight-bold">
+                {{ $t("returns.type_th", "النوع") }}
+              </th>
+              <th class="text-right font-weight-bold">
                 {{ $t("dashboard.status_th") }}
               </th>
               <th class="text-center font-weight-bold">
@@ -220,6 +223,25 @@
               </td>
               <td>
                 <v-chip
+                  size="x-small"
+                  :color="order.return_type === 'partial' ? 'warning' : 'info'"
+                  variant="tonal"
+                  class="font-weight-bold"
+                >
+                  <v-icon start size="12">{{
+                    order.return_type === "partial"
+                      ? "mdi-format-list-checks"
+                      : "mdi-package-variant"
+                  }}</v-icon>
+                  {{
+                    order.return_type === "partial"
+                      ? $t("returns.type_partial", "جزئي")
+                      : $t("returns.type_full", "كامل")
+                  }}
+                </v-chip>
+              </td>
+              <td>
+                <v-chip
                   size="small"
                   :color="getReturnStatusColor(order.return_request_status)"
                   variant="flat"
@@ -296,9 +318,28 @@
 
         <v-card-text class="pa-6">
           <div class="mb-6 bg-grey-lighten-4 pa-4 rounded-lg">
-            <h3 class="text-subtitle-1 font-weight-bold mb-3 border-b pb-2">
-              {{ $t("returns.reason_label") }}
-            </h3>
+            <div
+              class="d-flex justify-space-between align-center mb-3 border-b pb-2"
+            >
+              <h3 class="text-subtitle-1 font-weight-bold mb-0">
+                {{ $t("returns.reason_label") }}
+              </h3>
+              <v-chip
+                :color="
+                  selectedOrder.return_type === 'partial'
+                    ? 'warning'
+                    : 'primary'
+                "
+                size="small"
+                variant="flat"
+              >
+                {{
+                  selectedOrder.return_type === "partial"
+                    ? $t("returns.type_partial", "إرجاع جزئي")
+                    : $t("returns.type_full", "إرجاع كامل")
+                }}
+              </v-chip>
+            </div>
             <div class="d-flex flex-column gap-1">
               <v-chip
                 v-if="selectedOrder.return_reason_code"
@@ -321,7 +362,12 @@
           <v-card variant="outlined" class="rounded-lg mb-4">
             <v-list density="compact">
               <v-list-item
-                v-for="item in selectedOrder.items"
+                v-for="item in selectedOrder.return_type === 'partial' &&
+                selectedOrder.return_target_items
+                  ? selectedOrder.items.filter((i) =>
+                      selectedOrder.return_target_items.includes(i.id)
+                    )
+                  : selectedOrder.items"
                 :key="item.id"
                 class="border-b last-child-no-border"
               >
@@ -346,10 +392,15 @@
 
           <div class="d-flex justify-space-between align-center px-2">
             <span class="font-weight-bold">{{
-              $t("returns.total_to_refund")
+              selectedOrder.return_type === "partial"
+                ? $t(
+                    "returns.estimated_refund_items",
+                    "إجمالي المنتجات المرجعة"
+                  )
+                : $t("returns.total_to_refund")
             }}</span>
             <span class="text-h6 font-weight-black text-primary"
-              >{{ Number(selectedOrder.total).toLocaleString() }}
+              >{{ Number(calculateRefund(selectedOrder)).toLocaleString() }}
               {{ $t("products.currency") }}</span
             >
           </div>
@@ -597,6 +648,19 @@ const rejectedCount = computed(
   () =>
     returns.value.filter((r) => r.return_request_status === "rejected").length
 );
+
+const calculateRefund = (order) => {
+  if (order.return_type === "partial" && order.return_target_items) {
+    const items = order.items.filter((i) =>
+      order.return_target_items.includes(i.id)
+    );
+    return items.reduce(
+      (sum, item) => sum + Number(item.price) * Number(item.quantity),
+      0
+    );
+  }
+  return order.total;
+};
 
 const fetchReturns = async (quiet = false) => {
   if (!quiet) loading.value = true;

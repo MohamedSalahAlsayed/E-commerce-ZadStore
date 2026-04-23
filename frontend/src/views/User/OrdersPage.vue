@@ -356,41 +356,137 @@
                 </v-col>
               </v-row>
             </div>
-            <v-table density="compact" class="invoice-table my-8 border">
+
+            <!-- Invoice Items Table -->
+            <table
+              class="invoice-table"
+              style="
+                width: 100%;
+                border-collapse: collapse;
+                margin: 30px 0;
+                border: 1px solid #eee;
+              "
+            >
               <thead>
-                <tr class="bg-grey-lighten-4">
-                  <th>{{ locale === "ar" ? "المنتج" : "Product" }}</th>
-                  <th class="text-center">
+                <tr style="background: #f8fafc">
+                  <th
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: right;
+                    "
+                  >
+                    {{ locale === "ar" ? "المنتج" : "Product" }}
+                  </th>
+                  <th
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: center;
+                    "
+                  >
                     {{ locale === "ar" ? "الكمية" : "Qty" }}
                   </th>
-                  <th :class="locale === 'ar' ? 'text-left' : 'text-right'">
+                  <th
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: left;
+                    "
+                  >
                     {{ locale === "ar" ? "السعر" : "Price" }}
                   </th>
-                  <th :class="locale === 'ar' ? 'text-left' : 'text-right'">
+                  <th
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: left;
+                    "
+                  >
                     {{ locale === "ar" ? "الإجمالي" : "Total" }}
+                  </th>
+                  <th
+                    v-if="order.return_request_status"
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: center;
+                    "
+                  >
+                    {{ locale === "ar" ? "الحالة" : "Status" }}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in order.items" :key="item.id">
-                  <td class="py-2">{{ item.name }}</td>
-                  <td class="text-center">{{ item.quantity }}</td>
-                  <td :class="locale === 'ar' ? 'text-left' : 'text-right'">
+                <tr
+                  v-for="item in order.items"
+                  :key="item.id"
+                  :style="
+                    isItemReturned(order, item)
+                      ? 'opacity:0.5;background:#fff8f8;'
+                      : ''
+                  "
+                >
+                  <td
+                    style="padding: 12px; border: 1px solid #eee"
+                    :style="
+                      isItemReturned(order, item)
+                        ? 'text-decoration:line-through;'
+                        : ''
+                    "
+                  >
+                    {{ item.name }}
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: center;
+                    "
+                  >
+                    {{ item.quantity }}
+                  </td>
+                  <td
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: left;
+                    "
+                  >
                     {{ item.price }} {{ $t("products.currency") }}
                   </td>
                   <td
-                    :class="
-                      locale === 'ar'
-                        ? 'text-left'
-                        : 'text-right' + ' font-weight-bold'
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: left;
+                      font-weight: bold;
                     "
                   >
                     {{ item.price * item.quantity }}
                     {{ $t("products.currency") }}
                   </td>
+                  <td
+                    v-if="order.return_request_status"
+                    style="
+                      padding: 12px;
+                      border: 1px solid #eee;
+                      text-align: center;
+                    "
+                  >
+                    <span
+                      v-if="isItemReturned(order, item)"
+                      style="color: #d32f2f; font-size: 12px; font-weight: bold"
+                      >{{ locale === "ar" ? "⮐ مُرجَع" : "⮐ Returned" }}</span
+                    >
+                    <span v-else style="color: #2e7d32; font-size: 12px">{{
+                      locale === "ar" ? "✓ نشط" : "✓ Active"
+                    }}</span>
+                  </td>
                 </tr>
               </tbody>
-            </v-table>
+            </table>
+
             <div class="invoice-footer d-flex flex-column align-end">
               <div
                 class="summary-line d-flex justify-space-between w-100"
@@ -411,6 +507,23 @@
                 <span>{{ locale === "ar" ? "الشحن:" : "Shipping:" }}</span>
                 <span
                   >{{ order.shipping_fee || 0 }}
+                  {{ $t("products.currency") }}</span
+                >
+              </div>
+              <!-- Refund line for returned/partially returned orders -->
+              <div
+                v-if="
+                  ['returned', 'partially_returned'].includes(order.status) &&
+                  order.return_request_status === 'approved'
+                "
+                class="summary-line d-flex justify-space-between w-100"
+                style="max-width: 250px; color: #d32f2f"
+              >
+                <span style="font-weight: bold">{{
+                  locale === "ar" ? "المبلغ المُسترد:" : "Refunded:"
+                }}</span>
+                <span style="font-weight: bold"
+                  >- {{ getRefundAmount(order) }}
                   {{ $t("products.currency") }}</span
                 >
               </div>
@@ -475,11 +588,27 @@
                   </div>
 
                   <div class="flex-grow-1 min-width-0">
-                    <h5
-                      class="text-subtitle-2 font-weight-bold text-grey-darken-4 mb-0 line-clamp-1"
-                    >
-                      {{ item.name }}
-                    </h5>
+                    <div class="d-flex align-center gap-2 flex-wrap">
+                      <h5
+                        class="text-subtitle-2 font-weight-bold text-grey-darken-4 mb-0 line-clamp-1"
+                        :style="
+                          isItemReturned(order, item)
+                            ? 'text-decoration:line-through;opacity:0.6;'
+                            : ''
+                        "
+                      >
+                        {{ item.name }}
+                      </h5>
+                      <v-chip
+                        v-if="isItemReturned(order, item)"
+                        size="x-small"
+                        color="error"
+                        variant="tonal"
+                        class="ms-1"
+                      >
+                        {{ locale === "ar" ? "مُرجَع" : "Returned" }}
+                      </v-chip>
+                    </div>
                     <div class="d-flex align-center gap-4 mt-1">
                       <span class="text-caption text-grey-darken-1">
                         {{ $t("checkout.quantity") }} {{ item.quantity || 1 }}
@@ -726,7 +855,7 @@
     </v-dialog>
 
     <!-- Return Request Dialog -->
-    <v-dialog v-model="returnDialog" max-width="500">
+    <v-dialog v-model="returnDialog" max-width="600">
       <v-card v-if="selectedOrder" class="rounded-xl pa-4">
         <v-card-title class="text-h6 font-weight-bold text-primary mb-2">
           {{
@@ -739,6 +868,69 @@
           <p class="text-body-2 text-grey-darken-1 mb-4">
             {{ $t("orders.return_hint") }}
           </p>
+
+          <v-radio-group v-model="returnType" inline class="mb-4">
+            <v-radio
+              :label="$t('orders.return_full_order', 'إرجاع كامل الطلب')"
+              value="full"
+            ></v-radio>
+            <v-radio
+              :label="$t('orders.return_specific_items', 'إرجاع منتجات محددة')"
+              value="partial"
+            ></v-radio>
+          </v-radio-group>
+
+          <v-expand-transition>
+            <div v-if="returnType === 'partial'" class="mb-4">
+              <div class="text-subtitle-2 font-weight-bold mb-2">
+                {{
+                  $t(
+                    "orders.select_return_items",
+                    "اختر المنتجات المراد إرجاعها"
+                  )
+                }}
+              </div>
+              <v-list
+                class="bg-grey-lighten-5 rounded-lg border"
+                density="compact"
+              >
+                <v-list-item
+                  v-for="item in selectedOrder.items"
+                  :key="item.id"
+                  class="px-2"
+                >
+                  <template v-slot:prepend>
+                    <v-checkbox-btn
+                      v-model="selectedReturnItems"
+                      :value="item.id"
+                      color="primary"
+                    ></v-checkbox-btn>
+                  </template>
+                  <div class="d-flex align-center gap-3 w-100">
+                    <v-avatar size="40" rounded class="border bg-white">
+                      <img
+                        :src="
+                          item.image ||
+                          (item.product ? item.product.thumbnail : '')
+                        "
+                        alt=""
+                        style="width: 100%; height: 100%; object-fit: cover"
+                      />
+                    </v-avatar>
+                    <div>
+                      <div class="text-subtitle-2 line-clamp-1">
+                        {{ item.name }}
+                      </div>
+                      <div class="text-caption text-primary font-weight-bold">
+                        {{ item.price }} {{ $t("products.currency") }}
+                      </div>
+                    </div>
+                  </div>
+                </v-list-item>
+              </v-list>
+            </div>
+          </v-expand-transition>
+
           <v-select
             v-model="returnReasonCode"
             :items="returnReasonOptions"
@@ -776,7 +968,10 @@
             class="px-6 rounded-lg font-weight-bold"
             @click="submitReturnRequest"
             :loading="actionLoading === 'return_' + selectedOrder.id"
-            :disabled="!returnReasonCode"
+            :disabled="
+              !returnReasonCode ||
+              (returnType === 'partial' && selectedReturnItems.length === 0)
+            "
           >
             {{ $t("orders.submit_request") }}
           </v-btn>
@@ -819,6 +1014,8 @@ const selectedOrder = ref(null);
 const reviews = ref({});
 const comments = ref({});
 const returnDialog = ref(false);
+const returnType = ref("full");
+const selectedReturnItems = ref([]);
 const returnReasonCode = ref(null);
 const returnReasonDetails = ref("");
 const returnReasonOptions = computed(() => [
@@ -968,6 +1165,16 @@ const getOrderTheme = (status) => {
       iconColor: "grey-darken-3",
       icon: "mdi-keyboard-return",
       textColor: "text-grey-darken-4",
+    };
+  if (status === "partially_returned")
+    return {
+      text: t("orders.partially_returned", "مرتجع جزئياً"),
+      headerClass: "bg-orange-lighten-5",
+      headerBorder: "border-orange-lighten-4",
+      iconBg: "orange-lighten-4",
+      iconColor: "orange-darken-3",
+      icon: "mdi-keyboard-return",
+      textColor: "text-orange-darken-4",
     };
   // default / pending
   return {
@@ -1150,6 +1357,8 @@ const cancelOrder = async (order) => {
 
 const openReturnDialog = (order) => {
   selectedOrder.value = order;
+  returnType.value = "full";
+  selectedReturnItems.value = [];
   returnReasonCode.value = null;
   returnReasonDetails.value = "";
   returnDialog.value = true;
@@ -1157,16 +1366,24 @@ const openReturnDialog = (order) => {
 
 const submitReturnRequest = async () => {
   if (!selectedOrder.value || !returnReasonCode.value) return;
+  if (returnType.value === "partial" && selectedReturnItems.value.length === 0)
+    return;
+
   const order = selectedOrder.value;
   actionLoading.value = "return_" + order.id;
   try {
     const res = await axios.post(
       `/user/orders/${selectedOrder.value.id}/return`,
       {
-        reason: returnReasonCode.value + ": " + returnReasonDetails.value,
+        return_type: returnType.value,
+        item_ids:
+          returnType.value === "partial" ? selectedReturnItems.value : [],
+        reason_code: returnReasonCode.value,
+        reason: returnReasonDetails.value,
       }
     );
     order.return_request_status = "pending";
+    order.return_type = returnType.value;
     returnDialog.value = false;
     emitter.emit("showMessage", {
       text: res.data.message || "تم تسجيل طلب الاسترجاع بنجاح!",
@@ -1174,7 +1391,7 @@ const submitReturnRequest = async () => {
     });
   } catch (err) {
     emitter.emit("showMessage", {
-      text: "حدث خطأ في تقديم الطلب",
+      text: err.response?.data?.message || "حدث خطأ في تقديم الطلب",
       color: "error",
     });
   } finally {
@@ -1207,6 +1424,46 @@ const submitRating = async (productId) => {
   } finally {
     actionLoading.value = null;
   }
+};
+
+/**
+ * Check if a specific item is targeted for return in this order.
+ * Works for both partial returns (checks item_ids) and full returns.
+ */
+const isItemReturned = (order, item) => {
+  if (
+    !order.return_request_status ||
+    order.return_request_status !== "approved"
+  )
+    return false;
+  if (order.return_type === "full" || order.status === "returned") return true;
+  if (order.return_type === "partial" && order.return_target_items) {
+    const targetIds = Array.isArray(order.return_target_items)
+      ? order.return_target_items
+      : JSON.parse(order.return_target_items || "[]");
+    return targetIds.includes(item.id);
+  }
+  return item.is_returned === true || item.is_returned === 1;
+};
+
+/**
+ * Calculate total refund amount for an order based on returned items.
+ */
+const getRefundAmount = (order) => {
+  if (!order.items) return 0;
+  if (order.return_type === "full" || order.status === "returned") {
+    return order.subtotal || order.total;
+  }
+  const targetIds = (() => {
+    if (!order.return_target_items) return [];
+    return Array.isArray(order.return_target_items)
+      ? order.return_target_items
+      : JSON.parse(order.return_target_items || "[]");
+  })();
+  return order.items
+    .filter((item) => targetIds.includes(item.id) || item.is_returned)
+    .reduce((sum, item) => sum + item.price * item.quantity, 0)
+    .toFixed(2);
 };
 </script>
 

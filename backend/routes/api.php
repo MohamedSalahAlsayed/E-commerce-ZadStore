@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\Api\PaymentController;
 
 // Public Endpoints
 Route::get('/categories', [PublicController::class, 'getCategories']);
@@ -62,7 +63,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Favorites Endpoints
     Route::get('/user/favorites', [UserController::class, 'getFavorites']);
     Route::post('/user/favorites', [UserController::class, 'toggleFavorite']);
+
+    // Payment Endpoints
+    Route::post('/orders/{id}/pay', [PaymentController::class, 'checkout'])->name('payment.checkout');
 });
+
+// Payment Callbacks & Webhooks (Public)
+Route::match(['get', 'post'], '/payment/callback/{method}', [PaymentController::class, 'callback'])->name('payment.callback');
+Route::post('/payment/webhook/{method}', [PaymentController::class, 'webhook'])->name('payment.webhook');
 
 use App\Http\Controllers\AdminController;
 use App\Http\Middleware\AdminMiddleware;
@@ -71,6 +79,7 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->prefix('admin')->gr
     Route::get('/statistics', [AdminController::class, 'statistics']);
     Route::get('/header-data', [\App\Http\Controllers\AdminSupplementalController::class, 'getHeaderData']);
     Route::get('/financials', [\App\Http\Controllers\AdminFinancialController::class, 'getFinancials']);
+    Route::get('/transactions', [\App\Http\Controllers\AdminFinancialController::class, 'getTransactions']);
     
     // Users
     Route::get('/users', [AdminController::class, 'getUsers']);

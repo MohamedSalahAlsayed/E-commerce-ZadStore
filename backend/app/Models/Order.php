@@ -32,11 +32,16 @@ class Order extends Model
         'tracking_number',
         'shipping_provider',
         'shipping_metadata',
+        'return_type',
+        'return_target_items',
+        'return_reason_code',
+        'return_reason',
     ];
 
     protected $casts = [
         'shipping_metadata' => 'array',
         'is_urgent' => 'boolean',
+        'return_target_items' => 'array',
     ];
 
     public function governorate()
@@ -57,5 +62,10 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function paymentTransactions()
+    {
+        return $this->hasMany(PaymentTransaction::class);
     }
 }

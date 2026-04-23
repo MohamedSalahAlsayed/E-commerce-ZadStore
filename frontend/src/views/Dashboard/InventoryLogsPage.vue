@@ -146,10 +146,12 @@
                         class="font-weight-bold text-truncate"
                         style="max-width: 180px"
                       >
-                        {{ log.product?.title || "منتج محذوف" }}
+                        {{
+                          log.product?.title || $t("inventory.deleted_product")
+                        }}
                       </div>
                       <div class="text-caption text-grey">
-                        BY: {{ log.user?.name || "النظام" }}
+                        BY: {{ log.user?.name || $t("inventory.system_user") }}
                       </div>
                     </div>
                   </div>

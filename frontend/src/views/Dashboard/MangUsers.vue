@@ -9,7 +9,7 @@
             class="text-h5 font-weight-black"
             style="color: rgb(var(--v-theme-primary))"
           >
-            إدارة العملاء
+            {{ $t("users.title") }}
           </h2>
 
           <div
@@ -19,7 +19,7 @@
             <v-text-field
               v-model="searchQuery"
               prepend-inner-icon="mdi-magnify"
-              label="ابحث بالاسم أو البريد الإلكتروني..."
+              :label="$t('users.search_placeholder')"
               variant="outlined"
               density="compact"
               hide-details
@@ -34,7 +34,7 @@
               height="40"
               @click="exportToCSV"
             >
-              تصدير (CSV)
+              {{ $t("users.export_csv") }}
             </v-btn>
           </div>
         </v-card-text>
@@ -51,7 +51,12 @@
             <div class="d-flex align-center gap-3">
               <v-icon>mdi-checkbox-multiple-marked</v-icon>
               <div class="text-h6 font-weight-bold">
-                تم تحديد {{ selectedIds.length }} عملاء
+                {{
+                  $t("users.selected_count").replace(
+                    "{count}",
+                    selectedIds.length
+                  )
+                }}
               </div>
             </div>
             <div class="d-flex gap-2">
@@ -61,10 +66,13 @@
                 prepend-icon="mdi-delete-multiple"
                 @click="batchDeleteDialog = true"
               >
-                حذف المحدد
+                {{ $t("dashboard.delete_selected") }}
               </v-btn>
-              <v-btn color="white" variant="outlined" @click="selectedIds = []"
-                >إلغاء</v-btn
+              <v-btn
+                color="white"
+                variant="outlined"
+                @click="selectedIds = []"
+                >{{ $t("dashboard.cancel") }}</v-btn
               >
             </div>
           </div>
@@ -83,13 +91,27 @@
                     hide-details
                   ></v-checkbox-btn>
                 </th>
-                <th class="text-right font-weight-bold">العميل</th>
-                <th class="text-right font-weight-bold">البريد الإلكتروني</th>
-                <th class="text-center font-weight-bold">تاريخ الانضمام</th>
-                <th class="text-center font-weight-bold">إجمالي الطلبات</th>
-                <th class="text-center font-weight-bold">إجمالي الإنفاق</th>
-                <th class="text-center font-weight-bold">حالة الحساب</th>
-                <th class="text-center font-weight-bold">الإجراءات</th>
+                <th class="text-right font-weight-bold">
+                  {{ $t("users.customer_th") }}
+                </th>
+                <th class="text-right font-weight-bold">
+                  {{ $t("users.email_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("users.join_date_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("users.total_orders_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("users.total_spent_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("users.account_status_th") }}
+                </th>
+                <th class="text-center font-weight-bold">
+                  {{ $t("dashboard.actions_th") }}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -253,7 +275,7 @@
               variant="tonal"
               class="px-6 font-weight-bold"
               @click="deleteDialog = false"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="error"
@@ -282,7 +304,7 @@
               variant="tonal"
               class="px-6 font-weight-bold"
               @click="batchDeleteDialog = false"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="error"
@@ -291,7 +313,7 @@
               :loading="deleting"
               :disabled="deleting"
               @click="confirmBatchDelete"
-              >نعم، احذف المحدد</v-btn
+              >نعم، ا{{ $t("dashboard.delete_selected") }}</v-btn
             >
           </v-card-actions>
         </v-card>

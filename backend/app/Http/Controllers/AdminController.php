@@ -469,14 +469,16 @@ class AdminController extends Controller
 
     public function updateOrderStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:pending,processing,shipped,completed,cancelled,returned']);
+        $request->validate(['status' => 'required|in:pending,processing,shipped,completed,cancelled,returned,partially_returned']);
         $order = Order::findOrFail($id);
 
         if (in_array($request->status, ['cancelled', 'returned']) && 
-            !in_array($order->status, ['cancelled', 'returned'])) {
+            !in_array($order->status, ['cancelled', 'returned', 'partially_returned'])) {
             
             $order->load('items');
             foreach ($order->items as $item) {
+                if ($item->is_returned) continue; // Already returned/restocked via partial return
+                
                 $p = \App\Models\Product::find($item->product_id);
                 if (!$p) continue;
                 $oldS = $p->stock;
@@ -490,13 +492,18 @@ class AdminController extends Controller
                     "إلغاء الطلب رقم #{$order->order_number}",
                     ['order_id' => $order->id]
                 );
+
+                $item->is_returned = true;
+                $item->save();
             }
         } 
-        elseif (in_array($order->status, ['cancelled', 'returned']) && 
-                !in_array($request->status, ['cancelled', 'returned'])) {
+        elseif (!in_array($request->status, ['cancelled', 'returned', 'partially_returned']) && 
+                in_array($order->status, ['cancelled', 'returned', 'partially_returned'])) {
             
             $order->load('items');
             foreach ($order->items as $item) {
+                if (!$item->is_returned) continue; // Only decrement if it was previously restocked
+                
                 $p = \App\Models\Product::find($item->product_id);
                 if (!$p) continue;
                 $oldS = $p->stock;
@@ -510,20 +517,23 @@ class AdminController extends Controller
                     "إعادة تفعيل الطلب رقم #{$order->order_number}",
                     ['order_id' => $order->id]
                 );
+
+                $item->is_returned = false;
+                $item->save();
             }
         }
 
         $order->status = $request->status;
         $order->save();
 
-        // Create localized status mappings for the notification
         $statusAr = [
             'pending' => 'قيد الانتظار',
             'processing' => 'قيد التجهيز',
             'shipped' => 'تم الشحن',
             'completed' => 'مكتمل',
             'cancelled' => 'ملغي',
-            'returned' => 'مرتجع'
+            'returned' => 'مرتجع',
+            'partially_returned' => 'مرتجع جزئياً'
         ];
         
         $color = 'primary';
@@ -533,7 +543,8 @@ class AdminController extends Controller
             case 'shipped': $color = 'info'; $icon = 'mdi-truck-delivery'; break;
             case 'completed': $color = 'success'; $icon = 'mdi-check-circle'; break;
             case 'cancelled': 
-            case 'returned': $color = 'error'; $icon = 'mdi-close-circle'; break;
+            case 'returned': 
+            case 'partially_returned': $color = 'error'; $icon = 'mdi-close-circle'; break;
             case 'processing': $color = 'warning'; $icon = 'mdi-progress-clock'; break;
         }
 
@@ -558,12 +569,24 @@ class AdminController extends Controller
             $order->return_request_status = 'approved';
             
             // Only increment stock if not already returned
-            if ($order->status !== 'returned') {
-                $order->status = 'returned';
+            if (!in_array($order->status, ['returned', 'partially_returned'])) {
+                
                 $order->load('items');
+                $isPartial = $order->return_type === 'partial';
+                $targetItemIds = $order->return_target_items ?? [];
+
                 foreach ($order->items as $item) {
+                    if ($isPartial && !in_array($item->id, $targetItemIds)) {
+                        continue;
+                    }
+
+                    if ($item->is_returned) {
+                        continue;
+                    }
+
                     $p = \App\Models\Product::find($item->product_id);
                     if (!$p) continue;
+                    
                     $oldS = $p->stock;
                     $p->increment('stock', $item->quantity);
 
@@ -572,10 +595,15 @@ class AdminController extends Controller
                         $oldS, 
                         $oldS + $item->quantity, 
                         'order_return', 
-                        "مرتجع الطلب رقم #{$order->order_number}",
+                        "مرتجع الطلب رقم #{$order->order_number}" . ($isPartial ? " (عنصر محدد)" : ""),
                         ['order_id' => $order->id]
                     );
+
+                    $item->is_returned = true;
+                    $item->save();
                 }
+
+                $order->status = $isPartial ? 'partially_returned' : 'returned';
             }
         } else {
             $order->return_request_status = 'rejected';

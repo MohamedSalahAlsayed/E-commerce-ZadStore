@@ -86,14 +86,42 @@
                 <v-btn
                   v-for="social in filteredSocials"
                   :key="social.key"
-                  :icon="social.icon"
                   size="large"
                   variant="flat"
                   class="social-sphere"
                   :style="{ '--brand-color': social.color }"
                   :href="social.link"
                   target="_blank"
-                ></v-btn>
+                >
+                  <!-- Custom SVG for TikTok -->
+                  <svg
+                    v-if="social.key === 'tiktok'"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.29 6.29 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.05a8.16 8.16 0 0 0 4.77 1.52V7.14a4.85 4.85 0 0 1-1-.45z"
+                    />
+                  </svg>
+                  <!-- Custom SVG for YouTube -->
+                  <svg
+                    v-else-if="social.key === 'youtube'"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.72 31.72 0 0 0 0 12a31.72 31.72 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.72 31.72 0 0 0 24 12a31.72 31.72 0 0 0-.5-5.81zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"
+                    />
+                  </svg>
+                  <!-- Default MDI icon for others -->
+                  <v-icon v-else>{{ social.icon }}</v-icon>
+                </v-btn>
               </div>
             </div>
           </v-col>
@@ -271,15 +299,20 @@ const userStore = useAuthStore();
 const { locale } = useI18n();
 
 const socials = {
-  facebook: { icon: "mdi-facebook", color: "#1877F2" },
-  instagram: { icon: "mdi-instagram", color: "#E4405F" },
-  twitter: { icon: "mdi-twitter", color: "#1DA1F2" },
-  tiktok: { icon: "mdi-music-note", color: "#ffffff" },
+  facebook: { icon: "mdi-facebook", color: "#1877F2", showKey: "showFacebook" },
+  instagram: {
+    icon: "mdi-instagram",
+    color: "#E4405F",
+    showKey: "showInstagram",
+  },
+  youtube: { icon: "youtube-svg", color: "#FF0000", showKey: "showYoutube" },
+  tiktok: { icon: "tiktok-svg", color: "#010101", showKey: "showTiktok" },
+  twitter: { icon: "mdi-twitter", color: "#1DA1F2", showKey: "showTwitter" },
 };
 
 const filteredSocials = computed(() => {
   return Object.keys(socials)
-    .filter((key) => settingsStore[key])
+    .filter((key) => settingsStore[socials[key].showKey] && settingsStore[key])
     .map((key) => ({
       key,
       ...socials[key],

@@ -49,6 +49,7 @@ class UserController extends Controller
             'address' => 'required|string',
             'governorate_id' => 'required|exists:governorates,id',
             'shipping_method_id' => 'required|exists:shipping_methods,id',
+            'payment_method' => 'required|string', // added
             'coupon_code' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -136,6 +137,8 @@ class UserController extends Controller
                 'governorate_id' => $governorate->id,
                 'shipping_method_id' => $method->id,
                 'status' => 'pending',
+                'payment_status' => 'unpaid',
+                'payment_method' => $request->payment_method,
                 'subtotal' => $subtotal - $discount_amount,
                 'shipping_fee' => $shipping_fee,
                 'total' => $total,
@@ -156,7 +159,22 @@ class UserController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'تم إنشاء الطلب بنجاح', 'order' => $order], 201);
+            // If payment is not COD, get the redirect URL
+            $redirectUrl = null;
+            if ($request->payment_method !== 'cod') {
+                try {
+                    $paymentService = app(\App\Services\Payment\PaymentService::class);
+                    $redirectUrl = $paymentService->process($order);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Payment initiation failed: ' . $e->getMessage());
+                }
+            }
+
+            return response()->json([
+                'message' => 'تم إنشاء الطلب بنجاح',
+                'order' => $order,
+                'redirect_url' => $redirectUrl
+            ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -440,8 +458,23 @@ class UserController extends Controller
     public function expediteOrder(Request $request, $id)
     {
         $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+
+        if ($order->is_urgent) {
+            return response()->json(['message' => 'تم تسجيل طلب الاستعجال مسبقاً.']);
+        }
+
         $order->is_urgent = true;
         $order->save();
+
+        // Create a user notification confirming request
+        \App\Models\UserNotification::create([
+            'user_id' => $request->user()->id,
+            'title' => '🔥 طلب تعجيل مُسجَّل',
+            'description' => "تم تسجيل طلب تعجيل الشحن للطلب #{$order->order_number}. سنعمل على تجهيزه بأسرع وقت!",
+            'icon' => 'mdi-fire',
+            'color' => 'warning',
+            'type' => 'order'
+        ]);
 
         return response()->json(['message' => 'تم استلام طلب الاستعجال، سنعمل على شحن طلبك بأسرع وقت!']);
     }
@@ -464,6 +497,8 @@ class UserController extends Controller
                 if ($item->product_id) {
                     Product::where('id', $item->product_id)->increment('stock', $item->quantity);
                 }
+                $item->is_returned = true;
+                $item->save();
             }
 
             DB::commit();
@@ -476,11 +511,21 @@ class UserController extends Controller
 
     public function requestReturn(Request $request, $id)
     {
-        $request->validate(['reason' => 'nullable|string|max:500']);
+        $request->validate([
+            'reason_code' => 'required|string',
+            'reason' => 'nullable|string|max:500',
+            'return_type' => 'required|in:full,partial',
+            'item_ids' => 'required_if:return_type,partial|array',
+            'item_ids.*' => 'exists:order_items,id'
+        ]);
+
         $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
         
         $order->return_request_status = 'pending';
-        // Note: we DO NOT change the actual $order->status here. We wait for Admin approval.
+        $order->return_type = $request->return_type;
+        $order->return_target_items = $request->return_type === 'partial' ? $request->item_ids : null;
+        $order->return_reason_code = $request->reason_code;
+        $order->return_reason = $request->reason;
         $order->save();
 
         return response()->json(['message' => 'تم تسجيل طلب الإرجاع بنجاح، سيقوم الدعم الفني بمراجعته في أقرب وقت.']);

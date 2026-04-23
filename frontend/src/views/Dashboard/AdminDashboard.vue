@@ -449,6 +449,7 @@ const getStatusColor = (status) => {
     completed: "success",
     cancelled: "error",
     returned: "grey",
+    partially_returned: "orange",
   };
   return map[status] || "grey";
 };
@@ -461,6 +462,7 @@ const getStatusText = (status) => {
     completed: t("sales.orders.status.completed"),
     cancelled: t("sales.orders.status.cancelled"),
     returned: t("sales.orders.status.returned"),
+    partially_returned: t("sales.orders.status.partially_returned"),
   };
   return map[status] || status;
 };

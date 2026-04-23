@@ -27,7 +27,7 @@
                     <h2
                       class="text-h5 font-weight-black text-white mb-3 outfit-font"
                     >
-                      {{ $t("auth.welcome_back") }}
+                      {{ $t("auth.register.welcome_title") }}
                     </h2>
                     <p
                       class="text-white mb-8 text-body-2 px-2"
@@ -112,8 +112,8 @@
                       v-model="valid"
                       @submit.prevent="handleRegister"
                     >
-                      <v-row dense>
-                        <v-col cols="12" sm="6">
+                      <v-row>
+                        <v-col cols="12">
                           <v-text-field
                             v-model="form.name"
                             :label="$t('auth.register.full_name')"
@@ -128,7 +128,7 @@
                           ></v-text-field>
                         </v-col>
 
-                        <v-col cols="12" sm="6">
+                        <v-col cols="12">
                           <v-text-field
                             v-model="form.email"
                             :label="$t('auth.email')"
@@ -158,7 +158,7 @@
                           />
                         </v-col>
 
-                        <v-col cols="12" sm="6">
+                        <v-col cols="12">
                           <v-text-field
                             v-model="form.password"
                             :label="$t('auth.password')"
@@ -182,7 +182,7 @@
                           ></v-text-field>
                         </v-col>
 
-                        <v-col cols="12" sm="6">
+                        <v-col cols="12">
                           <v-text-field
                             v-model="form.password_confirm"
                             :label="$t('auth.register.password_confirm')"

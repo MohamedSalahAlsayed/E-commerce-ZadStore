@@ -4,10 +4,10 @@
     <div class="d-flex align-center justify-space-between mb-8">
       <div>
         <h1 class="text-h4 font-weight-black text-grey-darken-4 mb-2">
-          {{ $t("dashboard.advanced_reports") || "مركز التقارير والتحليلات" }}
+          {{ $t("dashboard.advanced_reports") }}
         </h1>
         <p class="text-subtitle-1 text-grey-darken-1">
-          رؤية شاملة لأداء المتجر، المبيعات، والأرباح الحقيقية.
+          {{ $t("reports.subtitle") }}
         </p>
       </div>
       <div class="d-flex gap-3">
@@ -18,9 +18,9 @@
           density="compact"
           variant="tonal"
         >
-          <v-btn value="7">7 أيام</v-btn>
-          <v-btn value="30">30 يوم</v-btn>
-          <v-btn value="90">90 يوم</v-btn>
+          <v-btn value="7">{{ $t("reports.days_7") }}</v-btn>
+          <v-btn value="30">{{ $t("reports.days_30") }}</v-btn>
+          <v-btn value="90">{{ $t("reports.days_90") }}</v-btn>
         </v-btn-toggle>
         <v-btn
           icon="mdi-refresh"
@@ -76,9 +76,11 @@
         <v-card class="rounded-xl pa-6 border-0 elevation-2 h-100">
           <div class="d-flex align-center justify-space-between mb-6">
             <h3 class="text-h6 font-weight-bold">
-              تحليل المبيعات (Revenue Trend)
+              {{ $t("reports.revenue_trend") }}
             </h3>
-            <v-chip size="small" color="primary" variant="tonal">مباشر</v-chip>
+            <v-chip size="small" color="primary" variant="tonal">{{
+              $t("reports.live")
+            }}</v-chip>
           </div>
           <div style="height: 350px">
             <apexchart
@@ -94,7 +96,9 @@
       <!-- Category Performance -->
       <v-col cols="12" lg="4">
         <v-card class="rounded-xl pa-6 border-0 elevation-2 h-100">
-          <h3 class="text-h6 font-weight-bold mb-6">المبيعات حسب الفئات</h3>
+          <h3 class="text-h6 font-weight-bold mb-6">
+            {{ $t("reports.sales_by_category") }}
+          </h3>
           <div class="d-flex align-center justify-center" style="height: 350px">
             <apexchart
               type="donut"
@@ -113,8 +117,12 @@
       <v-col cols="12" md="6">
         <v-card class="rounded-xl pa-6 border-0 elevation-2">
           <div class="d-flex align-center justify-space-between mb-6">
-            <h3 class="text-h6 font-weight-bold">المنتجات الأكثر مبيعاً</h3>
-            <v-btn variant="text" color="primary" size="small">عرض الكل</v-btn>
+            <h3 class="text-h6 font-weight-bold">
+              {{ $t("reports.top_products") }}
+            </h3>
+            <v-btn variant="text" color="primary" size="small">{{
+              $t("reports.view_all")
+            }}</v-btn>
           </div>
           <v-list class="pa-0">
             <v-list-item

@@ -31,6 +31,7 @@
     "blog": "Blog",
     "system": "System & Administration",
     "financials": "Financials & Profits",
+    "payments": "Payments Management",
     "shipping": "Shipping Zones",
     "staff": "Staff & Permissions",
     "messages": "Visitor Messages",
@@ -74,7 +75,18 @@
     "actions_th": "Actions",
     "error_loading": "An error occurred while loading data",
     "error_occurred": "An error occurred",
-    "delete_error": "An error occurred while deleting"
+    "delete_error": "An error occurred while deleting",
+    "close": "Close",
+    "confirm": "Confirm",
+    "deselect_all": "Deselect All",
+    "select_all": "Select All",
+    "delete_selected": "Delete Selected",
+    "add": "Add",
+    "name_required": "Name is required",
+    "image_required": "Image is required",
+    "confirm_delete_q": "Are you sure you want to delete",
+    "yes_delete": "Yes, Delete",
+    "view_website": "Visit Storefront"
   },
   "nav": {
     "home": "Home",
@@ -187,7 +199,7 @@
     "login_required_favorites": "You must log in first to add products to favorites",
     "register": {
       "welcome_title": "Join ZadStore Family 🚀",
-      "subtitle": "Start your journey as a professional marketer and get your first commission today",
+      "subtitle": "Create your account now, start your shopping journey, and enjoy our exclusive offers",
       "full_name": "Full Name",
       "full_name_placeholder": "e.g. John Doe",
       "phone": "Phone Number",
@@ -197,7 +209,9 @@
       "register_btn": "Create Account",
       "already_have_account": "Already have an account?",
       "login_link": "Sign In",
-      "success_msg": "Account created successfully! Redirecting..."
+      "success_msg": "Account created successfully! Redirecting...",
+      "email": "Email",
+      "password": "Password"
     },
     "forgot_password_page": {
       "title": "Forgot Password? 🔐",
@@ -227,15 +241,18 @@
     "logout_subtitle": "Goodbye!",
     "logout_status": "Securing your account and logging out...",
     "logout_redirect": "You will be redirected to the login page in moments",
-    "logout_btn": "Go Now"
+    "logout_btn": "Go Now",
+    "email_invalid": "Invalid Email"
   },
   "blog": {
-    "title": "Blog",
-    "subtitle": "Explore the latest articles and tips in the world of e-commerce and trading.",
+    "title": "Manage Articles",
+    "subtitle": "Control news and articles shown in your store blog",
     "post_title": "Introductory Article {number}",
     "post_date": "Published on: Oct 12, 2024",
     "post_desc": "This is a trial text that shows how the article description will look on the site's main blog for visitors and members.",
-    "read_more": "Read More"
+    "read_more": "Read More",
+    "add_new": "Write New Article",
+    "selected_count": "{count} Articles Selected"
   },
   "contact": {
     "title": "Contact Us",
@@ -337,8 +354,6 @@
     "quantity_label": "Quantity",
     "browse_title": "Browse Products",
     "browse_subtitle": "Discover our latest and best products available with the strongest offers.",
-    "all_categories": "All Categories",
-    "all_brands": "All Brands",
     "category_browse": "Browse Categories",
     "brand_browse": "Browse Brands",
     "sort_by_price": "Sort by Price",
@@ -502,6 +517,7 @@
     "delivered": "Delivered",
     "cancelled": "Cancelled",
     "returned": "Returned",
+    "partially_returned": "Partially Returned",
     "processing": "Processing",
     "add_to_cart_success": "Product added to cart successfully!",
     "search_placeholder": "Search order number or product...",
@@ -537,6 +553,9 @@
     "publish_rating": "Publish Rating",
     "return_request_title": "Return Request for Order #{no}",
     "return_hint": "Please select a return reason and provide details if any:",
+    "return_full_order": "Return Full Order",
+    "return_specific_items": "Return Specific Items",
+    "select_return_items": "Select items to return:",
     "return_reason_label": "Return Reason",
     "return_additional_details": "Additional Details (Optional)",
     "return_notes_placeholder": "Write your notes here...",
@@ -644,7 +663,11 @@
     "price_csv": "Price",
     "cost_csv": "Cost",
     "quantity_csv": "Quantity",
-    "status_csv": "Status"
+    "status_csv": "Status",
+    "deleted_product": "Deleted Product",
+    "system_user": "System",
+    "total_units": "Total Units in Stock",
+    "units_suffix": "units"
   },
   "purchases": {
     "purchases_title": "Purchases & Procurement 🧾",
@@ -934,6 +957,9 @@
     "no_details": "No additional details provided",
     "order_items": "Order Items:",
     "total_to_refund": "Total to be Refunded:",
+    "estimated_refund_items": "Returned Items Total:",
+    "type_partial": "Partial Return",
+    "type_full": "Full Return",
     "approve_btn": "Approve Return",
     "reject_btn": "Reject Request",
     "confirm_action_title": "Confirm Action",
@@ -961,7 +987,8 @@
       "QUALITY_ISSUE": "Product quality is lower than expected",
       "CHANGED_MIND": "I no longer want to buy it",
       "OTHER": "Other reason"
-    }
+    },
+    "type_th": "Type"
   },
   "shipping": {
     "title": "Shipping Management",
@@ -1040,10 +1067,9 @@
     "home": "Home",
     "blog": "Blog",
     "about_us": "About Us",
-    "contact": "Contact Us",
+    "contact": "Contact",
     "login": "Login",
-    "register": "Register",
-    "language_label": "Language / اللغة"
+    "register": "Register"
   },
   "settings": {
     "title": "General Store Settings",
@@ -1054,6 +1080,7 @@
       "social": "Social Media",
       "footer": "Footer Settings",
       "landing": "Guest Landing Page",
+      "promos": "Interface Offers (Top Offers)",
       "advanced": "System Settings"
     },
     "messages": {
@@ -1071,7 +1098,11 @@
       "FaqSection": "FAQ Section",
       "ShopWithUs": "Shop With Us",
       "BrandS": "Brands",
-      "CtaSection": "Registration CTA"
+      "CtaSection": "Registration CTA",
+      "show": "Show",
+      "hide": "Hide",
+      "texts_title": "Customize Section Texts",
+      "auto_hint": "Leave empty for automatic display"
     },
     "general": {
       "title": "Basic Information & Identity",
@@ -1144,7 +1175,11 @@
         "modern": "Modern Edge",
         "neo": "Neo Glass",
         "classic": "Classic Professional"
-      }
+      },
+      "show": "Show",
+      "hide": "Hide",
+      "texts_title": "Landing Page Texts",
+      "auto_hint": "Auto Hint"
     },
     "advanced": {
       "title": "Advanced Settings",
@@ -1396,7 +1431,8 @@
         "shipped": "Shipped",
         "completed": "Completed",
         "cancelled": "Cancelled",
-        "returned": "Returned"
+        "returned": "Returned",
+        "partially_returned": "Partially Returned"
       },
       "details_title": "Order Details #{num}",
       "timeline": {
@@ -1492,12 +1528,113 @@
     "avatar_error": "Failed to upload image",
     "unregistered": "Not registered"
   },
-  "guest_nav": {
-    "home": "Home",
-    "blog": "Blog",
-    "about_us": "About Us",
-    "contact": "Contact",
-    "login": "Login",
-    "register": "Register"
+  "close": "Close",
+  "merchants": {
+    "add_title": "Add New Merchant",
+    "basic_info": "Basic Information",
+    "fullname": "Full Merchant Name",
+    "store_name": "Store / Company Name",
+    "phone": "Phone Number",
+    "email": "Email (For Login)",
+    "password": "Password",
+    "business_info": "Business Information",
+    "category": "Store Category",
+    "tax_id": "Tax ID",
+    "commercial_reg": "Commercial Registration No.",
+    "address_info": "Address & Location",
+    "city": "Governorate / City",
+    "address_detail": "Detailed Address",
+    "attachments": "Attachments & Official Docs",
+    "logo": "Store Logo",
+    "docs_images": "Document Images (Reg/ID)",
+    "clear_data": "Clear Data",
+    "save": "Save Merchant Data"
+  },
+  "reports": {
+    "main_title": "Reports & Analytics Center",
+    "subtitle": "Comprehensive view of store performance, sales, and real profits.",
+    "days_7": "7 Days",
+    "days_30": "30 Days",
+    "days_90": "90 Days",
+    "revenue_trend": "Sales Analysis (Revenue Trend)",
+    "live": "Live",
+    "sales_by_category": "Sales By Category",
+    "top_products": "Top Selling Products",
+    "view_all": "View All"
+  },
+  "banners": {
+    "title": "Manage Banners & Sliders",
+    "type_label": "Banner Type",
+    "add_new": "Add New Banner",
+    "selected_count": "{count} Banners Selected"
+  },
+  "brands": {
+    "main_title": "Categories & Brands",
+    "add_cat": "Category",
+    "add_brand": "Brand",
+    "categories_tab": "Categories",
+    "brands_tab": "Brands",
+    "cat_img_th": "Category Image",
+    "cat_name_th": "Category Name",
+    "products_count_th": "Products Count",
+    "product_word": "Product",
+    "brand_img_th": "Brand Logo",
+    "brand_name_th": "Brand Name",
+    "cat_name_label": "Category Name",
+    "brand_name_label": "Brand Name",
+    "choose_cat_img": "Choose Category Image",
+    "choose_brand_img": "Choose Brand Logo",
+    "this_cat": "this category",
+    "this_brand": "this brand"
+  },
+  "users": {
+    "title": "Manage Customers",
+    "search_placeholder": "Search by name or email...",
+    "export_csv": "Export (CSV)",
+    "selected_count": "{count} Customers Selected",
+    "customer_th": "Customer",
+    "email_th": "Email",
+    "join_date_th": "Join Date",
+    "total_orders_th": "Total Orders",
+    "total_spent_th": "Total Spent",
+    "account_status_th": "Account Status"
+  },
+  "payments": {
+    "title": "Payments Management",
+    "subtitle": "Manage and track all store financial and bank transactions",
+    "refresh": "Refresh Data",
+    "stats_success": "Total Paid",
+    "stats_failed": "Total Failed",
+    "stats_pending": "Pending",
+    "stats_count": "Txn Count",
+    "search_placeholder": "Search order number...",
+    "status_label": "Status",
+    "method_label": "Payment Method",
+    "clear_filters": "Clear Filters",
+    "table_txn_id": "Txn ID",
+    "table_order_no": "Order #",
+    "table_customer": "Customer",
+    "table_method": "Method",
+    "table_amount": "Amount",
+    "table_date": "Date",
+    "table_actions": "Actions",
+    "no_data": "No recorded payment transactions",
+    "details_title": "Transaction Details",
+    "raw_data": "Webhook Raw Data:",
+    "status_success": "Success",
+    "status_failed": "Failed",
+    "status_pending": "Pending",
+    "recent_transactions": "Recent Transactions",
+    "transaction_id": "Transaction ID",
+    "order_no": "Order No",
+    "method": "Method",
+    "amount": "Amount",
+    "status": "Status",
+    "date": "Date",
+    "paid_amount": "Paid Amount",
+    "unpaid_amount": "Unpaid Amount",
+    "success": "Success",
+    "failed": "Failed",
+    "pending": "Pending"
   }
 }

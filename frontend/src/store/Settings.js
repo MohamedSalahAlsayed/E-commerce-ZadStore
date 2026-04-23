@@ -16,6 +16,12 @@ export const useSettingsStore = defineStore("settings", {
     instagram: "",
     twitter: "",
     tiktok: "",
+    youtube: "",
+    showFacebook: true,
+    showInstagram: true,
+    showTwitter: true,
+    showTiktok: true,
+    showYoutube: true,
     currency: "EGP",
     taxRate: 0,
     freeShippingEnabled: false,
@@ -89,12 +95,27 @@ export const useSettingsStore = defineStore("settings", {
           "instagram",
           "twitter",
           "tiktok",
+          "youtube",
           "currency",
           "primaryColor",
           "storeTheme",
           "footerAbout",
           "footerCopyright",
         ];
+
+        // Handle social show/hide booleans
+        const boolSocials = [
+          "showFacebook",
+          "showInstagram",
+          "showTwitter",
+          "showTiktok",
+          "showYoutube",
+        ];
+        boolSocials.forEach((key) => {
+          if (data[key] !== undefined) {
+            this[key] = data[key] === "true" || data[key] === true;
+          }
+        });
 
         props.forEach((p) => {
           if (data[p] !== undefined) this[p] = data[p];

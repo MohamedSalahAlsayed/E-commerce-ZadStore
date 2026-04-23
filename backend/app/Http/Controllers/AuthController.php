@@ -187,60 +187,70 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $user = $request->user();
-        
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
-            'phone' => 'nullable|string|max:20',
-            'bio' => 'nullable|string|max:1000',
-            'avatar' => 'nullable|image|max:2048',
-            'password' => 'nullable|string|min:8|confirmed',
-            'notifications' => 'nullable|array',
-            'address' => 'nullable|string|max:255',
-            'preferred_shipping_company' => 'nullable|string|max:100',
-        ]);
+        try {
+            $user = $request->user();
+            
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+                'username' => 'nullable|string|max:255|unique:users,username,' . $user->id,
+                'phone' => 'nullable|string|max:20',
+                'bio' => 'nullable|string|max:1000',
+                'avatar' => 'nullable|image|max:10240',
+                'password' => 'nullable|string|min:8|confirmed',
+                'notifications' => 'nullable|array',
+                'address' => 'nullable|string|max:255',
+                'preferred_shipping_company' => 'nullable|string|max:100',
+            ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-        if ($request->has('username')) {
-            $user->username = $request->username;
-        }
-        if ($request->has('phone')) {
-            $user->phone = $request->phone;
-        }
-        if ($request->has('bio')) {
-            $user->bio = $request->bio;
-        }
-        if ($request->has('notifications')) {
-            $user->notifications_prefs = json_encode($request->notifications);
-        }
-        if ($request->has('address')) {
-            $user->address = $request->address;
-        }
-        if ($request->has('preferred_shipping_company')) {
-            $user->preferred_shipping_company = $request->preferred_shipping_company;
-        }
-        
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar) {
-                $oldPath = str_replace('/storage/', '', $user->avatar);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            if ($request->has('username')) {
+                $user->username = $request->username;
             }
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = '/storage/' . $path;
-        }
+            if ($request->has('phone')) {
+                $user->phone = $request->phone;
+            }
+            if ($request->has('bio')) {
+                $user->bio = $request->bio;
+            }
+            if ($request->has('notifications')) {
+                $user->notifications_prefs = json_encode($request->notifications);
+            }
+            if ($request->has('address')) {
+                $user->address = $request->address;
+            }
+            if ($request->has('preferred_shipping_company')) {
+                $user->preferred_shipping_company = $request->preferred_shipping_company;
+            }
+            
+            if ($request->hasFile('avatar')) {
+                if ($user->avatar) {
+                    $oldPath = str_replace('/storage/', '', $user->avatar);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+                $path = $request->file('avatar')->store('avatars', 'public');
+                $user->avatar = '/storage/' . $path;
+            }
 
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-        }
-        
-        $user->save();
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+            }
+            
+            $user->save();
 
-        return response()->json([
-            'message' => 'تم تحديث البيانات بنجاح',
-            'user' => $user
-        ]);
+            return response()->json([
+                'message' => 'تم تحديث البيانات بنجاح',
+                'user' => $user
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Profile Update Failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'message' => 'حدث خطأ أثناء التحديث: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

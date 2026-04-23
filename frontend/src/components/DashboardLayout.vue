@@ -6,16 +6,13 @@
       :permanent="!isMobile"
       :temporary="isMobile"
       :location="isRtl ? 'right' : 'left'"
-      width="250"
+      width="280"
       @click="rail = false"
       class="sidebar-menu custom-scrollbar border-0"
       elevation="4"
     >
       <v-list-item
-        :prepend-avatar="
-          adminUser.avatar ||
-          'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
-        "
+        :prepend-avatar="getAvatarUrl(adminUser.avatar)"
         :title="adminUser.name || 'ZadStore Admin'"
         :subtitle="adminUser.email || $t('dashboard.admin_role')"
         class="py-4 text-white font-weight-black text-subtitle-1 border-b-0"
@@ -232,6 +229,14 @@
         ></v-list-item>
         <v-list-item
           v-if="can('view_financials')"
+          to="/Dashboard/Payments"
+          prepend-icon="mdi-credit-card-outline"
+          :title="$t('dashboard.payments')"
+          active-color="#fb923c"
+          class="text-white menu-item"
+        ></v-list-item>
+        <v-list-item
+          v-if="can('view_financials')"
           to="/Dashboard/AdvancedReports"
           prepend-icon="mdi-chart-line"
           :title="$t('dashboard.advanced_reports')"
@@ -320,6 +325,52 @@
           >{{ $t("dashboard.title") }}</v-app-bar-title
         >
         <v-spacer></v-spacer>
+
+        <!-- Social Media Links (dynamic from settings) -->
+        <template v-for="social in navbarSocials" :key="social.key">
+          <v-btn
+            icon
+            variant="tonal"
+            class="mx-1 social-nav-btn"
+            :class="social.key + '-btn'"
+            :href="social.href"
+            target="_blank"
+            height="40"
+            width="40"
+          >
+            <!-- TikTok SVG -->
+            <svg
+              v-if="social.key === 'tiktok'"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.29 6.29 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.05a8.16 8.16 0 0 0 4.77 1.52V7.14a4.85 4.85 0 0 1-1-.45z"
+              />
+            </svg>
+            <!-- YouTube SVG -->
+            <svg
+              v-else-if="social.key === 'youtube'"
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.72 31.72 0 0 0 0 12a31.72 31.72 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.72 31.72 0 0 0 24 12a31.72 31.72 0 0 0-.5-5.81zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"
+              />
+            </svg>
+            <!-- MDI icon for others -->
+            <v-icon v-else :color="social.color">{{ social.icon }}</v-icon>
+            <v-tooltip activator="parent" location="bottom">{{
+              social.label
+            }}</v-tooltip>
+          </v-btn>
+        </template>
 
         <!-- Messages Menu -->
         <v-menu
@@ -472,10 +523,33 @@
         </v-menu>
 
         <!-- Language Switcher -->
-        <v-btn icon color="primary" class="mr-2" @click="toggleLanguage">
-          <v-icon>{{ isRtl ? "mdi-translate" : "mdi-translate-off" }}</v-icon>
+        <v-btn
+          variant="tonal"
+          color="primary"
+          class="mx-1 rounded-lg font-weight-black"
+          height="40"
+          width="40"
+          @click="toggleLanguage"
+        >
+          {{ isRtl ? "EN" : "AR" }}
           <v-tooltip activator="parent" location="bottom">{{
-            isRtl ? "English" : "العربية"
+            isRtl ? "Switch to English" : "التحويل للغة العربية"
+          }}</v-tooltip>
+        </v-btn>
+
+        <!-- View Website Button -->
+        <v-btn
+          variant="tonal"
+          color="success"
+          class="mx-1 rounded-lg"
+          height="40"
+          width="40"
+          to="/"
+          target="_blank"
+        >
+          <v-icon>mdi-open-in-new</v-icon>
+          <v-tooltip activator="parent" location="bottom">{{
+            $t("dashboard.view_website")
           }}</v-tooltip>
         </v-btn>
 
@@ -488,12 +562,7 @@
               class="mr-4 ml-4 cursor-pointer elevation-1"
               v-bind="props"
             >
-              <v-img
-                :src="
-                  adminUser.avatar ||
-                  'https://cdn-icons-png.flaticon.com/512/149/149071.png'
-                "
-              ></v-img>
+              <v-img :src="getAvatarUrl(adminUser.avatar)"></v-img>
             </v-avatar>
           </template>
           <v-card width="200" class="rounded-lg">
@@ -535,11 +604,13 @@ import { ref, onMounted, onUnmounted, inject, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useLocale, useDisplay } from "vuetify";
-import { useAuthStore } from "@/store/auth/LogIn"; // Added
+import { useAuthStore } from "@/store/auth/LogIn";
+import { useSettingsStore } from "@/store/Settings";
 import axios from "@/axios";
 
-const auth = useAuthStore(); // Added
-const { can } = auth; // Added
+const auth = useAuthStore();
+const { can } = auth;
+const settingsStore = useSettingsStore();
 const { mobile: isMobile } = useDisplay();
 
 const emitter = inject("emitter");
@@ -565,6 +636,14 @@ const toggleLanguage = () => {
 };
 
 const adminUser = ref({});
+const defaultAvatar = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+const getAvatarUrl = (path) => {
+  if (!path) return defaultAvatar;
+  if (path.startsWith("http")) return path;
+  const baseUrl = process.env.VUE_APP_API_URL || "http://127.0.0.1:8000";
+  return `${baseUrl}${path}`;
+};
 const messageList = ref([]);
 const recentNotifications = ref([]);
 const notificationsCount = ref(0);
@@ -574,6 +653,49 @@ const acknowledgedCount = ref(
 
 const displayNotifCount = computed(() => {
   return Math.max(0, notificationsCount.value - acknowledgedCount.value);
+});
+
+const navbarSocials = computed(() => {
+  const all = [
+    {
+      key: "facebook",
+      icon: "mdi-facebook",
+      color: "#1877F2",
+      label: "Facebook",
+      showKey: "showFacebook",
+    },
+    {
+      key: "instagram",
+      icon: "mdi-instagram",
+      color: "#E4405F",
+      label: "Instagram",
+      showKey: "showInstagram",
+    },
+    {
+      key: "youtube",
+      icon: "youtube-svg",
+      color: "#FF0000",
+      label: "YouTube",
+      showKey: "showYoutube",
+    },
+    {
+      key: "tiktok",
+      icon: "tiktok-svg",
+      color: "#010101",
+      label: "TikTok",
+      showKey: "showTiktok",
+    },
+    {
+      key: "twitter",
+      icon: "mdi-twitter",
+      color: "#1DA1F2",
+      label: "Twitter",
+      showKey: "showTwitter",
+    },
+  ];
+  return all
+    .filter((s) => settingsStore[s.showKey] && settingsStore[s.key])
+    .map((s) => ({ ...s, href: settingsStore[s.key] }));
 });
 
 const onNotificationsMenuOpen = (isOpen) => {
@@ -714,6 +836,28 @@ onUnmounted(() => {
 }
 .pulse-info :deep(.v-badge__badge) {
   animation: pulse-info 2s infinite;
+}
+
+/* =========================================
+     Social Media Buttons in Navbar
+  ========================================= */
+.social-nav-btn {
+  border-radius: 10px !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  color: #616161 !important;
+}
+.social-nav-btn:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+.youtube-btn:hover {
+  background: rgba(255, 0, 0, 0.12) !important;
+  color: #ff0000 !important;
+  box-shadow: 0 4px 14px rgba(255, 0, 0, 0.2);
+}
+.tiktok-btn:hover {
+  background: rgba(1, 1, 1, 0.08) !important;
+  color: #010101 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
 /* =========================================

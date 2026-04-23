@@ -1,52 +1,58 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import HomePage from "../views/User/HomePage.vue";
-import AboutPage from "../views/AboutPage.vue";
-import Product from "../views/User/ProductPage.vue";
-import ProductDetails from "../views/User/ProductDetails.vue";
-import FavourateProduct from "@/views/User/FavourateProduct.vue";
-import BrandPage from "../views/User/BrandPage.vue";
-import CartPage from "@/views/User/CartPage.vue";
-import ProductsPage from "@/views/User/ProductsPage.vue";
-// import ProductPage from "../views/User/ProductPage.vue";
-import AddOrder from "@/views/User/AddOrder.vue";
-import StatisticsPage from "@/views/User/StatisticsPage.vue";
-import OrdersPage from "@/views/User/OrdersPage.vue";
-import CommissionTransferRequests from "@/views/User/CommissionTransferRequests.vue";
-import ElhesapatePage from "@/views/User/ElhesapatePage.vue";
-import AddModeratorPage from "@/views/User/AddModeratorPage.vue";
-import HomeGestPage from "@/views/Gest/HomeGestPage.vue";
-import OrderSuccess from "@/views/User/OrderSuccess.vue";
-import LogIn from "@/views/Auth/LogIn.vue";
-import RegisterNow from "@/views/Auth/RegisterNow.vue";
-import GoogleCallback from "@/views/Auth/GoogleCallback.vue";
-import LogOut from "@/views/Auth/LogOut.vue";
+// Lazy load all views for better performance
+const HomePage = () => import("../views/User/HomePage.vue");
+const AboutPage = () => import("../views/AboutPage.vue");
+const Product = () => import("../views/User/ProductPage.vue");
+const ProductDetails = () => import("../views/User/ProductDetails.vue");
+const FavourateProduct = () => import("@/views/User/FavourateProduct.vue");
+const BrandPage = () => import("../views/User/BrandPage.vue");
+const CartPage = () => import("@/views/User/CartPage.vue");
+const ProductsPage = () => import("@/views/User/ProductsPage.vue");
+const AddOrder = () => import("@/views/User/AddOrder.vue");
+const StatisticsPage = () => import("@/views/User/StatisticsPage.vue");
+const OrdersPage = () => import("@/views/User/OrdersPage.vue");
+const CommissionTransferRequests = () =>
+  import("@/views/User/CommissionTransferRequests.vue");
+const ElhesapatePage = () => import("@/views/User/ElhesapatePage.vue");
+const AddModeratorPage = () => import("@/views/User/AddModeratorPage.vue");
+const HomeGestPage = () => import("@/views/Gest/HomeGestPage.vue");
+const OrderSuccess = () => import("@/views/User/OrderSuccess.vue");
+const LogIn = () => import("@/views/Auth/LogIn.vue");
+const RegisterNow = () => import("@/views/Auth/RegisterNow.vue");
+const GoogleCallback = () => import("@/views/Auth/GoogleCallback.vue");
+const LogOut = () => import("@/views/Auth/LogOut.vue");
 
 // Guest / CMS Pages
-import BlogPage from "@/views/CMS/BlogPage.vue";
-import ContactPage from "@/views/CMS/ContactPage.vue";
-import ProfilePage from "@/views/User/UserProfile/ProfilePage.vue";
-import EditProfilePage from "@/views/User/UserProfile/EditProfilePage.vue";
-import ForgetPassword from "@/views/Auth/ForgetPassword.vue";
-import MessagePage from "@/views/User/UserProfile/MessagePage.vue";
-import NotificationPage from "@/views/User/UserProfile/NotificationPage.vue";
-import TagerPage from "@/views/User/TagerPage.vue";
-import AdminDashboard from "@/views/Dashboard/AdminDashboard.vue";
-import MangProductPage from "@/views/Dashboard/MangProductPage.vue";
-import MangOrder from "@/views/Dashboard/MangOrder.vue";
-import MangCategoury from "@/views/Dashboard/MangCategoury.vue";
-import MangUsers from "@/views/Dashboard/MangUsers.vue";
-import InventoryManager from "@/views/Dashboard/InventoryManager.vue";
-import CouponsDiscounts from "@/views/Dashboard/CouponsDiscounts.vue";
-import MangBanner from "@/views/Dashboard/MangBanner.vue";
-import RatingsReviews from "@/views/Dashboard/RatingsReviews.vue";
-import ShippingZone from "@/views/Dashboard/ShippingZone.vue";
-import StoreSetting from "@/views/Dashboard/StoreSetting.vue";
-import ContactMessage from "@/views/Dashboard/ContactMessage.vue";
-import MangReturns from "@/views/Dashboard/MangReturns.vue";
-import AddTager from "@/views/Dashboard/AddTager.vue";
-import MangPurchases from "@/views/Dashboard/MangPurchases.vue";
-import StaffManagement from "@/views/Dashboard/StaffManagement.vue";
-import MangBlog from "@/views/Dashboard/MangBlog.vue";
+const BlogPage = () => import("@/views/CMS/BlogPage.vue");
+const ContactPage = () => import("@/views/CMS/ContactPage.vue");
+const ProfilePage = () => import("@/views/User/UserProfile/ProfilePage.vue");
+const EditProfilePage = () =>
+  import("@/views/User/UserProfile/EditProfilePage.vue");
+const ForgetPassword = () => import("@/views/Auth/ForgetPassword.vue");
+const MessagePage = () => import("@/views/User/UserProfile/MessagePage.vue");
+const NotificationPage = () =>
+  import("@/views/User/UserProfile/NotificationPage.vue");
+const TagerPage = () => import("@/views/User/TagerPage.vue");
+
+// Dashboard Pages
+const AdminDashboard = () => import("@/views/Dashboard/AdminDashboard.vue");
+const MangProductPage = () => import("@/views/Dashboard/MangProductPage.vue");
+const MangOrder = () => import("@/views/Dashboard/MangOrder.vue");
+const MangCategoury = () => import("@/views/Dashboard/MangCategoury.vue");
+const MangUsers = () => import("@/views/Dashboard/MangUsers.vue");
+const InventoryManager = () => import("@/views/Dashboard/InventoryManager.vue");
+const CouponsDiscounts = () => import("@/views/Dashboard/CouponsDiscounts.vue");
+const MangBanner = () => import("@/views/Dashboard/MangBanner.vue");
+const RatingsReviews = () => import("@/views/Dashboard/RatingsReviews.vue");
+const ShippingZone = () => import("@/views/Dashboard/ShippingZone.vue");
+const StoreSetting = () => import("@/views/Dashboard/StoreSetting.vue");
+const ContactMessage = () => import("@/views/Dashboard/ContactMessage.vue");
+const MangReturns = () => import("@/views/Dashboard/MangReturns.vue");
+const AddTager = () => import("@/views/Dashboard/AddTager.vue");
+const MangPurchases = () => import("@/views/Dashboard/MangPurchases.vue");
+const StaffManagement = () => import("@/views/Dashboard/StaffManagement.vue");
+const MangBlog = () => import("@/views/Dashboard/MangBlog.vue");
+const MangPayments = () => import("@/views/Dashboard/MangPayments.vue");
 import { useAuthStore } from "@/store/auth/LogIn";
 
 const routes = [
@@ -436,6 +442,16 @@ const routes = [
     path: "/Dashboard/MangPurchases",
     name: "MangPurchases",
     component: MangPurchases,
+    meta: {
+      layout: "DashboardLayout",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/Dashboard/Payments",
+    name: "MangPayments",
+    component: MangPayments,
     meta: {
       layout: "DashboardLayout",
       requiresAuth: true,

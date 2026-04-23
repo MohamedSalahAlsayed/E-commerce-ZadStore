@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\PaymentTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -59,6 +60,15 @@ class AdminFinancialController extends Controller
             ->take(5)
             ->get();
 
+        // إحصائيات حالات الدفع (مدفوع vs غير مدفوع)
+        $paidAmount = Order::where('payment_status', 'paid')
+            ->where('created_at', '>=', $since)
+            ->sum('total');
+            
+        $unpaidAmount = Order::where('payment_status', 'unpaid')
+            ->where('created_at', '>=', $since)
+            ->sum('total');
+
         return response()->json([
             'summary' => [
                 'total_revenue' => (float)$totalRevenue,
@@ -66,11 +76,43 @@ class AdminFinancialController extends Controller
                 'total_costs' => (float)$totalCosts,
                 'net_profit' => (float)$netProfit,
                 'profit_margin' => ($totalRevenue - $totalRefunded) > 0 ? round(($netProfit / ($totalRevenue - $totalRefunded)) * 100, 2) : 0,
+                'paid_amount' => (float)$paidAmount,
+                'unpaid_amount' => (float)$unpaidAmount,
             ],
             'charts' => [
                 'sales_history' => $salesHistory
             ],
             'top_products' => $topProfitableProducts
         ]);
+    }
+
+    /**
+     * جلب سجل معاملات الدفع التفصيلي للوحة التحكم
+     */
+    public function getTransactions(Request $request)
+    {
+        $query = PaymentTransaction::with('order:id,order_number,customer_name');
+
+        // البحث برقم الطلب
+        if ($request->filled('search')) {
+            $query->whereHas('order', function($q) use ($request) {
+                $q->where('order_number', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // فلترة بالحالة
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // فلترة بوسيلة الدفع
+        if ($request->filled('method')) {
+            $query->where('payment_method', $request->method);
+        }
+
+        $transactions = $query->orderBy('created_at', 'desc')
+            ->paginate($request->input('per_page', 20));
+
+        return response()->json($transactions);
     }
 }

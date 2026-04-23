@@ -3,16 +3,18 @@
     <v-container>
       <v-card class="pa-5" elevation="3" :loading="loading">
         <v-card-title class="text-h5 mb-4 font-weight-bold">
-          إضافة تاجر جديد
+          {{ $t("merchants.add_title") }}
         </v-card-title>
 
         <v-form @submit.prevent="submitMerchant" ref="merchantForm">
-          <h3 class="text-h6 mb-3 text-primary">البيانات الأساسية</h3>
+          <h3 class="text-h6 mb-3 text-primary">
+            {{ $t("merchants.basic_info") }}
+          </h3>
           <v-row>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="merchant.fullName"
-                label="اسم التاجر بالكامل (الاسم الشخصي)"
+                :label="$t('merchants.fullname')"
                 variant="outlined"
                 required
               ></v-text-field>
@@ -20,7 +22,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="merchant.storeName"
-                label="اسم المتجر / الشركة"
+                :label="$t('merchants.store_name')"
                 variant="outlined"
                 required
               ></v-text-field>
@@ -28,14 +30,14 @@
             <v-col cols="12" md="6">
               <PhoneInput
                 v-model="merchant.phone"
-                label="رقم التليفون"
+                :label="$t('merchants.phone')"
                 required
               />
             </v-col>
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="merchant.email"
-                label="البريد الإلكتروني (لتسجيل الدخول)"
+                :label="$t('merchants.email')"
                 type="email"
                 variant="outlined"
                 required
@@ -44,7 +46,7 @@
             <v-col cols="12" md="6">
               <v-text-field
                 v-model="merchant.password"
-                label="كلمة المرور (دخول التاجر لحسابه)"
+                :label="$t('merchants.password')"
                 type="password"
                 variant="outlined"
                 required
@@ -54,27 +56,29 @@
 
           <v-divider class="my-4"></v-divider>
 
-          <h3 class="text-h6 mb-3 text-primary">بيانات النشاط التجاري</h3>
+          <h3 class="text-h6 mb-3 text-primary">
+            {{ $t("merchants.business_info") }}
+          </h3>
           <v-row>
             <v-col cols="12" md="4">
               <v-select
                 v-model="merchant.category"
                 :items="categories"
-                label="تصنيف المتجر"
+                :label="$t('merchants.category')"
                 variant="outlined"
               ></v-select>
             </v-col>
             <v-col cols="12" md="4">
               <v-text-field
                 v-model="merchant.taxId"
-                label="رقم البطاقة الضريبية"
+                :label="$t('merchants.tax_id')"
                 variant="outlined"
               ></v-text-field>
             </v-col>
             <v-col cols="12" md="4">
               <v-text-field
                 v-model="merchant.commercialRecord"
-                label="رقم السجل التجاري"
+                :label="$t('merchants.commercial_reg')"
                 variant="outlined"
               ></v-text-field>
             </v-col>
@@ -82,20 +86,22 @@
 
           <v-divider class="my-4"></v-divider>
 
-          <h3 class="text-h6 mb-3 text-primary">العنوان والموقع</h3>
+          <h3 class="text-h6 mb-3 text-primary">
+            {{ $t("merchants.address_info") }}
+          </h3>
           <v-row>
             <v-col cols="12" md="4">
               <v-select
                 v-model="merchant.city"
                 :items="cities"
-                label="المحافظة / المدينة"
+                :label="$t('merchants.city')"
                 variant="outlined"
               ></v-select>
             </v-col>
             <v-col cols="12" md="8">
               <v-textarea
                 v-model="merchant.address"
-                label="العنوان بالتفصيل"
+                :label="$t('merchants.address_detail')"
                 rows="2"
                 variant="outlined"
               ></v-textarea>
@@ -104,12 +110,14 @@
 
           <v-divider class="my-4"></v-divider>
 
-          <h3 class="text-h6 mb-3 text-primary">المرفقات والأوراق الرسمية</h3>
+          <h3 class="text-h6 mb-3 text-primary">
+            {{ $t("merchants.attachments") }}
+          </h3>
           <v-row>
             <v-col cols="12" md="6">
               <v-file-input
                 v-model="merchant.logo"
-                label="شعار المتجر (Logo)"
+                :label="$t('merchants.logo')"
                 accept="image/*"
                 prepend-icon="mdi-camera"
                 variant="outlined"
@@ -118,7 +126,7 @@
             <v-col cols="12" md="6">
               <v-file-input
                 v-model="merchant.documents"
-                label="صور الأوراق (سجل/بطاقة)"
+                :label="$t('merchants.docs_images')"
                 accept="image/*,.pdf"
                 prepend-icon="mdi-file-document-multiple"
                 variant="outlined"
@@ -133,7 +141,7 @@
               variant="text"
               @click="resetForm"
               :disabled="loading"
-              >مسح البيانات</v-btn
+              >{{ $t("merchants.clear_data") }}</v-btn
             >
             <v-btn
               color="primary"
@@ -141,7 +149,7 @@
               variant="elevated"
               size="large"
               :loading="loading"
-              >حفظ بيانات التاجر</v-btn
+              >{{ $t("merchants.save") }}</v-btn
             >
           </v-card-actions>
         </v-form>
@@ -156,7 +164,7 @@
         {{ snackbar.text }}
         <template v-slot:actions>
           <v-btn color="white" variant="text" @click="snackbar.show = false">
-            إغلاق
+            {{ $t("dashboard.close") }}
           </v-btn>
         </template>
       </v-snackbar>

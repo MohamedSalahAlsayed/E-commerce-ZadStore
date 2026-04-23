@@ -4,10 +4,10 @@
     <div class="d-flex align-center justify-space-between mb-6">
       <div>
         <h1 class="text-h4 font-weight-black text-primary-darken-3 mb-1">
-          إدارة المقالات
+          {{ $t("blog.title") }}
         </h1>
         <p class="text-subtitle-1 text-grey-darken-1">
-          تحكم في الأخبار والمقالات التي تظهر في صفحة المدونة الخاصة بمتجرك
+          {{ $t("blog.subtitle") }}
         </p>
       </div>
       <div class="d-flex gap-3">
@@ -19,7 +19,7 @@
           elevation="2"
           @click="openDialog()"
         >
-          كتابة مقال جديد
+          {{ $t("blog.add_new") }}
         </v-btn>
       </div>
     </div>
@@ -35,7 +35,9 @@
           <div class="d-flex align-center gap-3">
             <v-icon>mdi-checkbox-multiple-marked</v-icon>
             <div class="text-h6 font-weight-bold">
-              تم تحديد {{ selectedIds.length }} مقالات
+              {{
+                $t("blog.selected_count").replace("{count}", selectedIds.length)
+              }}
             </div>
           </div>
           <div class="d-flex gap-2">
@@ -45,11 +47,11 @@
               prepend-icon="mdi-delete-multiple"
               @click="batchDeleteDialog = true"
             >
-              حذف المحدد
+              {{ $t("dashboard.delete_selected") }}
             </v-btn>
-            <v-btn color="white" variant="outlined" @click="selectedIds = []"
-              >إلغاء</v-btn
-            >
+            <v-btn color="white" variant="outlined" @click="selectedIds = []">{{
+              $t("dashboard.cancel")
+            }}</v-btn>
           </div>
         </div>
       </v-card>
@@ -224,7 +226,7 @@
                 لا توجد مقالات مضافة
               </h3>
               <p class="text-body-2 text-grey">
-                اضغط على "كتابة مقال جديد" للبدء في إضافة محتوى المتجر
+                اضغط على "{{ $t("blog.add_new") }}" للبدء في إضافة محتوى المتجر
               </p>
             </div>
           </template>
@@ -273,7 +275,7 @@
       <v-card class="rounded-xl">
         <v-toolbar color="surface" elevation="0" class="border-bottom">
           <v-toolbar-title class="text-h6 font-weight-bold">
-            {{ editedItem.id ? "تعديل المقال" : "كتابة مقال جديد" }}
+            {{ editedItem.id ? "تعديل المقال" : $t("blog.add_new") }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn icon @click="closeDialog">

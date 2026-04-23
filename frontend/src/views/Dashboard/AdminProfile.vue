@@ -8,7 +8,7 @@
           <v-card-text class="text-center pt-0 profile-card-content">
             <div class="avatar-wrapper mb-4">
               <v-avatar size="120" class="profile-avatar border-4 border-white">
-                <v-img :src="profileData.avatar || defaultAvatar" cover></v-img>
+                <v-img :src="getAvatarUrl(profileData.avatar)" cover></v-img>
               </v-avatar>
               <v-btn
                 icon="mdi-camera"
@@ -259,6 +259,13 @@ const profileData = ref({
   role: "admin",
 });
 
+const getAvatarUrl = (path) => {
+  if (!path) return defaultAvatar;
+  if (path.startsWith("http")) return path;
+  const baseUrl = process.env.VUE_APP_API_URL || "http://127.0.0.1:8000";
+  return `${baseUrl}${path}`;
+};
+
 const getRoleName = (role) => {
   if (role === "super_admin") return t("profile_page.super_admin");
   if (role === "staff") return t("profile_page.staff");
@@ -344,12 +351,16 @@ const onAvatarChange = async (e) => {
 
   const formData = new FormData();
   formData.append("avatar", file);
+  formData.append("name", profileData.value.name);
+  formData.append("email", profileData.value.email);
+  if (profileData.value.phone)
+    formData.append("phone", profileData.value.phone);
+  if (profileData.value.bio) formData.append("bio", profileData.value.bio);
+  formData.append("_method", "PUT"); // Laravel requirement for multipart PUT
 
   loading.value = true;
   try {
-    const res = await api.put("/user/profile", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await api.post("/user/profile", formData);
     profileData.value.avatar = res.data.user?.avatar || res.data.avatar;
     emitter.emit("showMessage", {
       text: t("profile_page.avatar_success"),
@@ -358,7 +369,7 @@ const onAvatarChange = async (e) => {
     emitter.emit("updateHeaderData");
   } catch (err) {
     emitter.emit("showMessage", {
-      text: t("profile_page.avatar_error"),
+      text: err.response?.data?.message || t("profile_page.avatar_error"),
       color: "error",
     });
   } finally {

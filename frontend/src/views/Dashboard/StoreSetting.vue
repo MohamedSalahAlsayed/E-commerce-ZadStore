@@ -105,7 +105,7 @@
               class="text-right font-weight-bold d-flex justify-start px-6 py-3"
             >
               <v-icon right class="ml-3">mdi-star-shooting</v-icon>
-              عروض الواجهة (Top Offers)
+              {{ $t("settings.tabs.promos") }}
             </v-tab>
           </v-tabs>
 
@@ -338,56 +338,310 @@
                 </div>
                 <div v-else-if="activeTab === 'social'">
                   <h3
-                    class="text-h6 font-weight-bold mb-6"
+                    class="text-h6 font-weight-bold mb-2"
                     style="color: rgb(var(--v-theme-primary))"
                   >
                     {{ $t("settings.social.title") }}
                   </h3>
+                  <p class="text-caption text-grey mb-6">
+                    {{
+                      locale === "ar"
+                        ? "أضف روابط حسابات التواصل الاجتماعي للمتجر. فعّل/عطّل ظهور كل أيقونة في الناف بار والفوتر."
+                        : "Add your store social media links. Toggle visibility in navbar & footer."
+                    }}
+                  </p>
+
                   <v-row v-if="isLoading">
-                    <v-col cols="12" md="6" v-for="i in 4" :key="i">
+                    <v-col cols="12" md="6" v-for="i in 5" :key="i">
                       <v-skeleton-loader type="list-item" />
                     </v-col>
                   </v-row>
+
                   <v-row v-else>
+                    <!-- Facebook -->
                     <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="settings.facebook"
-                        :label="$t('settings.social.facebook')"
-                        prepend-inner-icon="mdi-facebook"
+                      <v-card
                         variant="outlined"
-                        color="#1877F2"
-                        dir="ltr"
-                      ></v-text-field>
+                        class="social-field-card pa-4 rounded-xl"
+                        :class="{ 'active-social': settings.showFacebook }"
+                      >
+                        <div
+                          class="d-flex align-center justify-space-between mb-3"
+                        >
+                          <div class="d-flex align-center gap-2">
+                            <v-icon color="#1877F2" size="28"
+                              >mdi-facebook</v-icon
+                            >
+                            <span class="font-weight-bold text-subtitle-1"
+                              >Facebook</span
+                            >
+                          </div>
+                          <v-switch
+                            v-model="settings.showFacebook"
+                            color="#1877F2"
+                            density="compact"
+                            hide-details
+                            inset
+                          ></v-switch>
+                        </div>
+                        <v-text-field
+                          v-model="settings.facebook"
+                          placeholder="https://facebook.com/yourpage"
+                          variant="outlined"
+                          density="compact"
+                          color="#1877F2"
+                          dir="ltr"
+                          hide-details
+                          prepend-inner-icon="mdi-link"
+                        ></v-text-field>
+                      </v-card>
                     </v-col>
+
+                    <!-- Instagram -->
                     <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="settings.instagram"
-                        :label="$t('settings.social.instagram')"
-                        prepend-inner-icon="mdi-instagram"
+                      <v-card
                         variant="outlined"
-                        color="#E4405F"
-                        dir="ltr"
-                      ></v-text-field>
+                        class="social-field-card pa-4 rounded-xl"
+                        :class="{ 'active-social': settings.showInstagram }"
+                      >
+                        <div
+                          class="d-flex align-center justify-space-between mb-3"
+                        >
+                          <div class="d-flex align-center gap-2">
+                            <v-icon color="#E4405F" size="28"
+                              >mdi-instagram</v-icon
+                            >
+                            <span class="font-weight-bold text-subtitle-1"
+                              >Instagram</span
+                            >
+                          </div>
+                          <v-switch
+                            v-model="settings.showInstagram"
+                            color="#E4405F"
+                            density="compact"
+                            hide-details
+                            inset
+                          ></v-switch>
+                        </div>
+                        <v-text-field
+                          v-model="settings.instagram"
+                          placeholder="https://instagram.com/yourpage"
+                          variant="outlined"
+                          density="compact"
+                          color="#E4405F"
+                          dir="ltr"
+                          hide-details
+                          prepend-inner-icon="mdi-link"
+                        ></v-text-field>
+                      </v-card>
                     </v-col>
+
+                    <!-- YouTube -->
                     <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="settings.tiktok"
-                        :label="$t('settings.social.tiktok')"
-                        prepend-inner-icon="mdi-music-note"
+                      <v-card
                         variant="outlined"
-                        color="black"
-                        dir="ltr"
-                      ></v-text-field>
+                        class="social-field-card pa-4 rounded-xl"
+                        :class="{ 'active-social': settings.showYoutube }"
+                      >
+                        <div
+                          class="d-flex align-center justify-space-between mb-3"
+                        >
+                          <div class="d-flex align-center gap-2">
+                            <v-icon color="#FF0000" size="28"
+                              >mdi-youtube</v-icon
+                            >
+                            <span class="font-weight-bold text-subtitle-1"
+                              >YouTube</span
+                            >
+                          </div>
+                          <v-switch
+                            v-model="settings.showYoutube"
+                            color="#FF0000"
+                            density="compact"
+                            hide-details
+                            inset
+                          ></v-switch>
+                        </div>
+                        <v-text-field
+                          v-model="settings.youtube"
+                          placeholder="https://youtube.com/@yourchannel"
+                          variant="outlined"
+                          density="compact"
+                          color="#FF0000"
+                          dir="ltr"
+                          hide-details
+                          prepend-inner-icon="mdi-link"
+                        ></v-text-field>
+                      </v-card>
                     </v-col>
+
+                    <!-- TikTok -->
                     <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="settings.twitter"
-                        :label="$t('settings.social.twitter')"
-                        prepend-inner-icon="mdi-twitter"
+                      <v-card
                         variant="outlined"
-                        color="#1DA1F2"
-                        dir="ltr"
-                      ></v-text-field>
+                        class="social-field-card pa-4 rounded-xl"
+                        :class="{ 'active-social': settings.showTiktok }"
+                      >
+                        <div
+                          class="d-flex align-center justify-space-between mb-3"
+                        >
+                          <div class="d-flex align-center gap-2">
+                            <v-icon color="#010101" size="28"
+                              >mdi-music-note-outline</v-icon
+                            >
+                            <span class="font-weight-bold text-subtitle-1"
+                              >TikTok</span
+                            >
+                          </div>
+                          <v-switch
+                            v-model="settings.showTiktok"
+                            color="#010101"
+                            density="compact"
+                            hide-details
+                            inset
+                          ></v-switch>
+                        </div>
+                        <v-text-field
+                          v-model="settings.tiktok"
+                          placeholder="https://tiktok.com/@yourpage"
+                          variant="outlined"
+                          density="compact"
+                          color="black"
+                          dir="ltr"
+                          hide-details
+                          prepend-inner-icon="mdi-link"
+                        ></v-text-field>
+                      </v-card>
+                    </v-col>
+
+                    <!-- Twitter / X -->
+                    <v-col cols="12" md="6">
+                      <v-card
+                        variant="outlined"
+                        class="social-field-card pa-4 rounded-xl"
+                        :class="{ 'active-social': settings.showTwitter }"
+                      >
+                        <div
+                          class="d-flex align-center justify-space-between mb-3"
+                        >
+                          <div class="d-flex align-center gap-2">
+                            <v-icon color="#1DA1F2" size="28"
+                              >mdi-twitter</v-icon
+                            >
+                            <span class="font-weight-bold text-subtitle-1"
+                              >Twitter / X</span
+                            >
+                          </div>
+                          <v-switch
+                            v-model="settings.showTwitter"
+                            color="#1DA1F2"
+                            density="compact"
+                            hide-details
+                            inset
+                          ></v-switch>
+                        </div>
+                        <v-text-field
+                          v-model="settings.twitter"
+                          placeholder="https://twitter.com/yourpage"
+                          variant="outlined"
+                          density="compact"
+                          color="#1DA1F2"
+                          dir="ltr"
+                          hide-details
+                          prepend-inner-icon="mdi-link"
+                        ></v-text-field>
+                      </v-card>
+                    </v-col>
+
+                    <!-- Live Preview -->
+                    <v-col cols="12">
+                      <v-divider class="my-4"></v-divider>
+                      <h4 class="text-subtitle-1 font-weight-bold mb-4">
+                        <v-icon size="18" class="me-2">mdi-eye-outline</v-icon>
+                        {{
+                          locale === "ar"
+                            ? "معاينة مباشرة للأيقونات"
+                            : "Live Icon Preview"
+                        }}
+                      </h4>
+                      <v-card
+                        variant="outlined"
+                        class="pa-4 rounded-xl d-flex align-center gap-3 flex-wrap"
+                      >
+                        <template
+                          v-if="settings.showFacebook && settings.facebook"
+                        >
+                          <v-btn
+                            icon
+                            size="small"
+                            variant="tonal"
+                            :href="settings.facebook"
+                            target="_blank"
+                          >
+                            <v-icon color="#1877F2">mdi-facebook</v-icon>
+                          </v-btn>
+                        </template>
+                        <template
+                          v-if="settings.showInstagram && settings.instagram"
+                        >
+                          <v-btn
+                            icon
+                            size="small"
+                            variant="tonal"
+                            :href="settings.instagram"
+                            target="_blank"
+                          >
+                            <v-icon color="#E4405F">mdi-instagram</v-icon>
+                          </v-btn>
+                        </template>
+                        <template
+                          v-if="settings.showYoutube && settings.youtube"
+                        >
+                          <v-btn
+                            icon
+                            size="small"
+                            variant="tonal"
+                            :href="settings.youtube"
+                            target="_blank"
+                          >
+                            <v-icon color="#FF0000">mdi-youtube</v-icon>
+                          </v-btn>
+                        </template>
+                        <template v-if="settings.showTiktok && settings.tiktok">
+                          <v-btn
+                            icon
+                            size="small"
+                            variant="tonal"
+                            :href="settings.tiktok"
+                            target="_blank"
+                          >
+                            <v-icon>mdi-music-note-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <template
+                          v-if="settings.showTwitter && settings.twitter"
+                        >
+                          <v-btn
+                            icon
+                            size="small"
+                            variant="tonal"
+                            :href="settings.twitter"
+                            target="_blank"
+                          >
+                            <v-icon color="#1DA1F2">mdi-twitter</v-icon>
+                          </v-btn>
+                        </template>
+                        <span
+                          v-if="!hasSocialPreview"
+                          class="text-caption text-grey"
+                        >
+                          {{
+                            locale === "ar"
+                              ? "فعّل الأيقونات وأضف الروابط لتظهر هنا"
+                              : "Enable icons and add links to see preview"
+                          }}
+                        </span>
+                      </v-card>
                     </v-col>
                   </v-row>
                 </div>
@@ -594,8 +848,8 @@
                                       settings.guestHome[
                                         getSectionToggleKey(section)
                                       ]
-                                        ? "إظهار"
-                                        : "إخفاء"
+                                        ? $t("settings.landing.show")
+                                        : $t("settings.landing.hide")
                                     }}
                                   </v-tooltip>
                                 </v-btn>
@@ -634,10 +888,7 @@
                           <v-icon size="20" class="ml-2"
                             >mdi-format-text</v-icon
                           >
-                          {{
-                            $t("settings.landing.texts_title") ||
-                            "تخصيص نصوص الأقسام"
-                          }}
+                          {{ $t("settings.landing.texts_title") }}
                         </h4>
 
                         <v-row>
@@ -647,7 +898,7 @@
                               v-model="settings.guestHome.heroTitle"
                               :label="$t('settings.landing.hero_title_label')"
                               variant="outlined"
-                              placeholder="اتركه فارغاً للاستعراض التلقائي"
+                              :placeholder="$t('settings.landing.auto_hint')"
                               color="primary"
                               density="compact"
                             ></v-text-field>
@@ -659,7 +910,7 @@
                                 $t('settings.landing.hero_subtitle_label')
                               "
                               variant="outlined"
-                              placeholder="اتركه فارغاً للاستعراض التلقائي"
+                              :placeholder="$t('settings.landing.auto_hint')"
                               color="primary"
                               density="compact"
                             ></v-text-field>
@@ -1314,6 +1565,12 @@ const settings = ref({
   instagram: "",
   twitter: "",
   tiktok: "",
+  youtube: "",
+  showFacebook: true,
+  showInstagram: true,
+  showTwitter: true,
+  showTiktok: true,
+  showYoutube: true,
   currency: "جنيه مصري (EGP)",
   taxRate: 0,
   orderPrefix: "ZAD-",
@@ -1376,6 +1633,16 @@ const promoLarge2Img = ref(null);
 const hasChanges = computed(() => {
   if (!initialSettings.value) return false;
   return JSON.stringify(settings.value) !== initialSettings.value;
+});
+
+const hasSocialPreview = computed(() => {
+  return (
+    (settings.value.showFacebook && settings.value.facebook) ||
+    (settings.value.showInstagram && settings.value.instagram) ||
+    (settings.value.showYoutube && settings.value.youtube) ||
+    (settings.value.showTiktok && settings.value.tiktok) ||
+    (settings.value.showTwitter && settings.value.twitter)
+  );
 });
 
 const hexToRgb = (hex) => {
@@ -1464,6 +1731,19 @@ const loadSettings = async () => {
     if (data.instagram) settings.value.instagram = data.instagram;
     if (data.twitter) settings.value.twitter = data.twitter;
     if (data.tiktok) settings.value.tiktok = data.tiktok;
+    if (data.youtube) settings.value.youtube = data.youtube;
+    // social show toggles
+    const boolSocials = [
+      "showFacebook",
+      "showInstagram",
+      "showTwitter",
+      "showTiktok",
+      "showYoutube",
+    ];
+    boolSocials.forEach((key) => {
+      if (data[key] !== undefined)
+        settings.value[key] = data[key] === "true" || data[key] === true;
+    });
     if (data.currency) settings.value.currency = data.currency;
     if (data.taxRate) settings.value.taxRate = Number(data.taxRate);
     if (data.order_prefix) settings.value.orderPrefix = data.order_prefix;

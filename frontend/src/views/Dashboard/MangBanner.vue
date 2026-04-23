@@ -20,7 +20,7 @@
                 class="text-h5 font-weight-black"
                 style="color: rgb(var(--v-theme-primary))"
               >
-                إدارة البانرات والشرائح
+                {{ $t("banners.title") }}
               </h2>
             </div>
 
@@ -38,14 +38,14 @@
               >
                 {{
                   selectedIds.length === banners.length
-                    ? "إلغاء تحديد الكل"
-                    : "تحديد الكل"
+                    ? $t("dashboard.deselect_all")
+                    : $t("dashboard.select_all")
                 }}
               </v-btn>
               <v-select
                 v-model="filterType"
                 :items="['الكل', 'slider', 'sidebar', 'popup']"
-                label="نوع البانر"
+                :label="$t('banners.type_label')"
                 variant="outlined"
                 density="compact"
                 hide-details
@@ -58,7 +58,7 @@
                 height="44"
                 @click="openAddDialog"
               >
-                إضافة بانر جديد
+                {{ $t("banners.add_new") }}
               </v-btn>
             </div>
           </div>
@@ -76,7 +76,12 @@
             <div class="d-flex align-center gap-3">
               <v-icon>mdi-checkbox-multiple-marked</v-icon>
               <div class="text-h6 font-weight-bold">
-                تم تحديد {{ selectedIds.length }} بانرات
+                {{
+                  $t("banners.selected_count").replace(
+                    "{count}",
+                    selectedIds.length
+                  )
+                }}
               </div>
             </div>
             <div class="d-flex gap-2">
@@ -86,10 +91,13 @@
                 prepend-icon="mdi-delete-multiple"
                 @click="batchDeleteDialog = true"
               >
-                حذف المحدد
+                {{ $t("dashboard.delete_selected") }}
               </v-btn>
-              <v-btn color="white" variant="outlined" @click="selectedIds = []"
-                >إلغاء</v-btn
+              <v-btn
+                color="white"
+                variant="outlined"
+                @click="selectedIds = []"
+                >{{ $t("dashboard.cancel") }}</v-btn
               >
             </div>
           </div>
@@ -361,7 +369,7 @@
               variant="tonal"
               class="px-4 font-weight-bold"
               @click="closeDialog"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="primary"
@@ -391,7 +399,7 @@
               variant="tonal"
               class="px-6 font-weight-bold"
               @click="dialogDelete = false"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="error"
@@ -419,7 +427,7 @@
               variant="tonal"
               class="px-6 font-weight-bold"
               @click="batchDeleteDialog = false"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="error"
@@ -428,7 +436,7 @@
               :loading="deleting"
               :disabled="deleting"
               @click="confirmBatchDelete"
-              >نعم، احذف المحدد</v-btn
+              >نعم، ا{{ $t("dashboard.delete_selected") }}</v-btn
             >
           </v-card-actions>
         </v-card>

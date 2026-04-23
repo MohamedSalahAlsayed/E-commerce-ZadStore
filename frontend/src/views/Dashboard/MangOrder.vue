@@ -260,7 +260,7 @@
                   :color="getStatusColor(order.status)"
                   class="font-weight-bold"
                 >
-                  {{ order.status }}
+                  {{ getStatusText(order.status) }}
                 </v-chip>
               </td>
               <td class="text-center">
@@ -326,6 +326,22 @@
         </v-card-title>
 
         <v-card-text class="pa-0 printable-area" style="max-height: 80vh">
+          <!-- Print-Only Header -->
+          <div class="print-header px-6 py-4 mb-6 border-b-2 d-none">
+            <div class="d-flex justify-space-between align-center">
+              <div>
+                <h1 class="text-h4 font-weight-black text-primary">ZadStore</h1>
+                <p class="text-caption">متجر زاد - أفضل تجربة تسوق</p>
+              </div>
+              <div class="text-left">
+                <div class="text-h6 font-weight-bold">فاتورة طلب</div>
+                <div class="text-subtitle-1">
+                  #{{ selectedOrder.orderNumber }}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Professional Order Timeline -->
           <div class="bg-primary-lighten-5 pa-4 border-b no-print">
             <v-timeline
@@ -470,14 +486,39 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in selectedOrder.items" :key="index">
+                <tr
+                  v-for="(item, index) in selectedOrder.items"
+                  :key="index"
+                  :style="
+                    isItemReturned(selectedOrder, item)
+                      ? 'opacity:0.6; background:#fff8f8;'
+                      : ''
+                  "
+                >
                   <td class="d-flex align-center gap-3 py-2">
                     <v-avatar size="40" rounded class="bg-grey-lighten-2">
                       <v-img :src="item.image" cover></v-img>
                     </v-avatar>
-                    <span class="font-weight-bold text-caption">{{
-                      item.name
-                    }}</span>
+                    <div>
+                      <span
+                        class="font-weight-bold text-caption"
+                        :style="
+                          isItemReturned(selectedOrder, item)
+                            ? 'text-decoration:line-through;'
+                            : ''
+                        "
+                        >{{ item.name }}</span
+                      >
+                      <v-chip
+                        v-if="isItemReturned(selectedOrder, item)"
+                        size="x-small"
+                        color="error"
+                        variant="tonal"
+                        class="d-block mt-1"
+                      >
+                        {{ locale === "ar" ? "مُرجَع" : "Returned" }}
+                      </v-chip>
+                    </div>
                   </td>
                   <td class="text-center">{{ item.quantity }}</td>
                   <td class="text-left">
@@ -703,6 +744,7 @@ const STATUS_MAP_EN_AR = {
   completed: t("sales.orders.status.completed"),
   cancelled: t("sales.orders.status.cancelled"),
   returned: t("sales.orders.status.returned"),
+  partially_returned: t("sales.orders.status.partially_returned"),
 };
 
 const STATUS_MAP_AR_EN = Object.fromEntries(
@@ -835,6 +877,18 @@ const deleteDialog = ref(false);
 const orderToDelete = ref(null);
 const deleting = ref(false);
 
+const isItemReturned = (order, item) => {
+  if (!order.returnStatus || order.returnStatus !== "approved") return false;
+  if (order.status === "مرتجع") return true;
+  if (order.status === "مرتجع جزئياً" && order.return_target_items) {
+    const targetIds = Array.isArray(order.return_target_items)
+      ? order.return_target_items
+      : JSON.parse(order.return_target_items || "[]");
+    return targetIds.includes(item.id || item.product_id); // Fallback to product_id if id is not available
+  }
+  return item.is_returned === true || item.is_returned === 1;
+};
+
 // --- الدوال (Functions) ---
 
 // تنسيق التاريخ
@@ -867,9 +921,19 @@ const getStatusColor = (status) => {
       return "error";
     case t("sales.orders.status.returned"):
       return "black";
+    case t("sales.orders.status.partially_returned"):
+      return "orange";
     default:
       return "grey";
   }
+};
+
+// تحديد اسم الحالة (نص)
+const getStatusText = (status) => {
+  // If it's already translated (AR), we might need to map it back or just return it
+  // But usually we store the EN value in the database and translate it here
+  const enStatus = STATUS_MAP_AR_EN[status] || status;
+  return STATUS_MAP_EN_AR[enStatus] || status;
 };
 
 // فلترة الطلبات (بحث + فلتر حالة)
@@ -931,20 +995,19 @@ const handleReturnRequest = async (order, action) => {
     const res = await api.put(`/admin/orders/${order.id}/handle-return`, {
       action,
     });
-    showMessage(res.data.message);
+    const updatedOrder = res.data.order;
+    const newStatusEn = updatedOrder.status;
+    const newStatusAr = STATUS_MAP_EN_AR[newStatusEn] || newStatusEn;
 
     // Update local object softly
     const index = orders.value.findIndex((o) => o.id === order.id);
-    orders.value[index].status = t("sales.orders.status.returned");
-    if (action === "approve") {
-      orders.value[index].status = t("sales.orders.status.returned");
+    if (index !== -1) {
+      orders.value[index].status = newStatusAr;
+      orders.value[index].returnStatus = updatedOrder.return_request_status;
+
       if (selectedOrder.value && selectedOrder.value.id === order.id) {
-        selectedOrder.value.status = t("sales.orders.status.returned");
-        selectedOrder.value.returnStatus = "approved";
-      }
-    } else {
-      if (selectedOrder.value && selectedOrder.value.id === order.id) {
-        selectedOrder.value.returnStatus = "rejected";
+        selectedOrder.value.status = newStatusAr;
+        selectedOrder.value.returnStatus = updatedOrder.return_request_status;
       }
     }
   } catch (error) {
@@ -1076,24 +1139,45 @@ const confirmDelete = async () => {
     visibility: visible;
   }
   .printable-area {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
-    width: 100vw !important;
-    height: 100vh !important;
-    padding: 20px !important;
+    width: 100% !important;
+    padding: 0 !important;
     margin: 0 !important;
     background: white !important;
     z-index: 9999;
     overflow: visible !important;
     max-height: none !important;
   }
+  .print-header {
+    display: block !important;
+    border-bottom: 2px solid #000 !important;
+    margin-bottom: 30px !important;
+  }
   .no-print,
   .v-btn,
   .v-field,
   .v-timeline,
-  .v-card-actions {
+  .v-card-actions,
+  .v-dialog-content__scroller {
     display: none !important;
+  }
+  .v-card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+  /* Force table layout for printing */
+  .v-table {
+    background: white !important;
+  }
+  .v-table th {
+    background: #f0f0f0 !important;
+    color: black !important;
+    border: 1px solid #ddd !important;
+  }
+  .v-table td {
+    border: 1px solid #ddd !important;
   }
   /* Ensure text is black for printing */
   .printable-area * {

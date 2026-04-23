@@ -12,6 +12,7 @@ use App\Models\ShippingMethod;
 use App\Models\StoreSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 use App\Mail\ContactReplyMail;
 
 class AdminSupplementalController extends Controller
@@ -302,6 +303,7 @@ class AdminSupplementalController extends Controller
         foreach ($settings as $key => $value) {
             StoreSetting::updateOrCreate(['key' => $key], ['value' => is_array($value) ? json_encode($value) : $value]);
         }
+        Cache::forget('store_settings');
         return response()->json(['message' => 'Settings updated']);
     }
 
@@ -315,6 +317,7 @@ class AdminSupplementalController extends Controller
         foreach ($data['settings'] as $item) {
             StoreSetting::updateOrCreate(['key' => $item['key']], ['value' => $item['value']]);
         }
+        Cache::forget('store_settings');
         return response()->json(['message' => 'Bulk settings updated']);
     }
 
@@ -328,15 +331,30 @@ class AdminSupplementalController extends Controller
             ->take(5)
             ->get();
             
-        // جلب عدد التنبيهات (طلبات جديدة + مراجعات معلقة + طلبات إرجاع معلقة)
+        // جلب عدد التنبيهات (طلبات جديدة + طلبات مستعجلة + مراجعات معلقة + طلبات إرجاع معلقة)
         $pendingOrdersCount = \App\Models\Order::whereIn('status', ['pending', 'processing'])->count();
+        $urgentOrdersCount = \App\Models\Order::where('is_urgent', true)
+            ->whereIn('status', ['pending', 'processing'])
+            ->count();
         $pendingReturnsCount = \App\Models\Order::where('return_request_status', 'pending')->count();
         $pendingReviewsCount = \App\Models\Review::where('is_approved', false)->count();
 
-        $notificationsCount = $pendingOrdersCount + $pendingReturnsCount + $pendingReviewsCount;
+        $notificationsCount = $pendingOrdersCount + $pendingReturnsCount + $pendingReviewsCount + ($urgentOrdersCount > 0 ? 1 : 0);
 
         // مصفوفة تفصيلية للإشعارات
         $recentNotifications = [];
+
+        // أولاً: الطلبات المستعجلة (أعلى الأولوية)
+        if ($urgentOrdersCount > 0) {
+            $recentNotifications[] = [
+                'id' => 'orders_urgent',
+                'title' => '🔥 طلبات مستعجلة',
+                'description' => "هناك {$urgentOrdersCount} طلب مستعجل يحتاج تجهيزاً فورياً",
+                'icon' => 'mdi-fire',
+                'color' => 'error',
+                'to' => '/Dashboard/MangOrder'
+            ];
+        }
         if ($pendingOrdersCount > 0) {
             $recentNotifications[] = [
                 'id' => 'orders_pending',

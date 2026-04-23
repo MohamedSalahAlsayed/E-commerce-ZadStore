@@ -10,7 +10,7 @@
               class="text-h5 font-weight-black"
               style="color: rgb(var(--v-theme-primary))"
             >
-              الأقسام والماركات
+              {{ $t("brands.main_title") }}
             </h2>
 
             <v-btn
@@ -20,7 +20,12 @@
               height="44"
               @click="openAddDialog"
             >
-              إضافة {{ activeTab === "categories" ? "قسم" : "ماركة" }}
+              إضافة
+              {{
+                activeTab === "categories"
+                  ? $t("brands.add_cat")
+                  : $t("brands.add_brand")
+              }}
             </v-btn>
           </div>
 
@@ -248,7 +253,7 @@
                     color="white"
                     variant="outlined"
                     @click="selectedBrandIds = []"
-                    >إلغاء</v-btn
+                    >{{ $t("dashboard.cancel") }}</v-btn
                   >
                 </div>
               </div>
@@ -816,7 +821,7 @@ const editedItem = ref({
   meta_keywords: "",
 });
 
-// معالجة رفع الصورة (تعمل مع الأقسام والماركات)
+// معالجة رفع الصورة (تعمل مع {{ $t("brands.main_title") }})
 const handleImageUpload = (fileArray) => {
   const file = Array.isArray(fileArray) ? fileArray[0] : fileArray;
   if (file) {

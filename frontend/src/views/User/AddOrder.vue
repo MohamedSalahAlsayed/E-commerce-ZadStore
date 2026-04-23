@@ -630,6 +630,7 @@ const submitOrder = async () => {
     governorate_id: orderData.value.governorate_id,
     shipping_method_id: orderData.value.shipping_method_id,
     coupon_code: activeCoupon.value ? activeCoupon.value.code : null,
+    payment_method: paymentMethod.value,
     items: cartItems.value.map((item) => ({
       product_id: item.id,
       quantity: item.quantity,

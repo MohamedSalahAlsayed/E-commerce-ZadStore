@@ -19,7 +19,12 @@ class OrderItem extends Model
         'price',
         'quantity',
         'image',
-        'purchase_price'
+        'purchase_price',
+        'is_returned'
+    ];
+
+    protected $casts = [
+        'is_returned' => 'boolean',
     ];
 
     public function order()

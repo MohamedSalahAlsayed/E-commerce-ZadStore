@@ -10,7 +10,7 @@
               class="text-h5 font-weight-black"
               style="color: rgb(var(--v-theme-primary))"
             >
-              الأقسام والماركات
+              {{ $t("brands.main_title") }}
             </h2>
 
             <v-btn
@@ -20,18 +20,23 @@
               height="44"
               @click="openAddDialog"
             >
-              إضافة {{ activeTab === "categories" ? "قسم" : "ماركة" }}
+              إضافة
+              {{
+                activeTab === "categories"
+                  ? $t("brands.add_cat")
+                  : $t("brands.add_brand")
+              }}
             </v-btn>
           </div>
 
           <v-tabs v-model="activeTab" color="primary" class="border-bottom">
             <v-tab value="categories" class="font-weight-bold text-subtitle-1">
               <v-icon right class="ml-2">mdi-shape-outline</v-icon>
-              الأقسام (Categories)
+              {{ $t("brands.categories_tab") }}
             </v-tab>
             <v-tab value="brands" class="font-weight-bold text-subtitle-1">
               <v-icon right class="ml-2">mdi-tag-multiple-outline</v-icon>
-              الماركات (Brands)
+              {{ $t("brands.brands_tab") }}
             </v-tab>
           </v-tabs>
         </v-card-text>
@@ -43,11 +48,21 @@
             <v-table class="custom-table pa-2">
               <thead class="bg-grey-lighten-4">
                 <tr>
-                  <th class="text-right font-weight-bold">صورة القسم</th>
-                  <th class="text-right font-weight-bold">اسم القسم</th>
-                  <th class="text-right font-weight-bold">عدد المنتجات</th>
-                  <th class="text-right font-weight-bold">الحالة</th>
-                  <th class="text-center font-weight-bold">الإجراءات</th>
+                  <th class="text-right font-weight-bold">
+                    {{ $t("brands.cat_img_th") }}
+                  </th>
+                  <th class="text-right font-weight-bold">
+                    {{ $t("brands.cat_name_th") }}
+                  </th>
+                  <th class="text-right font-weight-bold">
+                    {{ $t("brands.products_count_th") }}
+                  </th>
+                  <th class="text-right font-weight-bold">
+                    {{ $t("dashboard.status_th") }}
+                  </th>
+                  <th class="text-center font-weight-bold">
+                    {{ $t("dashboard.actions_th") }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -65,7 +80,7 @@
                     {{ cat.name }}
                   </td>
                   <td class="text-grey-darken-1">
-                    {{ cat.productsCount }} منتج
+                    {{ cat.productsCount }} {{ $t("brands.product_word") }}
                   </td>
                   <td>
                     <v-switch
@@ -107,9 +122,15 @@
             <v-table class="custom-table pa-2">
               <thead class="bg-grey-lighten-4">
                 <tr>
-                  <th class="text-right font-weight-bold">لوجو الماركة</th>
-                  <th class="text-right font-weight-bold">اسم الماركة</th>
-                  <th class="text-center font-weight-bold">الإجراءات</th>
+                  <th class="text-right font-weight-bold">
+                    {{ $t("brands.brand_img_th") }}
+                  </th>
+                  <th class="text-right font-weight-bold">
+                    {{ $t("brands.brand_name_th") }}
+                  </th>
+                  <th class="text-center font-weight-bold">
+                    {{ $t("dashboard.actions_th") }}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -160,8 +181,12 @@
             class="text-h5 font-weight-bold pt-4 px-4"
             style="color: rgb(var(--v-theme-primary))"
           >
-            {{ isEditing ? "تعديل" : "إضافة" }}
-            {{ activeTab === "categories" ? "قسم" : "ماركة" }}
+            {{ isEditing ? $t("dashboard.edit") : $t("dashboard.add") }}
+            {{
+              activeTab === "categories"
+                ? $t("brands.add_cat")
+                : $t("brands.add_brand")
+            }}
           </v-card-title>
           <v-divider class="my-3"></v-divider>
 
@@ -172,11 +197,13 @@
                   <v-text-field
                     v-model="editedItem.name"
                     :label="
-                      activeTab === 'categories' ? 'اسم القسم' : 'اسم الماركة'
+                      activeTab === 'categories'
+                        ? $t('brands.cat_name_th')
+                        : $t('brands.brand_name_th')
                     "
                     variant="outlined"
                     color="primary"
-                    :rules="[(v) => !!v || 'الاسم مطلوب']"
+                    :rules="[(v) => !!v || $t('dashboard.name_required')]"
                   ></v-text-field>
                 </v-col>
 
@@ -185,8 +212,8 @@
                     v-model="imageFile"
                     :label="
                       activeTab === 'categories'
-                        ? 'اختر صورة القسم'
-                        : 'اختر لوجو الماركة'
+                        ? $t('brands.choose_cat_img')
+                        : $t('brands.choose_brand_img')
                     "
                     variant="outlined"
                     color="primary"
@@ -195,7 +222,10 @@
                     prepend-inner-icon="mdi-camera"
                     @update:modelValue="handleImageUpload"
                     :rules="[
-                      (v) => isEditing || !!previewImage || 'الصورة مطلوبة',
+                      (v) =>
+                        isEditing ||
+                        !!previewImage ||
+                        $t('dashboard.image_required'),
                     ]"
                   ></v-file-input>
                 </v-col>
@@ -229,7 +259,7 @@
               variant="tonal"
               class="px-4 font-weight-bold"
               @click="closeDialog"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="primary"
@@ -239,7 +269,7 @@
               :loading="saving"
               @click="saveItem"
             >
-              حفظ
+              {{ $t("dashboard.save") }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -251,8 +281,12 @@
             >mdi-alert-circle-outline</v-icon
           >
           <v-card-title class="text-h6 font-weight-bold text-wrap">
-            هل أنت متأكد من حذف
-            {{ activeTab === "categories" ? "هذا القسم" : "هذه الماركة" }}؟
+            {{ $t("dashboard.confirm_delete_q") }}
+            {{
+              activeTab === "categories"
+                ? $t("brands.this_cat")
+                : $t("brands.this_brand")
+            }}؟
           </v-card-title>
           <v-card-actions class="d-flex justify-center mt-4">
             <v-btn
@@ -260,7 +294,7 @@
               variant="tonal"
               class="px-6 font-weight-bold"
               @click="dialogDelete = false"
-              >إلغاء</v-btn
+              >{{ $t("dashboard.cancel") }}</v-btn
             >
             <v-btn
               color="error"
@@ -269,7 +303,7 @@
               :loading="deleting"
               :disabled="deleting"
               @click="confirmDelete"
-              >نعم، احذف</v-btn
+              >{{ $t("dashboard.yes_delete") }}</v-btn
             >
           </v-card-actions>
         </v-card>
@@ -285,7 +319,9 @@
       >
         {{ snackbar.text }}
         <template v-slot:actions>
-          <v-btn variant="text" @click="snackbar.show = false">إغلاق</v-btn>
+          <v-btn variant="text" @click="snackbar.show = false">{{
+            $t("dashboard.close")
+          }}</v-btn>
         </template>
       </v-snackbar>
     </v-container>
@@ -398,7 +434,7 @@ const editedItem = ref({
   is_active: true,
 });
 
-// معالجة رفع الصورة (تعمل مع الأقسام والماركات)
+// معالجة رفع الصورة (تعمل مع {{ $t("brands.main_title") }})
 const handleImageUpload = (fileArray) => {
   const file = Array.isArray(fileArray) ? fileArray[0] : fileArray;
   if (file) {
@@ -460,7 +496,7 @@ const closeDialog = () => {
   }, 300);
 };
 
-// حفظ البيانات
+// {{ $t("dashboard.save") }} البيانات
 const saveItem = async () => {
   if (!validForm.value) return;
   saving.value = true;

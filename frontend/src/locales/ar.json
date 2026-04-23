@@ -22,7 +22,7 @@
     "reviews": "التقييمات والمراجعات",
     "sales_crm": "المبيعات والعملاء",
     "orders": "الطلبات",
-    "returns": "المرتجعــــات",
+    "returns": "المرتجعات",
     "purchases": "المشتريات والطلبيات",
     "customers": "العملاء",
     "marketing": "التسويق والمحتوى",
@@ -31,6 +31,7 @@
     "blog": "المدونة",
     "system": "النظام والإدارة",
     "financials": "الماليات والأرباح",
+    "payments": "عمليات الدفع",
     "shipping": "مناطق الشحن",
     "staff": "الموظفين والصلاحيات",
     "messages": "رسائل الزوار",
@@ -74,7 +75,18 @@
     "actions_th": "الإجراءات",
     "error_loading": "حدث خطأ أثناء تحميل البيانات",
     "error_occurred": "حدث خطأ",
-    "delete_error": "حدث خطأ أثناء الحذف"
+    "delete_error": "حدث خطأ أثناء الحذف",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "deselect_all": "إلغاء تحديد الكل",
+    "select_all": "تحديد الكل",
+    "delete_selected": "حذف المحدد",
+    "add": "إضافة",
+    "name_required": "الاسم مطلوب",
+    "image_required": "الصورة مطلوبة",
+    "confirm_delete_q": "هل أنت متأكد من حذف",
+    "yes_delete": "نعم، احذف",
+    "view_website": "زيارة المتجر"
   },
   "nav": {
     "home": "الرئيسية",
@@ -180,7 +192,7 @@
     "or": "أو",
     "login_with_google": "الدخول باستخدام جوجل",
     "new_here": "جديد معنا؟",
-    "register_subtitle": "أنشئ حسابك الآن وابدأ رحلتك في عالم التجارة الإلكترونية واحصل على عمولات مجزية.",
+    "register_subtitle": "أنشئ حسابك الآن وابدأ رحلتك في عالم التسوق واستمتع بأفضل العروض الحصرية.",
     "create_account_btn": "إنشاء حساب جديد",
     "unexpected_error": "حدث خطأ غير متوقع",
     "no_account": "ليس لديك حساب؟",
@@ -189,7 +201,7 @@
     "login_required_favorites": "يجب تسجيل الدخول أولاً لإضافة منتجات إلى المفضلة",
     "register": {
       "welcome_title": "انضم لعائلة زاد ستور 🚀",
-      "subtitle": "ابدأ رحلتك كمسوق محترف واحصل على أول عمولة لك اليوم",
+      "subtitle": "أنشئ حسابك الآن وابدأ رحلتك في عالم التسوق واستمتع بعروضنا المميزة",
       "full_name": "الاسم بالكامل",
       "full_name_placeholder": "اكتب اسمك الثلاثي",
       "phone": "رقم الهاتف",
@@ -199,7 +211,9 @@
       "register_btn": "إنشاء حساب",
       "already_have_account": "لديك حساب بالفعل؟",
       "login_link": "تسجيل دخول",
-      "success_msg": "تم إنشاء الحساب بنجاح! جاري التحويل..."
+      "success_msg": "تم إنشاء الحساب بنجاح! جاري التحويل...",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور"
     },
     "forgot_password_page": {
       "title": "نسيت كلمة المرور؟ 🔐",
@@ -229,15 +243,18 @@
     "logout_subtitle": "إلى اللقاء!",
     "logout_status": "جاري تأمين حسابك وتسجيل الخروج...",
     "logout_redirect": "سيتم توجيهك لصفحة الدخول خلال لحظات",
-    "logout_btn": "الذهاب الآن"
+    "logout_btn": "الذهاب الآن",
+    "email_invalid": "البريد الإلكتروني غير صالح"
   },
   "blog": {
-    "title": "المدونة",
-    "subtitle": "استكشف أحدث المقالات والنصائح في عالم التسوق الإلكتروني والتجارة.",
+    "title": "إدارة المقالات",
+    "subtitle": "تحكم في الأخبار والمقالات التي تظهر في صفحة المدونة الخاصة بمتجرك",
     "post_title": "مقال تعريفي للمتجر {number}",
     "post_date": "تاريخ النشر: 12 أكتوبر 2024",
     "post_desc": "هذا نص تجريبي يوضح كيف سيبدو وصف المقال في مدونة الموقع الرئيسية الخاصة بالزوار والأعضاء.",
-    "read_more": "اقرأ المزيد"
+    "read_more": "اقرأ المزيد",
+    "add_new": "كتابة مقال جديد",
+    "selected_count": "تم تحديد {count} مقالات"
   },
   "contact": {
     "title": "تواصل معنا",
@@ -313,7 +330,7 @@
   },
   "products": {
     "all_products": "جميع المنتجات",
-    "all_categories": "كل التصنيفات",
+    "all_categories": "كل الأقسام",
     "all_brands": "كل الماركات",
     "new": "جديد",
     "quick_view": "نظرة سريعة",
@@ -338,8 +355,6 @@
     "quantity_label": "الكمية",
     "browse_title": "تصفح المنتجات",
     "browse_subtitle": "اكتشف أحدث وأفضل المنتجات المتاحة لدينا بأقوى العروض.",
-    "all_categories": "كل الأقسام",
-    "all_brands": "كل الماركات",
     "category_browse": "تصفح الأقسام",
     "brand_browse": "تصفح الماركات",
     "sort_by_price": "التصنيف حسب السعر",
@@ -501,6 +516,7 @@
     "delivered": "تم التوصيل",
     "cancelled": "تم الإلغاء",
     "returned": "تم الإرجاع",
+    "partially_returned": "مرتجع جزئياً",
     "processing": "جاري التجهيز",
     "add_to_cart_success": "تمت إضافة المنتج للسلة بنجاح!",
     "search_placeholder": "ابحث برقم الطلب أو المنتج...",
@@ -536,6 +552,9 @@
     "publish_rating": "نشر التقييم",
     "return_request_title": "طلب استرجاع الطلب #{no}",
     "return_hint": "يرجى اختيار سبب الاسترجاع وكتابة التفاصيل إن وجدت:",
+    "return_full_order": "إرجاع كامل الطلب",
+    "return_specific_items": "إرجاع منتجات محددة",
+    "select_return_items": "اختر المنتجات المراد إرجاعها:",
     "return_reason_label": "سبب الاسترجاع",
     "return_additional_details": "تفاصيل إضافية (اختياري)",
     "return_notes_placeholder": "اكتب ملاحظاتك هنا...",
@@ -551,6 +570,87 @@
     "period_all_times": "جميع الأوقات",
     "period_last_30_days": "آخر 30 يوم",
     "period_last_3_months": "آخر 3 أشهر"
+  },
+  "sales": {
+    "orders": {
+      "title": "إدارة الطلبات",
+      "search_placeholder": "رقم الطلب أو اسم العميل...",
+      "status_label": "حالة الطلب",
+      "export_csv": "تصدير (CSV)",
+      "date_from": "من:",
+      "date_to": "إلى:",
+      "selected_count": "تم تحديد {count} طلبات",
+      "delete_selected": "حذف المحدد",
+      "no_orders": "لا توجد طلبات مطابقة للبحث.",
+      "urgent_tip": "طلب مستعجل!",
+      "currency": "ج.م",
+      "table": {
+        "number": "رقم الطلب",
+        "customer": "العميل",
+        "date": "التاريخ / الوقت",
+        "payment": "الدفع",
+        "total": "الإجمالي",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      },
+      "payment_status": {
+        "paid": "تم الدفع",
+        "unpaid": "لم يتم الدفع"
+      },
+      "status": {
+        "pending": "قيد الانتظار",
+        "processing": "جاري التجهيز",
+        "shipped": "تم الشحن",
+        "completed": "مكتمل",
+        "cancelled": "ملغي",
+        "returned": "مُرتجع",
+        "partially_returned": "مرتجع جزئياً"
+      },
+      "details_title": "تفاصيل الطلب #{num}",
+      "timeline": {
+        "ordered": "تم الطلب",
+        "processing": "تجهيز",
+        "shipped": "شحن",
+        "completed": "اكتمال"
+      },
+      "customer_info": {
+        "title": "بيانات العميل",
+        "name": "الاسم",
+        "phone": "الهاتف",
+        "address": "العنوان"
+      },
+      "update_status": "تحديث الحالة",
+      "return_request": {
+        "notify": "قدم العميل طلب استرجاع لهذا الطلب",
+        "approve": "الموافقة",
+        "reject": "رفض الطلب"
+      },
+      "items_title": "المنتجات المطلوبة",
+      "items_table": {
+        "product": "المنتج",
+        "qty": "الكمية",
+        "price": "السعر",
+        "total": "الإجمالي"
+      },
+      "pricing": {
+        "subtotal": "المجموع الفرعي:",
+        "shipping": "رسوم الشحن:",
+        "total": "الإجمالي:"
+      },
+      "btns": {
+        "close": "إغلاق",
+        "print": "طباعة الفاتورة",
+        "details": "التفاصيل"
+      },
+      "messages": {
+        "delete_confirm": "هل أنت متأكد من حذف هذا الطلب بشكل نهائي؟",
+        "batch_delete_confirm": "هل أنت متأكد من حذف {count} طلبات؟",
+        "delete_warning": "هذا الإجراء لا يمكن التراجع عنه.",
+        "delete_success": "تم حذف الطلبات بنجاح",
+        "status_success": "تم تحديث الحالة بنجاح",
+        "error": "حدث خطأ"
+      }
+    }
   },
   "messaging": {
     "visitor_messages": "رسائل الزوار",
@@ -643,7 +743,11 @@
     "price_csv": "السعر",
     "cost_csv": "سعر التكلفة",
     "quantity_csv": "الكمية",
-    "status_csv": "حالة المخزون"
+    "status_csv": "حالة المخزون",
+    "deleted_product": "منتج محذوف",
+    "system_user": "النظام",
+    "total_units": "إجمالي الوحدات بالمخزن",
+    "units_suffix": "قطعة"
   },
   "purchases": {
     "purchases_title": "إدارة المشتريات 🧾",
@@ -754,6 +858,44 @@
     "net_profit_label": "صافي الربح (Net Profit)",
     "net_chip": "صافي",
     "stable": "مستقر"
+  },
+  "payments": {
+    "title": "إدارة عمليات الدفع",
+    "subtitle": "إدارة ومتابعة كافة العمليات المالية والبنكية للمتجر",
+    "refresh": "تحديث البيانات",
+    "stats_success": "إجمالي الناجح",
+    "stats_failed": "إجمالي الفاشل",
+    "stats_pending": "قيد الانتظار",
+    "stats_count": "عدد العمليات",
+    "search_placeholder": "بحث برقم الطلب...",
+    "status_label": "الحالة",
+    "method_label": "وسيلة الدفع",
+    "clear_filters": "مسح الفلاتر",
+    "table_txn_id": "رقم المعاملة",
+    "table_order_no": "رقم الطلب",
+    "table_customer": "العميل",
+    "table_method": "الوسيلة",
+    "table_amount": "المبلغ",
+    "table_date": "التاريخ",
+    "table_actions": "إجراءات",
+    "no_data": "لا توجد عمليات دفع مسجلة حالياً",
+    "details_title": "تفاصيل المعاملة",
+    "raw_data": "بيانات الـ Webhook (Raw Data):",
+    "status_success": "ناجحة",
+    "status_failed": "فاشلة",
+    "status_pending": "قيد الانتظار",
+    "recent_transactions": "أحدث المعاملات المالية",
+    "transaction_id": "رقم المعاملة",
+    "order_no": "رقم الطلب",
+    "method": "وسيلة الدفع",
+    "amount": "المبلغ",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "paid_amount": "المبالغ المدفوعة",
+    "unpaid_amount": "مبالغ لم تُحصل",
+    "success": "ناجحة",
+    "failed": "فاشلة",
+    "pending": "قيد الانتظار"
   },
   "seo": {
     "title": "الإعدادات العامه للسيو (SEO)",
@@ -933,6 +1075,9 @@
     "no_details": "لم يتم ذكر تفاصيل إضافية",
     "order_items": "محتويات الطلب:",
     "total_to_refund": "الإجمالي المراد استرجاعه:",
+    "estimated_refund_items": "إجمالي المنتجات المرجعة:",
+    "type_partial": "إرجاع جزئي",
+    "type_full": "إرجاع كامل",
     "approve_btn": "موافقة على الاسترجاع",
     "reject_btn": "رفض الطلب",
     "confirm_action_title": "تأكيد الإجراء",
@@ -960,7 +1105,8 @@
       "QUALITY_ISSUE": "جودة المنتج أقل من المتوقع",
       "CHANGED_MIND": "لم أعد أرغب في الشراء",
       "OTHER": "سبب آخر"
-    }
+    },
+    "type_th": "النوع"
   },
   "shipping": {
     "title": "إدارة الشحن والتوصيل",
@@ -1048,11 +1194,10 @@
   "guest_nav": {
     "home": "الرئيسية",
     "blog": "المدونة",
-    "about_us": "عن الموقع",
-    "contact": "تواصل معنا",
+    "about_us": "من نحن",
+    "contact": "اتصل بنا",
     "login": "تسجيل الدخول",
-    "register": "إنشاء حساب",
-    "language_label": "اللغة / Language"
+    "register": "إنشاء حساب"
   },
   "settings": {
     "title": "الإعدادات العامة للمتجر",
@@ -1063,6 +1208,7 @@
       "social": "منصات التواصل",
       "footer": "تذييل الصفحة (الفوتر)",
       "landing": "صفحة الزوار (الهوم)",
+      "promos": "عروض الواجهة (Top Offers)",
       "advanced": "إعدادات النظام"
     },
     "messages": {
@@ -1080,7 +1226,11 @@
       "FaqSection": "الأسئلة الشائعة",
       "ShopWithUs": "لماذا تشتري منا؟",
       "BrandS": "الماركات",
-      "CtaSection": "قسم دعوة التسجيل (CTA)"
+      "CtaSection": "قسم دعوة التسجيل (CTA)",
+      "show": "إظهار",
+      "hide": "إخفاء",
+      "texts_title": "تخصيص نصوص الأقسام",
+      "auto_hint": "اتركه فارغاً للاستعراض التلقائي"
     },
     "general": {
       "title": "المعلومات الأساسية والهوية",
@@ -1153,7 +1303,11 @@
         "modern": "العصر الحديث (Modern Edge)",
         "neo": "الزجاجي (Neo Glass)",
         "classic": "الكلاسيكي المحترف (Classic)"
-      }
+      },
+      "show": "إظهار",
+      "hide": "إخفاء",
+      "texts_title": "نصوص الصفحة الرئيسية",
+      "auto_hint": "نص تلقائي"
     },
     "advanced": {
       "title": "إعدادات متقدمة",
@@ -1373,86 +1527,6 @@
       "delete_success": "تم مسح التقييم نهائياً"
     }
   },
-  "sales": {
-    "orders": {
-      "title": "إدارة الطلبات",
-      "search_placeholder": "رقم الطلب أو اسم العميل...",
-      "status_label": "حالة الطلب",
-      "export_csv": "تصدير (CSV)",
-      "date_from": "من:",
-      "date_to": "إلى:",
-      "selected_count": "تم تحديد {count} طلبات",
-      "delete_selected": "حذف المحدد",
-      "no_orders": "لا توجد طلبات مطابقة للبحث.",
-      "urgent_tip": "طلب مستعجل!",
-      "currency": "ج.م",
-      "table": {
-        "number": "رقم الطلب",
-        "customer": "العميل",
-        "date": "التاريخ / الوقت",
-        "payment": "الدفع",
-        "total": "الإجمالي",
-        "status": "الحالة",
-        "actions": "الإجراءات"
-      },
-      "payment_status": {
-        "paid": "تم الدفع",
-        "unpaid": "لم يتم الدفع"
-      },
-      "status": {
-        "pending": "قيد الانتظار",
-        "processing": "جاري التجهيز",
-        "shipped": "تم الشحن",
-        "completed": "مكتمل",
-        "cancelled": "ملغي",
-        "returned": "مُرتجع"
-      },
-      "details_title": "تفاصيل الطلب #{num}",
-      "timeline": {
-        "ordered": "تم الطلب",
-        "processing": "تجهيز",
-        "shipped": "شحن",
-        "completed": "اكتمال"
-      },
-      "customer_info": {
-        "title": "بيانات العميل",
-        "name": "الاسم",
-        "phone": "الهاتف",
-        "address": "العنوان"
-      },
-      "update_status": "تحديث الحالة",
-      "return_request": {
-        "notify": "قدم العميل طلب استرجاع لهذا الطلب",
-        "approve": "الموافقة",
-        "reject": "رفض الطلب"
-      },
-      "items_title": "المنتجات المطلوبة",
-      "items_table": {
-        "product": "المنتج",
-        "qty": "الكمية",
-        "price": "السعر",
-        "total": "الإجمالي"
-      },
-      "pricing": {
-        "subtotal": "المجموع الفرعي:",
-        "shipping": "رسوم الشحن:",
-        "total": "الإجمالي:"
-      },
-      "btns": {
-        "close": "إغلاق",
-        "print": "طباعة الفاتورة",
-        "details": "التفاصيل"
-      },
-      "messages": {
-        "delete_confirm": "هل أنت متأكد من حذف هذا الطلب بشكل نهائي؟",
-        "batch_delete_confirm": "هل أنت متأكد من حذف {count} طلبات؟",
-        "delete_warning": "هذا الإجراء لا يمكن التراجع عنه.",
-        "delete_success": "تم حذف الطلبات بنجاح",
-        "status_success": "تم تحديث الحالة بنجاح",
-        "error": "حدث خطأ"
-      }
-    }
-  },
   "inventory_logs": {
     "title": "سجل حركات المخزون",
     "subtitle": "متابعة تفصيلية لجميع عمليات دخوله وخروجه وتعديله",
@@ -1501,12 +1575,75 @@
     "avatar_error": "فشل تحميل الصورة",
     "unregistered": "غير مسجل"
   },
-  "guest_nav": {
-    "home": "الرئيسية",
-    "blog": "المدونة",
-    "about_us": "من نحن",
-    "contact": "اتصل بنا",
-    "login": "تسجيل الدخول",
-    "register": "إنشاء حساب"
+  "close": "إغلاق",
+  "merchants": {
+    "add_title": "إضافة تاجر جديد",
+    "basic_info": "البيانات الأساسية",
+    "fullname": "اسم التاجر بالكامل (الاسم الشخصي)",
+    "store_name": "اسم المتجر / الشركة",
+    "phone": "رقم التليفون",
+    "email": "البريد الإلكتروني (لتسجيل الدخول)",
+    "password": "كلمة المرور (دخول التاجر لحسابه)",
+    "business_info": "بيانات النشاط التجاري",
+    "category": "تصنيف المتجر",
+    "tax_id": "رقم البطاقة الضريبية",
+    "commercial_reg": "رقم السجل التجاري",
+    "address_info": "العنوان والموقع",
+    "city": "المحافظة / المدينة",
+    "address_detail": "العنوان بالتفصيل",
+    "attachments": "المرفقات والأوراق الرسمية",
+    "logo": "شعار المتجر (Logo)",
+    "docs_images": "صور الأوراق (سجل/بطاقة)",
+    "clear_data": "مسح البيانات",
+    "save": "حفظ بيانات التاجر"
+  },
+  "reports": {
+    "main_title": "مركز التقارير والتحليلات",
+    "subtitle": "رؤية شاملة لأداء المتجر، المبيعات، والأرباح الحقيقية.",
+    "days_7": "7 أيام",
+    "days_30": "30 يوم",
+    "days_90": "90 يوم",
+    "revenue_trend": "تحليل المبيعات (Revenue Trend)",
+    "live": "مباشر",
+    "sales_by_category": "المبيعات حسب الفئات",
+    "top_products": "المنتجات الأكثر مبيعاً",
+    "view_all": "عرض الكل"
+  },
+  "banners": {
+    "title": "إدارة البانرات والشرائح",
+    "type_label": "نوع البانر",
+    "add_new": "إضافة بانر جديد",
+    "selected_count": "تم تحديد {count} بانرات"
+  },
+  "brands": {
+    "main_title": "الأقسام والماركات",
+    "add_cat": "قسم",
+    "add_brand": "ماركة",
+    "categories_tab": "الأقسام (Categories)",
+    "brands_tab": "الماركات (Brands)",
+    "cat_img_th": "صورة القسم",
+    "cat_name_th": "اسم القسم",
+    "products_count_th": "عدد المنتجات",
+    "product_word": "منتج",
+    "brand_img_th": "لوجو الماركة",
+    "brand_name_th": "اسم الماركة",
+    "cat_name_label": "اسم القسم",
+    "brand_name_label": "اسم الماركة",
+    "choose_cat_img": "اختر صورة القسم",
+    "choose_brand_img": "اختر لوجو الماركة",
+    "this_cat": "هذا القسم",
+    "this_brand": "هذه الماركة"
+  },
+  "users": {
+    "title": "إدارة العملاء",
+    "search_placeholder": "ابحث بالاسم أو البريد الإلكتروني...",
+    "export_csv": "تصدير (CSV)",
+    "selected_count": "تم تحديد {count} عملاء",
+    "customer_th": "العميل",
+    "email_th": "البريد الإلكتروني",
+    "join_date_th": "تاريخ الانضمام",
+    "total_orders_th": "إجمالي الطلبات",
+    "total_spent_th": "إجمالي الإنفاق",
+    "account_status_th": "حالة الحساب"
   }
 }

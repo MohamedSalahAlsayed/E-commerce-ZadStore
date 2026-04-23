@@ -479,6 +479,10 @@ const outOfStockCount = computed(
   () => products.value.filter((i) => i.stock === 0).length
 );
 
+const totalUnitsInStock = computed(() => {
+  return products.value.reduce((total, item) => total + (item.stock || 0), 0);
+});
+
 const totalInventoryValue = computed(() => {
   return products.value.reduce((total, item) => {
     return total + item.stock * (item.purchase_price || 0);
@@ -491,6 +495,15 @@ const inventoryStats = computed(() => [
     value: products.value.length,
     icon: "mdi-package-variant",
     color: "primary",
+  },
+  {
+    title: t("inventory.total_units"),
+    value:
+      totalUnitsInStock.value.toLocaleString() +
+      " " +
+      t("inventory.units_suffix"),
+    icon: "mdi-counter",
+    color: "info",
   },
   {
     title: t("inventory.low_stock_alerts"),
