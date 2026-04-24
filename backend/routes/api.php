@@ -21,6 +21,7 @@ Route::get('/posts', [PublicController::class, 'getBlogPosts']);
 Route::get('/posts/{slug}', [PublicController::class, 'getBlogPost']);
 Route::post('/apply-coupon', [PublicController::class, 'applyCoupon']);
 Route::post('/contact', [PublicController::class, 'contactUs']);
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -53,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Review Endpoints
     Route::post('/products/{id}/reviews', [UserController::class, 'postReview']);
+    Route::post('/products/reviews/{id}/reply', [UserController::class, 'replyToAdminReview']);
 
     // Cart Endpoints
     Route::get('/user/cart', [UserController::class, 'getCart']);
@@ -154,6 +156,7 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->prefix('admin')->gr
     // Reviews
     Route::get('/reviews', [\App\Http\Controllers\AdminSupplementalController::class, 'getReviews']);
     Route::put('/reviews/{id}/status', [\App\Http\Controllers\AdminSupplementalController::class, 'toggleReviewStatus']);
+    Route::put('/reviews/{id}/read-reply', [\App\Http\Controllers\AdminSupplementalController::class, 'markReplyAsRead']);
     Route::post('/reviews/{id}/reply', [\App\Http\Controllers\AdminSupplementalController::class, 'replyToReview']);
     Route::delete('/reviews/{id}', [\App\Http\Controllers\AdminSupplementalController::class, 'deleteReview']);
 
@@ -172,6 +175,10 @@ Route::middleware(['auth:sanctum', AdminMiddleware::class])->prefix('admin')->gr
     Route::get('/settings', [\App\Http\Controllers\AdminSupplementalController::class, 'getSettings']);
     Route::post('/settings', [\App\Http\Controllers\AdminSupplementalController::class, 'updateSettings']);
     Route::post('/store-settings/bulk', [\App\Http\Controllers\AdminSupplementalController::class, 'updateBulkSettings']);
+
+    // Newsletter Subscribers
+    Route::get('/subscribers', [\App\Http\Controllers\NewsletterController::class, 'index']);
+    Route::delete('/subscribers/{id}', [\App\Http\Controllers\NewsletterController::class, 'destroy']);
 
     // Blog
     Route::get('/posts', [\App\Http\Controllers\AdminBlogController::class, 'index']);

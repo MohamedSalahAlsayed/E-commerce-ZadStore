@@ -292,7 +292,10 @@
             variant="flat"
             prepend-icon="mdi-logout"
             class="rounded-lg font-weight-black shadow-none h-48"
-            @click="$router.push('/Auth/LogOut')"
+            @click="
+              logoutDialog = true;
+              mobileMenu = false;
+            "
           >
             {{ $t("logout") }}
           </v-btn>
@@ -750,7 +753,7 @@
               <v-divider class="my-1"></v-divider>
               <v-list-item
                 value="logout"
-                @click="router.push({ path: '/Auth/LogOut' })"
+                @click="logoutDialog = true"
                 prepend-icon="mdi-logout"
                 :title="$t('logout')"
                 color="error"
@@ -884,6 +887,39 @@
       </v-btn>
     </div>
   </v-fade-transition>
+
+  <!-- Logout Confirmation Dialog -->
+  <v-dialog v-model="logoutDialog" max-width="400" persistent>
+    <v-card class="rounded-xl pa-4 text-center">
+      <v-avatar color="error-lighten-5" size="70" class="mb-4 mx-auto">
+        <v-icon color="error" size="40">mdi-logout-variant</v-icon>
+      </v-avatar>
+      <v-card-title class="text-h5 font-weight-bold mb-2">
+        {{ $t("auth.logout_confirm_title") }}
+      </v-card-title>
+      <v-card-text class="text-grey-darken-1 text-body-1 pb-6">
+        {{ $t("auth.logout_confirm_msg") }}
+      </v-card-text>
+      <v-card-actions class="justify-center gap-4">
+        <v-btn
+          color="grey-lighten-1"
+          variant="flat"
+          class="rounded-lg px-6 font-weight-bold"
+          @click="logoutDialog = false"
+        >
+          {{ $t("dashboard.cancel") }}
+        </v-btn>
+        <v-btn
+          color="error"
+          variant="flat"
+          class="rounded-lg px-6 font-weight-bold shadow-none"
+          @click="performLogout"
+        >
+          {{ $t("auth.logout_confirm_btn") }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -905,6 +941,11 @@ const productStore = ProductModule();
 const cartStore = AddInCart();
 const settingsStore = useSettingsStore();
 const authStore = useAuthStore();
+const logoutDialog = ref(false);
+const performLogout = () => {
+  logoutDialog.value = false;
+  router.push("/Auth/LogOut");
+};
 
 const availableLangs = [
   { code: "en", name: "English", flag: "https://flagcdn.com/w40/us.png" },

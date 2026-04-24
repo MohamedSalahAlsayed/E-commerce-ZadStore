@@ -1,5 +1,9 @@
 <template>
-  <v-layout :dir="isRtl ? 'rtl' : 'ltr'" class="dashboard-layout">
+  <v-layout
+    :dir="isRtl ? 'rtl' : 'ltr'"
+    class="dashboard-layout"
+    style="height: 100vh; overflow: hidden"
+  >
     <v-navigation-drawer
       v-model="drawer"
       :rail="rail && !isMobile"
@@ -193,6 +197,14 @@
           to="/Dashboard/MangBlog"
           prepend-icon="mdi-post-outline"
           :title="$t('dashboard.blog')"
+          active-color="#fb923c"
+          class="text-white menu-item"
+        ></v-list-item>
+        <v-list-item
+          v-if="can('manage_marketing')"
+          to="/Dashboard/Subscribers"
+          prepend-icon="mdi-email-multiple-outline"
+          :title="$t('dashboard.newsletter_subscribers') || 'المشتركين'"
           active-color="#fb923c"
           class="text-white menu-item"
         ></v-list-item>
@@ -590,12 +602,45 @@
         </v-menu>
       </v-app-bar>
 
-      <v-main class="bg-grey-lighten-4" style="min-height: 100vh">
+      <v-main class="bg-grey-lighten-4 dashboard-main">
         <v-container fluid class="pa-6" :style="layoutVars">
           <slot></slot>
         </v-container>
       </v-main>
     </v-locale-provider>
+
+    <!-- Logout Confirmation Dialog -->
+    <v-dialog v-model="logoutDialog" max-width="400" persistent>
+      <v-card class="rounded-xl pa-4 text-center">
+        <v-avatar color="error-lighten-5" size="70" class="mb-4 mx-auto">
+          <v-icon color="error" size="40">mdi-logout-variant</v-icon>
+        </v-avatar>
+        <v-card-title class="text-h5 font-weight-bold mb-2">
+          {{ $t("auth.logout_confirm_title") }}
+        </v-card-title>
+        <v-card-text class="text-grey-darken-1 text-body-1 pb-6">
+          {{ $t("auth.logout_confirm_msg") }}
+        </v-card-text>
+        <v-card-actions class="justify-center gap-4">
+          <v-btn
+            color="grey-lighten-1"
+            variant="flat"
+            class="rounded-lg px-6 font-weight-bold"
+            @click="logoutDialog = false"
+          >
+            {{ $t("dashboard.cancel") }}
+          </v-btn>
+          <v-btn
+            color="error"
+            variant="flat"
+            class="rounded-lg px-6 font-weight-bold shadow-btn"
+            @click="performLogout"
+          >
+            {{ $t("auth.logout_confirm_btn") }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-layout>
 </template>
 
@@ -729,9 +774,15 @@ const fetchHeaderData = async () => {
   }
 };
 
-const logoutAdmin = async () => {
+const logoutDialog = ref(false);
+const logoutAdmin = () => {
+  logoutDialog.value = true;
+};
+
+const performLogout = async () => {
+  logoutDialog.value = false;
   try {
-    await axios.post("/logout"); // Corrected from /api/logout
+    await axios.post("/logout");
   } catch (e) {
     console.error(e);
   } finally {
@@ -982,5 +1033,27 @@ onUnmounted(() => {
 }
 .hover-row:hover {
   background-color: #f8fafc;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(var(--v-theme-primary), 0.2);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-primary), 0.4);
+}
+
+/* Scrollable main content */
+.dashboard-main {
+  height: 100vh;
+  overflow-y: auto !important;
+  scroll-behavior: smooth;
 }
 </style>

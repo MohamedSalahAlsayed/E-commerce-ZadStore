@@ -11,10 +11,22 @@ class Review extends Model
     use SyncToMysql;
     use HasFactory;
 
-    protected $fillable = ['user_id', 'product_id', 'rating', 'comment', 'is_approved', 'admin_reply', 'replied_at'];
+    protected $fillable = [
+        'user_id',
+        'product_id',
+        'rating',
+        'comment',
+        'is_approved',
+        'admin_reply',
+        'replied_at',
+        'user_reply',
+        'user_replied_at',
+        'is_admin_read_reply',
+    ];
 
     protected $casts = [
         'is_approved' => 'boolean',
+        'is_admin_read_reply' => 'boolean',
     ];
 
     public function user()

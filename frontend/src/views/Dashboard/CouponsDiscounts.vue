@@ -224,6 +224,23 @@
                 }}
               </td>
 
+              <td class="text-center text-grey-darken-1 font-weight-medium">
+                {{
+                  coupon.min_order_amount ? "$" + coupon.min_order_amount : "-"
+                }}
+              </td>
+
+              <td
+                class="text-center"
+                :class="
+                  isExpired(coupon.expires_at)
+                    ? 'text-error font-weight-bold'
+                    : 'text-grey-darken-1'
+                "
+              >
+                {{ coupon.expires_at ? formatDate(coupon.expires_at) : "-" }}
+              </td>
+
               <td class="text-center">
                 <div class="mb-1 text-caption font-weight-bold">
                   {{ coupon.used_count || 0 }} /
@@ -240,17 +257,6 @@
                   rounded
                   background-opacity="0.1"
                 ></v-progress-linear>
-              </td>
-
-              <td
-                class="text-center"
-                :class="
-                  isExpired(coupon.expires_at)
-                    ? 'text-error font-weight-bold'
-                    : 'text-grey-darken-1'
-                "
-              >
-                {{ coupon.expires_at ? formatDate(coupon.expires_at) : "-" }}
               </td>
 
               <td class="text-center">

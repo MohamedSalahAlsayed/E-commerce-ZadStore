@@ -248,6 +248,26 @@
 
                 <td class="text-center">
                   <v-chip
+                    v-if="review.user_reply && !review.is_admin_read_reply"
+                    size="small"
+                    color="secondary"
+                    variant="elevated"
+                    class="font-weight-bold"
+                  >
+                    <v-icon start size="small">mdi-alert-circle</v-icon>
+                    رد عميل جديد
+                  </v-chip>
+                  <v-chip
+                    v-else-if="review.user_reply"
+                    size="small"
+                    color="blue-grey"
+                    variant="outlined"
+                    class="font-weight-bold"
+                  >
+                    رد العميل
+                  </v-chip>
+                  <v-chip
+                    v-else
                     size="small"
                     :color="review.admin_reply ? 'info' : 'grey'"
                     variant="outlined"
@@ -411,6 +431,20 @@
                 {{ $t("reviews.admin_reply_label") }}
               </div>
               <div class="text-body-2">{{ selectedReview.admin_reply }}</div>
+            </div>
+
+            <div
+              v-if="selectedReview.user_reply"
+              class="mt-3 bg-blue-grey-lighten-5 pa-4 rounded-lg border-left-secondary"
+              style="border-right: 4px solid #607d8b"
+            >
+              <div
+                class="text-caption font-weight-bold text-blue-grey-darken-2 mb-1 d-flex align-center gap-2"
+              >
+                <v-icon size="small">mdi-account-reply</v-icon>
+                رد العميل على الإدارة
+              </div>
+              <div class="text-body-2">{{ selectedReview.user_reply }}</div>
             </div>
           </v-card-text>
 
@@ -606,9 +640,18 @@ const fetchReviews = async (quiet = false) => {
   }
 };
 
-const viewReview = (review) => {
+const viewReview = async (review) => {
   selectedReview.value = review;
   viewDialog.value = true;
+
+  if (review.user_reply && !review.is_admin_read_reply) {
+    try {
+      await axios.put(`/admin/reviews/${review.id}/read-reply`);
+      review.is_admin_read_reply = true;
+    } catch (e) {
+      console.error("Failed to mark review reply as read", e);
+    }
+  }
 };
 
 const openReplyDialog = (review) => {

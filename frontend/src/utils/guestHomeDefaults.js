@@ -38,6 +38,7 @@ export function defaultGuestHome() {
     heroTitle: "",
     heroSubtitle: "",
     flashTitle: "",
+    flashDealEndsAt: "", // Date string (ISO or YYYY-MM-DD HH:mm:ss)
     bestSellersTitle: "",
     featuredTitle: "",
     brandsTitle: "",

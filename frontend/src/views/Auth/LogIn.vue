@@ -27,8 +27,9 @@
                       >
                         <v-icon color="white">mdi-storefront</v-icon>
                       </v-avatar>
-                      <span class="text-h6 font-weight-black text-grey-darken-4"
-                        >زاّد ستور</span
+                      <span
+                        class="text-h6 font-weight-black text-grey-darken-4"
+                        >{{ $t("auth.brand_name") }}</span
                       >
                     </div>
 

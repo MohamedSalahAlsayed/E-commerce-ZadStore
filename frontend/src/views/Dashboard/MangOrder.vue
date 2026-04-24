@@ -306,7 +306,7 @@
     <v-dialog v-model="detailsDialog" max-width="700px" scrollable>
       <v-card class="rounded-xl" v-if="selectedOrder">
         <v-card-title
-          class="d-flex align-center justify-space-between pt-4 px-6 bg-grey-lighten-4"
+          class="d-flex align-center justify-space-between pt-4 px-6 bg-grey-lighten-4 no-print"
         >
           <span
             class="text-h6 font-weight-bold"
@@ -325,276 +325,290 @@
           ></v-btn>
         </v-card-title>
 
-        <v-card-text class="pa-0 printable-area" style="max-height: 80vh">
-          <!-- Print-Only Header -->
-          <div class="print-header px-6 py-4 mb-6 border-b-2 d-none">
-            <div class="d-flex justify-space-between align-center">
-              <div>
-                <h1 class="text-h4 font-weight-black text-primary">ZadStore</h1>
-                <p class="text-caption">متجر زاد - أفضل تجربة تسوق</p>
-              </div>
-              <div class="text-left">
-                <div class="text-h6 font-weight-bold">فاتورة طلب</div>
-                <div class="text-subtitle-1">
-                  #{{ selectedOrder.orderNumber }}
+        <v-card-text class="pa-0" style="max-height: 80vh">
+          <div ref="invoiceRef" class="printable-invoice pa-6">
+            <!-- Print-Only Header -->
+            <div class="print-header px-0 py-4 mb-6 border-b-2 d-none">
+              <div class="d-flex justify-space-between align-center">
+                <div>
+                  <h1 class="text-h4 font-weight-black text-primary">
+                    ZadStore
+                  </h1>
+                  <p class="text-caption">متجر زاد - أفضل تجربة تسوق</p>
+                </div>
+                <div class="text-left">
+                  <div class="text-h6 font-weight-bold">فاتورة طلب</div>
+                  <div class="text-subtitle-1">
+                    #{{ selectedOrder.orderNumber }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Professional Order Timeline -->
-          <div class="bg-primary-lighten-5 pa-4 border-b no-print">
-            <v-timeline
-              direction="horizontal"
-              density="compact"
-              align="start"
-              class="timeline-custom"
-            >
-              <v-timeline-item
-                v-for="(st, i) in orderStory"
-                :key="i"
-                :dot-color="
-                  isStepCompleted(st.value) ? 'success' : 'grey-lighten-2'
-                "
-                size="x-small"
+            <!-- Professional Order Timeline -->
+            <div class="bg-primary-lighten-5 pa-4 border-b no-print">
+              <v-timeline
+                direction="horizontal"
+                density="compact"
+                align="start"
+                class="timeline-custom"
               >
-                <template v-slot:icon v-if="isStepCompleted(st.value)">
-                  <v-icon size="10" color="white">mdi-check</v-icon>
-                </template>
-                <div
-                  class="text-caption font-weight-black"
-                  :class="
-                    isStepCompleted(st.value) ? 'text-success' : 'text-grey'
+                <v-timeline-item
+                  v-for="(st, i) in orderStory"
+                  :key="i"
+                  :dot-color="
+                    isStepCompleted(st.value) ? 'success' : 'grey-lighten-2'
                   "
+                  size="x-small"
                 >
-                  {{ $t(`sales.orders.timeline.${st.value}`) }}
-                </div>
-              </v-timeline-item>
-            </v-timeline>
-          </div>
-
-          <div class="pa-6">
-            <v-row class="mb-4">
-              <v-col cols="12" sm="6">
-                <div class="text-subtitle-2 text-grey-darken-1 mb-1">
-                  {{ $t("sales.orders.customer_info.title") }}
-                </div>
-                <div class="font-weight-bold d-flex align-center gap-2 mb-2">
-                  <v-icon size="18" color="primary">mdi-account</v-icon>
-                  {{ selectedOrder.customerName }}
-                </div>
-                <div class="text-body-2 d-flex align-center gap-2 mb-2">
-                  <v-icon size="18" color="primary">mdi-phone</v-icon>
-                  {{ selectedOrder.phone }}
-                </div>
-                <div class="text-body-2 d-flex align-start gap-2">
-                  <v-icon size="18" color="primary" class="mt-1"
-                    >mdi-map-marker</v-icon
+                  <template v-slot:icon v-if="isStepCompleted(st.value)">
+                    <v-icon size="10" color="white">mdi-check</v-icon>
+                  </template>
+                  <div
+                    class="text-caption font-weight-black"
+                    :class="
+                      isStepCompleted(st.value) ? 'text-success' : 'text-grey'
+                    "
                   >
-                  <span>{{ selectedOrder.address }}</span>
-                </div>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <div class="text-subtitle-2 text-grey-darken-1 mb-1">
-                  {{ $t("sales.orders.update_status") }}
-                </div>
-
-                <!-- إشعار طلب الإرجاع -->
-                <div
-                  v-if="selectedOrder.returnStatus === 'requested'"
-                  class="mb-4 bg-red-lighten-5 pa-3 rounded-lg border border-red-lighten-4"
-                >
-                  <div class="d-flex align-center gap-2 mb-2">
-                    <v-icon color="error" size="20">mdi-alert-circle</v-icon>
-                    <span
-                      class="text-caption font-weight-bold text-red-darken-4"
-                    >
-                      {{ $t("sales.orders.return_request.notify") }}
-                    </span>
+                    {{ $t(`sales.orders.timeline.${st.value}`) }}
                   </div>
-                  <div class="d-flex gap-2 mt-2">
-                    <v-btn
-                      color="success"
-                      size="small"
-                      elevation="0"
-                      class="flex-grow-1 font-weight-bold"
-                      @click="handleReturnRequest(selectedOrder, 'approve')"
-                      :loading="savingStatus"
-                    >
-                      {{ $t("sales.orders.return_request.approve") }}
-                    </v-btn>
-                    <v-btn
-                      color="error"
-                      variant="outlined"
-                      size="small"
-                      elevation="0"
-                      class="flex-grow-1 font-weight-bold"
-                      @click="handleReturnRequest(selectedOrder, 'reject')"
-                      :loading="savingStatus"
-                    >
-                      {{ $t("sales.orders.return_request.reject") }}
-                    </v-btn>
+                </v-timeline-item>
+              </v-timeline>
+            </div>
+
+            <div class="pa-6">
+              <v-row class="mb-4">
+                <v-col cols="12" sm="6">
+                  <div class="text-subtitle-2 text-grey-darken-1 mb-1">
+                    {{ $t("sales.orders.customer_info.title") }}
                   </div>
-                </div>
+                  <div class="font-weight-bold d-flex align-center gap-2 mb-2">
+                    <v-icon size="18" color="primary">mdi-account</v-icon>
+                    {{ selectedOrder.customerName }}
+                  </div>
+                  <div class="text-body-2 d-flex align-center gap-2 mb-2">
+                    <v-icon size="18" color="primary">mdi-phone</v-icon>
+                    {{ selectedOrder.phone }}
+                  </div>
+                  <div class="text-body-2 d-flex align-start gap-2">
+                    <v-icon size="18" color="primary" class="mt-1"
+                      >mdi-map-marker</v-icon
+                    >
+                    <span>{{ selectedOrder.address }}</span>
+                  </div>
+                </v-col>
+                <v-col cols="12" sm="6">
+                  <div class="text-subtitle-2 text-grey-darken-1 mb-1 no-print">
+                    {{ $t("sales.orders.update_status") }}
+                  </div>
 
-                <v-select
-                  v-else
-                  v-model="selectedOrder.status"
-                  :items="statusOptions"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  color="primary"
-                  class="mb-3"
-                  :loading="savingStatus"
-                  :disabled="savingStatus"
-                  @update:modelValue="updateOrderStatus(selectedOrder)"
-                ></v-select>
-
-                <div class="text-subtitle-2 text-grey-darken-1 mb-1">
-                  تاريخ الطلب
-                </div>
-                <div class="font-weight-bold">
-                  {{ formatDate(selectedOrder.date) }}
-                </div>
-              </v-col>
-            </v-row>
-
-            <v-divider class="my-4"></v-divider>
-
-            <h3
-              class="text-subtitle-1 font-weight-bold mb-3"
-              style="color: rgb(var(--v-theme-primary))"
-            >
-              {{ $t("sales.orders.items_title") }}
-            </h3>
-            <v-table density="compact" class="border rounded-lg mb-4">
-              <thead class="bg-grey-lighten-4">
-                <tr>
-                  <th class="text-right">
-                    {{ $t("sales.orders.items_table.product") }}
-                  </th>
-                  <th class="text-center">
-                    {{ $t("sales.orders.items_table.qty") }}
-                  </th>
-                  <th class="text-left">
-                    {{ $t("sales.orders.items_table.price") }}
-                  </th>
-                  <th class="text-left">
-                    {{ $t("sales.orders.items_table.total") }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(item, index) in selectedOrder.items"
-                  :key="index"
-                  :style="
-                    isItemReturned(selectedOrder, item)
-                      ? 'opacity:0.6; background:#fff8f8;'
-                      : ''
-                  "
-                >
-                  <td class="d-flex align-center gap-3 py-2">
-                    <v-avatar size="40" rounded class="bg-grey-lighten-2">
-                      <v-img :src="item.image" cover></v-img>
-                    </v-avatar>
-                    <div>
+                  <!-- إشعار طلب الإرجاع -->
+                  <div
+                    v-if="selectedOrder.returnStatus === 'requested'"
+                    class="mb-4 bg-red-lighten-5 pa-3 rounded-lg border border-red-lighten-4 no-print"
+                  >
+                    <div class="d-flex align-center gap-2 mb-2">
+                      <v-icon color="error" size="20">mdi-alert-circle</v-icon>
                       <span
-                        class="font-weight-bold text-caption"
-                        :style="
-                          isItemReturned(selectedOrder, item)
-                            ? 'text-decoration:line-through;'
-                            : ''
-                        "
-                        >{{ item.name }}</span
+                        class="text-caption font-weight-bold text-red-darken-4"
                       >
-                      <v-chip
-                        v-if="isItemReturned(selectedOrder, item)"
-                        size="x-small"
-                        color="error"
-                        variant="tonal"
-                        class="d-block mt-1"
-                      >
-                        {{ locale === "ar" ? "مُرجَع" : "Returned" }}
-                      </v-chip>
+                        {{ $t("sales.orders.return_request.notify") }}
+                      </span>
                     </div>
-                  </td>
-                  <td class="text-center">{{ item.quantity }}</td>
-                  <td class="text-left">
-                    {{
-                      Number(item.price).toLocaleString(
-                        locale === "ar" ? "ar-EG" : "en-US"
-                      )
-                    }}
-                    {{ $t("sales.orders.currency") }}
-                  </td>
-                  <td class="text-left font-weight-bold">
-                    {{
-                      Number(item.price * item.quantity).toLocaleString(
-                        locale === "ar" ? "ar-EG" : "en-US"
-                      )
-                    }}
-                    {{ $t("sales.orders.currency") }}
-                  </td>
-                </tr>
-              </tbody>
-            </v-table>
+                    <div class="d-flex gap-2 mt-2">
+                      <v-btn
+                        color="success"
+                        size="small"
+                        elevation="0"
+                        class="flex-grow-1 font-weight-bold"
+                        @click="handleReturnRequest(selectedOrder, 'approve')"
+                        :loading="savingStatus"
+                      >
+                        {{ $t("sales.orders.return_request.approve") }}
+                      </v-btn>
+                      <v-btn
+                        color="error"
+                        variant="outlined"
+                        size="small"
+                        elevation="0"
+                        class="flex-grow-1 font-weight-bold"
+                        @click="handleReturnRequest(selectedOrder, 'reject')"
+                        :loading="savingStatus"
+                      >
+                        {{ $t("sales.orders.return_request.reject") }}
+                      </v-btn>
+                    </div>
+                  </div>
 
-            <div class="d-flex flex-column align-end border-t pt-4">
-              <div
-                class="d-flex justify-space-between w-100 mb-2"
-                style="max-width: 250px"
+                  <v-select
+                    v-else
+                    v-model="selectedOrder.status"
+                    :items="statusOptions"
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                    color="primary"
+                    class="mb-3 no-print"
+                    :loading="savingStatus"
+                    :disabled="savingStatus"
+                    @update:modelValue="updateOrderStatus(selectedOrder)"
+                  ></v-select>
+
+                  <!-- Status for Print -->
+                  <div class="d-none print-only-status mb-4">
+                    <div class="text-subtitle-2 text-grey-darken-1 mb-1">
+                      حالة الطلب
+                    </div>
+                    <div class="font-weight-bold text-primary">
+                      {{ getStatusText(selectedOrder.status) }}
+                    </div>
+                  </div>
+
+                  <div class="text-subtitle-2 text-grey-darken-1 mb-1">
+                    تاريخ الطلب
+                  </div>
+                  <div class="font-weight-bold">
+                    {{ formatDate(selectedOrder.date) }}
+                  </div>
+                </v-col>
+              </v-row>
+
+              <v-divider class="my-4"></v-divider>
+
+              <h3
+                class="text-subtitle-1 font-weight-bold mb-3"
+                style="color: rgb(var(--v-theme-primary))"
               >
-                <span class="text-grey-darken-1">{{
-                  $t("sales.orders.pricing.subtotal")
-                }}</span>
-                <span class="font-weight-bold"
-                  >{{
-                    Number(selectedOrder.subtotal).toLocaleString(
-                      locale === "ar" ? "ar-EG" : "en-US"
-                    )
-                  }}
-                  {{ $t("sales.orders.currency") }}</span
+                {{ $t("sales.orders.items_title") }}
+              </h3>
+              <v-table density="compact" class="border rounded-lg mb-4">
+                <thead class="bg-grey-lighten-4">
+                  <tr>
+                    <th class="text-right">
+                      {{ $t("sales.orders.items_table.product") }}
+                    </th>
+                    <th class="text-center">
+                      {{ $t("sales.orders.items_table.qty") }}
+                    </th>
+                    <th class="text-left">
+                      {{ $t("sales.orders.items_table.price") }}
+                    </th>
+                    <th class="text-left">
+                      {{ $t("sales.orders.items_table.total") }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, index) in selectedOrder.items"
+                    :key="index"
+                    :style="
+                      isItemReturned(selectedOrder, item)
+                        ? 'opacity:0.6; background:#fff8f8;'
+                        : ''
+                    "
+                  >
+                    <td class="d-flex align-center gap-3 py-2">
+                      <v-avatar size="40" rounded class="bg-grey-lighten-2">
+                        <v-img :src="item.image" cover></v-img>
+                      </v-avatar>
+                      <div>
+                        <span
+                          class="font-weight-bold text-caption"
+                          :style="
+                            isItemReturned(selectedOrder, item)
+                              ? 'text-decoration:line-through;'
+                              : ''
+                          "
+                          >{{ item.name }}</span
+                        >
+                        <v-chip
+                          v-if="isItemReturned(selectedOrder, item)"
+                          size="x-small"
+                          color="error"
+                          variant="tonal"
+                          class="d-block mt-1"
+                        >
+                          {{ locale === "ar" ? "مُرجَع" : "Returned" }}
+                        </v-chip>
+                      </div>
+                    </td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-left">
+                      {{
+                        Number(item.price).toLocaleString(
+                          locale === "ar" ? "ar-EG" : "en-US"
+                        )
+                      }}
+                      {{ $t("sales.orders.currency") }}
+                    </td>
+                    <td class="text-left font-weight-bold">
+                      {{
+                        Number(item.price * item.quantity).toLocaleString(
+                          locale === "ar" ? "ar-EG" : "en-US"
+                        )
+                      }}
+                      {{ $t("sales.orders.currency") }}
+                    </td>
+                  </tr>
+                </tbody>
+              </v-table>
+
+              <div class="d-flex flex-column align-end border-t pt-4">
+                <div
+                  class="d-flex justify-space-between w-100 mb-2"
+                  style="max-width: 250px"
                 >
-              </div>
-              <div
-                class="d-flex justify-space-between w-100 mb-2"
-                style="max-width: 250px"
-              >
-                <span class="text-grey-darken-1">{{
-                  $t("sales.orders.pricing.shipping")
-                }}</span>
-                <span class="font-weight-bold"
-                  >{{
-                    Number(selectedOrder.shippingFee).toLocaleString(
-                      locale === "ar" ? "ar-EG" : "en-US"
-                    )
-                  }}
-                  {{ $t("sales.orders.currency") }}</span
+                  <span class="text-grey-darken-1">{{
+                    $t("sales.orders.pricing.subtotal")
+                  }}</span>
+                  <span class="font-weight-bold"
+                    >{{
+                      Number(selectedOrder.subtotal).toLocaleString(
+                        locale === "ar" ? "ar-EG" : "en-US"
+                      )
+                    }}
+                    {{ $t("sales.orders.currency") }}</span
+                  >
+                </div>
+                <div
+                  class="d-flex justify-space-between w-100 mb-2"
+                  style="max-width: 250px"
                 >
-              </div>
-              <div
-                class="d-flex justify-space-between w-100 text-h6"
-                style="max-width: 250px; color: rgb(var(--v-theme-primary))"
-              >
-                <span class="font-weight-bold">{{
-                  $t("sales.orders.pricing.total")
-                }}</span>
-                <span class="font-weight-black text-success"
-                  >{{
-                    Number(selectedOrder.total).toLocaleString(
-                      locale === "ar" ? "ar-EG" : "en-US"
-                    )
-                  }}
-                  {{ $t("sales.orders.currency") }}</span
+                  <span class="text-grey-darken-1">{{
+                    $t("sales.orders.pricing.shipping")
+                  }}</span>
+                  <span class="font-weight-bold"
+                    >{{
+                      Number(selectedOrder.shippingFee).toLocaleString(
+                        locale === "ar" ? "ar-EG" : "en-US"
+                      )
+                    }}
+                    {{ $t("sales.orders.currency") }}</span
+                  >
+                </div>
+                <div
+                  class="d-flex justify-space-between w-100 text-h6"
+                  style="max-width: 250px; color: rgb(var(--v-theme-primary))"
                 >
+                  <span class="font-weight-bold">{{
+                    $t("sales.orders.pricing.total")
+                  }}</span>
+                  <span class="font-weight-black text-success"
+                    >{{
+                      Number(selectedOrder.total).toLocaleString(
+                        locale === "ar" ? "ar-EG" : "en-US"
+                      )
+                    }}
+                    {{ $t("sales.orders.currency") }}</span
+                  >
+                </div>
               </div>
             </div>
           </div>
         </v-card-text>
 
-        <v-card-actions class="pa-4 bg-grey-lighten-4 border-t">
+        <v-card-actions class="pa-4 bg-grey-lighten-4 border-t no-print">
           <v-spacer></v-spacer>
           <v-btn
             color="grey-darken-1"
@@ -872,6 +886,7 @@ const statusOptions = Object.values(STATUS_MAP_EN_AR);
 // --- حالة النافذة (Dialog) ---
 const detailsDialog = ref(false);
 const selectedOrder = ref(null);
+const invoiceRef = ref(null);
 
 const deleteDialog = ref(false);
 const orderToDelete = ref(null);
@@ -1018,11 +1033,65 @@ const handleReturnRequest = async (order, action) => {
   }
 };
 
-// طباعة الفاتورة
+// طباعة الفاتورة - طريقة احترافية عبر نافذة جديدة لضمان عزل الفاتورة فقط
 const printInvoice = () => {
-  setTimeout(() => {
-    window.print();
-  }, 500);
+  if (!invoiceRef.value) return;
+
+  const printWindow = window.open("", "_blank", "width=800,height=900");
+  const isRtl = locale.value === "ar";
+
+  // جلب كافة الستاييلز لضمان الحفاظ على التصميم
+  const styles = Array.from(document.styleSheets)
+    .map((styleSheet) => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join("");
+      } catch (e) {
+        return "";
+      }
+    })
+    .join("");
+
+  printWindow.document.write(
+    "<html>" +
+      "<head>" +
+      "<title>Invoice - " +
+      (selectedOrder.value.orderNumber || "") +
+      "</title>" +
+      "<style>" +
+      styles +
+      "@media print {" +
+      "body { margin: 0; padding: 20px; background: white !important; }" +
+      ".no-print { display: none !important; }" +
+      ".d-none { display: block !important; }" +
+      ".v-timeline, .v-btn, .v-select { display: none !important; }" +
+      ".printable-invoice { width: 100% !important; padding: 0 !important; }" +
+      "}" +
+      "body { font-family: 'Arial', sans-serif; direction: " +
+      (isRtl ? "rtl" : "ltr") +
+      "; padding: 20px; }" +
+      ".print-header { display: block !important; border-bottom: 2px solid #333; margin-bottom: 20px; padding-bottom: 10px; }" +
+      ".print-only-status { display: block !important; margin-bottom: 15px; }" +
+      "</style>" +
+      "</head>" +
+      "<body>" +
+      '<div class="v-application v-theme--light v-layout">' +
+      '<div class="v-application__wrap">' +
+      invoiceRef.value.innerHTML +
+      "</div>" +
+      "</div>" +
+      "<script>" +
+      "setTimeout(() => {" +
+      "window.print();" +
+      "window.close();" +
+      "}, 500);" +
+      "</" +
+      "script>" +
+      "</body>" +
+      "</html>"
+  );
+  printWindow.document.close();
 };
 
 // مسح الطلب
@@ -1131,58 +1200,8 @@ const confirmDelete = async () => {
 }
 
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  .printable-area,
-  .printable-area * {
-    visibility: visible;
-  }
-  .printable-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background: white !important;
-    z-index: 9999;
-    overflow: visible !important;
-    max-height: none !important;
-  }
-  .print-header {
-    display: block !important;
-    border-bottom: 2px solid #000 !important;
-    margin-bottom: 30px !important;
-  }
-  .no-print,
-  .v-btn,
-  .v-field,
-  .v-timeline,
-  .v-card-actions,
-  .v-dialog-content__scroller {
+  .no-print {
     display: none !important;
-  }
-  .v-card {
-    box-shadow: none !important;
-    border: none !important;
-  }
-  /* Force table layout for printing */
-  .v-table {
-    background: white !important;
-  }
-  .v-table th {
-    background: #f0f0f0 !important;
-    color: black !important;
-    border: 1px solid #ddd !important;
-  }
-  .v-table td {
-    border: 1px solid #ddd !important;
-  }
-  /* Ensure text is black for printing */
-  .printable-area * {
-    color: black !important;
-    box-shadow: none !important;
   }
 }
 

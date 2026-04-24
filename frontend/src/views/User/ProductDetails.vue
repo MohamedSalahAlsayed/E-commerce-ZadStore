@@ -333,10 +333,10 @@
                     <v-avatar color="primary" size="48">
                       <v-img
                         v-if="review.user?.avatar"
-                        :src="review.user.avatar"
+                        :src="getAvatarUrl(review.user.avatar)"
                       ></v-img>
                       <span v-else class="text-white font-weight-black">{{
-                        review.user?.[0]?.toUpperCase() || "C"
+                        review.user?.name?.[0]?.toUpperCase() || "C"
                       }}</span>
                     </v-avatar>
                     <div class="flex-grow-1">
@@ -363,6 +363,103 @@
                       <p class="review-comment text-grey-darken-2">
                         {{ review.comment }}
                       </p>
+
+                      <!-- Admin Reply -->
+                      <div
+                        v-if="review.admin_reply"
+                        class="admin-reply-box mt-4 pa-4 rounded-lg bg-grey-lighten-4"
+                        style="
+                          border-right: 4px solid rgb(var(--v-theme-primary));
+                        "
+                      >
+                        <div
+                          class="d-flex justify-space-between align-center mb-1"
+                        >
+                          <div
+                            class="d-flex align-center gap-2 text-primary font-weight-black text-caption"
+                          >
+                            <v-icon size="small">mdi-reply</v-icon>
+                            رد المتجر
+                          </div>
+                          <span
+                            v-if="review.replied_at"
+                            class="text-caption text-grey"
+                          >
+                            {{
+                              new Date(review.replied_at).toLocaleDateString(
+                                "ar-EG"
+                              )
+                            }}
+                          </span>
+                        </div>
+                        <p class="text-body-2 mb-0 text-grey-darken-3">
+                          {{ review.admin_reply }}
+                        </p>
+                      </div>
+
+                      <!-- User Reply to Admin -->
+                      <div
+                        v-if="review.user_reply"
+                        class="user-reply-box mt-3 pa-4 rounded-lg bg-blue-grey-lighten-5"
+                        style="border-right: 4px solid #607d8b"
+                      >
+                        <div
+                          class="d-flex justify-space-between align-center mb-1"
+                        >
+                          <div
+                            class="d-flex align-center gap-2 text-blue-grey-darken-2 font-weight-black text-caption"
+                          >
+                            <v-icon size="small">mdi-account-reply</v-icon>
+                            ردك
+                          </div>
+                          <span
+                            v-if="review.user_replied_at"
+                            class="text-caption text-grey"
+                          >
+                            {{
+                              new Date(
+                                review.user_replied_at
+                              ).toLocaleDateString("ar-EG")
+                            }}
+                          </span>
+                        </div>
+                        <p class="text-body-2 mb-0 text-grey-darken-3">
+                          {{ review.user_reply }}
+                        </p>
+                      </div>
+
+                      <!-- User Reply Input Form -->
+                      <div
+                        v-else-if="
+                          review.admin_reply &&
+                          currentUser &&
+                          currentUser.id === review.user_id
+                        "
+                        class="mt-4"
+                      >
+                        <v-textarea
+                          v-model="userReplyText[review.id]"
+                          label="إضافة رد على المتجر"
+                          variant="outlined"
+                          density="compact"
+                          rows="2"
+                          color="blue-grey"
+                          bg-color="white"
+                          hide-details
+                          class="mb-2"
+                        ></v-textarea>
+                        <v-btn
+                          color="blue-grey"
+                          variant="tonal"
+                          size="small"
+                          class="font-weight-bold"
+                          :loading="userReplyLoading === review.id"
+                          @click="submitUserReply(review.id)"
+                        >
+                          <v-icon start size="small">mdi-send</v-icon>
+                          إرسال الرد
+                        </v-btn>
+                      </div>
                     </div>
                   </div>
                 </v-card>
@@ -484,6 +581,10 @@ const quantity = ref(1);
 const isFav = ref(false);
 
 import api from "@/axios";
+import { useAuthStore } from "@/store/auth/LogIn";
+
+const authStore = useAuthStore();
+const currentUser = computed(() => authStore.currentUser);
 const isLoggedIn = ref(!!localStorage.getItem("auth_token"));
 const isReviewValid = ref(false);
 const reviewLoading = ref(false);
@@ -491,6 +592,45 @@ const reviewData = ref({
   rating: 0,
   comment: "",
 });
+
+const userReplyText = ref({});
+const userReplyLoading = ref(null);
+
+const submitUserReply = async (reviewId) => {
+  const reply = userReplyText.value[reviewId];
+  if (!reply || !reply.trim()) return;
+
+  userReplyLoading.value = reviewId;
+  try {
+    const res = await api.post(`/products/reviews/${reviewId}/reply`, {
+      user_reply: reply,
+    });
+    emitter.emit("showMessage", { text: res.data.message, color: "success" });
+
+    // Find the review and update it locally without reloading the whole page
+    const review = productDetails.productDetails.reviews.find(
+      (r) => r.id === reviewId
+    );
+    if (review) {
+      review.user_reply = res.data.user_reply;
+      review.user_replied_at = res.data.user_replied_at;
+    }
+  } catch (error) {
+    emitter.emit("showMessage", {
+      text: error.response?.data?.message || "فشل إرسال الرد",
+      color: "error",
+    });
+  } finally {
+    userReplyLoading.value = null;
+  }
+};
+
+const getAvatarUrl = (path) => {
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  const baseUrl = process.env.VUE_APP_API_URL || "http://127.0.0.1:8000";
+  return `${baseUrl}${path}`;
+};
 
 // Computed
 const discountedPrice = computed(() => {

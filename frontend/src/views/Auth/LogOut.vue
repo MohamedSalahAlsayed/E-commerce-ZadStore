@@ -84,7 +84,7 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 2px solid #3949ab;
+  border: 2px solid rgb(var(--v-theme-primary));
   animation: pulse 2s infinite;
   opacity: 0;
 }

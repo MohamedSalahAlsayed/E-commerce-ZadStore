@@ -12,7 +12,7 @@ class Brand extends Model
     use SyncToMysql;
     use HasFactory;
 
-    protected $fillable = ['name', 'logo', 'is_active', 'meta_title', 'meta_description', 'meta_keywords'];
+    protected $fillable = ['name', 'slug', 'logo', 'is_active', 'meta_title', 'meta_description', 'meta_keywords'];
 
     public function products()
     {

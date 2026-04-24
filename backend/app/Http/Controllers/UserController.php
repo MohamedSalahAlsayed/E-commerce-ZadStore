@@ -11,8 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
+use App\Traits\LogsInventory;
+
 class UserController extends Controller
 {
+    use LogsInventory;
+
     public function getOrders(Request $request)
     {
         $query = Order::with('items.product')->where('user_id', $request->user()->id);
@@ -57,6 +61,7 @@ class UserController extends Controller
         ]);
 
         DB::beginTransaction();
+        $order_number_temp = 'ORD-' . strtoupper(Str::random(10));
 
         try {
             $subtotal = 0;
@@ -87,7 +92,17 @@ class UserController extends Controller
                     'purchase_price' => $product->purchase_price,
                 ];
 
+                $oldStock = $product->stock;
                 $product->decrement('stock', $item['quantity']);
+
+                $this->logInventoryChange(
+                    $product->id, 
+                    $oldStock, 
+                    $oldStock - $item['quantity'], 
+                    'sale', 
+                    "مبيعات للطلب رقم #{$order_number_temp}", // Need to use a temporary number since order isn't created yet
+                    ['temp_order_number' => $order_number_temp]
+                );
             }
 
             // Secure Shipping Evaluation
@@ -130,7 +145,7 @@ class UserController extends Controller
 
             $order = Order::create([
                 'user_id' => $request->user()->id,
-                'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+                'order_number' => $order_number_temp,
                 'customer_name' => $request->customer_name,
                 'phone' => $request->phone,
                 'address' => $request->address . ' - ' . $governorate->name_ar,
@@ -301,6 +316,35 @@ class UserController extends Controller
         ]);
 
         return response()->json(['message' => 'تم استلام تقييمك بنجاح، بانتظار موافقة الإدارة.', 'review' => $review], 201);
+    }
+
+    public function replyToAdminReview(Request $request, $id)
+    {
+        $request->validate([
+            'user_reply' => 'required|string|max:1000'
+        ]);
+
+        $review = \App\Models\Review::where('user_id', $request->user()->id)
+                                    ->findOrFail($id);
+
+        if (empty($review->admin_reply)) {
+            return response()->json(['message' => 'لا يمكنك الرد قبل أن يقوم المتجر بالرد عليك'], 400);
+        }
+
+        if (!empty($review->user_reply)) {
+            return response()->json(['message' => 'لقد قمت بالرد بالفعل على المتجر'], 400);
+        }
+
+        $review->user_reply = $request->user_reply;
+        $review->user_replied_at = now();
+        $review->is_admin_read_reply = false;
+        $review->save();
+
+        return response()->json([
+            'message' => 'تم إرسال ردك بنجاح',
+            'user_reply' => $review->user_reply,
+            'user_replied_at' => $review->user_replied_at
+        ]);
     }
     
     // ==========================================

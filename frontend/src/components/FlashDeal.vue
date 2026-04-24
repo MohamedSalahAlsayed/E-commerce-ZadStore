@@ -89,6 +89,7 @@
 
 <script setup>
 import { ProductModule } from "@/store/Products.js";
+import { useSettingsStore } from "@/store/Settings.js";
 import { VSkeletonLoader } from "vuetify/lib/components";
 import PopUp from "./PopUp.vue";
 import ProductCard from "./ProductCard.vue";
@@ -96,11 +97,12 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation, Autoplay } from "swiper/modules";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { locale } = useI18n();
 const flashDeals = ProductModule();
+const settingsStore = useSettingsStore();
 const modules = [Navigation, Autoplay];
 
 const hours = ref("00");
@@ -109,20 +111,32 @@ const seconds = ref("00");
 
 const updateTimer = () => {
   const now = new Date();
-  const endOfDay = new Date();
-  endOfDay.setHours(23, 59, 59, 999);
+  let endOfDay;
+
+  if (settingsStore.guestHome?.flashDealEndsAt) {
+    endOfDay = new Date(settingsStore.guestHome.flashDealEndsAt);
+    if (isNaN(endOfDay.getTime())) {
+      endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+    }
+  } else {
+    endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+  }
 
   const diff = endOfDay - now;
   if (diff > 0) {
-    hours.value = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(
-      2,
-      "0"
-    );
+    // Calculate total hours to handle dates more than 24 hours away
+    hours.value = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
     minutes.value = String(Math.floor((diff / 1000 / 60) % 60)).padStart(
       2,
       "0"
     );
     seconds.value = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
+  } else {
+    hours.value = "00";
+    minutes.value = "00";
+    seconds.value = "00";
   }
 };
 
@@ -130,11 +144,14 @@ let timerInterval;
 
 onMounted(async () => {
   await flashDeals.getFlashDeals();
+  // Ensure settings are loaded if not already
+  if (!settingsStore.guestHome) {
+    await settingsStore.fetchSettings();
+  }
   updateTimer();
   timerInterval = setInterval(updateTimer, 1000);
 });
 
-import { onUnmounted } from "vue";
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval);
 });

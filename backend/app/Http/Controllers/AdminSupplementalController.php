@@ -63,7 +63,15 @@ class AdminSupplementalController extends Controller
     // --- Coupons ---
     public function getCoupons() { return response()->json(Coupon::all()); }
     public function createCoupon(Request $request) {
-        $data = $request->validate(['code' => 'required|string|unique:coupons', 'type' => 'required|string', 'value' => 'required|numeric', 'min_order_amount' => 'nullable|numeric', 'expires_at' => 'nullable|date', 'is_active' => 'boolean']);
+        $data = $request->validate([
+            'code' => 'required|string|unique:coupons', 
+            'type' => 'required|string', 
+            'value' => 'required|numeric', 
+            'min_order_amount' => 'nullable|numeric', 
+            'expires_at' => 'nullable|date', 
+            'is_active' => 'boolean',
+            'usage_limit' => 'nullable|integer|min:1'
+        ]);
         return response()->json(Coupon::create($data), 201);
     }
     public function updateCoupon(Request $request, $id) {
@@ -74,7 +82,8 @@ class AdminSupplementalController extends Controller
             'value' => 'required|numeric',
             'min_order_amount' => 'nullable|numeric',
             'expires_at' => 'nullable|date',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'usage_limit' => 'nullable|integer|min:1'
         ]);
         $coupon->update($data);
         return response()->json($coupon);
@@ -140,6 +149,13 @@ class AdminSupplementalController extends Controller
 
     // --- Reviews ---
     public function getReviews() { return response()->json(Review::with(['user', 'product'])->orderBy('created_at', 'desc')->get()); }
+    
+    public function markReplyAsRead($id) {
+        $review = Review::findOrFail($id);
+        $review->is_admin_read_reply = true;
+        $review->save();
+        return response()->json(['message' => 'تم تعيين الرد كمقروء', 'review' => $review]);
+    }
     public function toggleReviewStatus($id) {
         $review = Review::findOrFail($id);
         $review->is_approved = !$review->is_approved;
@@ -338,8 +354,9 @@ class AdminSupplementalController extends Controller
             ->count();
         $pendingReturnsCount = \App\Models\Order::where('return_request_status', 'pending')->count();
         $pendingReviewsCount = \App\Models\Review::where('is_approved', false)->count();
+        $unreadUserRepliesCount = \App\Models\Review::where('is_admin_read_reply', false)->whereNotNull('user_reply')->count();
 
-        $notificationsCount = $pendingOrdersCount + $pendingReturnsCount + $pendingReviewsCount + ($urgentOrdersCount > 0 ? 1 : 0);
+        $notificationsCount = $pendingOrdersCount + $pendingReturnsCount + $pendingReviewsCount + $unreadUserRepliesCount + ($urgentOrdersCount > 0 ? 1 : 0);
 
         // مصفوفة تفصيلية للإشعارات
         $recentNotifications = [];
@@ -382,6 +399,16 @@ class AdminSupplementalController extends Controller
                 'description' => "هناك {$pendingReviewsCount} تقييم جديد بانتظار النشر",
                 'icon' => 'mdi-star-outline',
                 'color' => 'info',
+                'to' => '/Dashboard/RatingsReviews'
+            ];
+        }
+        if ($unreadUserRepliesCount > 0) {
+            $recentNotifications[] = [
+                'id' => 'user_replies_unread',
+                'title' => 'ردود عملاء جديدة',
+                'description' => "هناك {$unreadUserRepliesCount} رد جديد من العملاء على تقييماتهم لم تقرأها",
+                'icon' => 'mdi-account-reply',
+                'color' => 'secondary',
                 'to' => '/Dashboard/RatingsReviews'
             ];
         }

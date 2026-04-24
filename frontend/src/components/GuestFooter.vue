@@ -23,8 +23,12 @@
           <div
             class="newsletter-action pa-6 pa-md-12 bg-white-opacity-10 backdrop-blur d-flex align-center"
           >
-            <v-form @submit.prevent class="w-100 d-flex gap-3">
+            <v-form
+              @submit.prevent="handleSubscribe"
+              class="w-100 d-flex gap-3"
+            >
               <v-text-field
+                v-model="subscribeEmail"
                 :placeholder="
                   $t('footer.email_placeholder') || 'بريدك الإلكتروني'
                 "
@@ -34,12 +38,15 @@
                 rounded="lg"
                 class="email-input flex-grow-1"
                 density="comfortable"
+                :disabled="loadingSubscribe"
               ></v-text-field>
               <v-btn
                 color="white"
                 class="text-primary font-weight-black px-8 rounded-lg send-btn"
                 height="48"
                 elevation="8"
+                :loading="loadingSubscribe"
+                @click="handleSubscribe"
               >
                 {{ $t("footer.subscribe_btn") || "اشترك الآن" }}
               </v-btn>
@@ -289,14 +296,52 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { ref, computed, inject } from "vue";
 import { useSettingsStore } from "@/store/Settings";
 import { useAuthStore } from "@/store/auth/LogIn";
 import { useI18n } from "vue-i18n";
+import api from "@/axios";
 
 const settingsStore = useSettingsStore();
 const userStore = useAuthStore();
-const { locale } = useI18n();
+const { locale, t } = useI18n();
+const emitter = inject("emitter");
+
+const subscribeEmail = ref("");
+const loadingSubscribe = ref(false);
+
+const handleSubscribe = async () => {
+  if (!subscribeEmail.value) {
+    emitter.emit("showMessage", {
+      text: t("auth.email_invalid") || "يرجى إدخال بريد إلكتروني",
+      color: "warning",
+    });
+    return;
+  }
+
+  loadingSubscribe.value = true;
+  try {
+    const res = await api.post("/newsletter/subscribe", {
+      email: subscribeEmail.value,
+    });
+    emitter.emit("showMessage", {
+      text: res.data.message || "تم الاشتراك بنجاح",
+      color: "success",
+    });
+    subscribeEmail.value = "";
+  } catch (error) {
+    console.error("Subscription error:", error);
+    emitter.emit("showMessage", {
+      text:
+        error.response?.data?.message ||
+        error.response?.data?.errors?.email?.[0] ||
+        "حدث خطأ أثناء الاشتراك",
+      color: "error",
+    });
+  } finally {
+    loadingSubscribe.value = false;
+  }
+};
 
 const socials = {
   facebook: { icon: "mdi-facebook", color: "#1877F2", showKey: "showFacebook" },

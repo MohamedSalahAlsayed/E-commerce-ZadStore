@@ -51,8 +51,10 @@ const MangReturns = () => import("@/views/Dashboard/MangReturns.vue");
 const AddTager = () => import("@/views/Dashboard/AddTager.vue");
 const MangPurchases = () => import("@/views/Dashboard/MangPurchases.vue");
 const StaffManagement = () => import("@/views/Dashboard/StaffManagement.vue");
-const MangBlog = () => import("@/views/Dashboard/MangBlog.vue");
-const MangPayments = () => import("@/views/Dashboard/MangPayments.vue");
+const MangBlog = () => import("../views/Dashboard/MangBlog.vue");
+const MangPayments = () => import("../views/Dashboard/MangPayments.vue");
+const NewsletterSubscribers = () =>
+  import("../views/Dashboard/NewsletterSubscribers.vue");
 import { useAuthStore } from "@/store/auth/LogIn";
 
 const routes = [
@@ -493,6 +495,16 @@ const routes = [
     path: "/Dashboard/MangSEO",
     name: "MangSEO",
     component: () => import("../views/Dashboard/MangSEO.vue"),
+    meta: {
+      layout: "DashboardLayout",
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+  },
+  {
+    path: "/Dashboard/Subscribers",
+    name: "NewsletterSubscribers",
+    component: NewsletterSubscribers,
     meta: {
       layout: "DashboardLayout",
       requiresAuth: true,

@@ -11,7 +11,7 @@ class Coupon extends Model
     use SyncToMysql;
     use HasFactory;
 
-    protected $fillable = ['code', 'type', 'value', 'min_order_amount', 'expires_at', 'is_active'];
+    protected $fillable = ['code', 'type', 'value', 'min_order_amount', 'expires_at', 'is_active', 'usage_limit'];
 
     protected $casts = [
         'is_active' => 'boolean',

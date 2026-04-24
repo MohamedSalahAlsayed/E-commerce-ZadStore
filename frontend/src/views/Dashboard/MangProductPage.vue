@@ -1,356 +1,415 @@
 <template>
   <v-locale-provider :rtl="locale === 'ar'">
     <v-container fluid class="pa-6">
-      <!-- Header Card with Search and Filters -->
-      <v-card class="mb-6 rounded-xl" elevation="1">
-        <v-card-text class="pa-4">
-          <v-row align="center">
-            <v-col cols="12" md="3">
-              <h2
-                class="text-h5 font-weight-black mb-1"
-                style="color: rgb(var(--v-theme-primary))"
-              >
-                {{ $t("products_mang.title") }}
-              </h2>
-              <div class="text-caption text-grey-darken-1">
-                {{
-                  $t("products_mang.total_count", {
-                    count: products?.length || 0,
-                  })
-                }}
-              </div>
-            </v-col>
+      <v-tabs
+        v-model="mainTab"
+        color="primary"
+        class="mb-6 rounded-lg bg-white"
+        elevation="1"
+      >
+        <v-tab value="products" class="font-weight-bold">
+          <v-icon class="ml-2">mdi-package-variant</v-icon>
+          المنتجات
+        </v-tab>
+        <v-tab value="flash_deals" class="font-weight-bold">
+          <v-icon class="ml-2">mdi-lightning-bolt</v-icon>
+          إعدادات العروض
+        </v-tab>
+      </v-tabs>
 
-            <v-col cols="12" md="9">
-              <div class="d-flex align-center gap-3 flex-wrap justify-end">
-                <v-text-field
-                  v-model="searchQuery"
-                  prepend-inner-icon="mdi-magnify"
-                  :label="$t('products_mang.search_placeholder')"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  style="max-width: 250px"
-                  class="bg-white rounded-lg"
-                ></v-text-field>
+      <v-window v-model="mainTab" style="overflow: visible">
+        <v-window-item value="products">
+          <!-- Header Card with Search and Filters -->
+          <v-card class="mb-6 rounded-xl" elevation="1">
+            <v-card-text class="pa-4">
+              <v-row align="center">
+                <v-col cols="12" md="3">
+                  <h2
+                    class="text-h5 font-weight-black mb-1"
+                    style="color: rgb(var(--v-theme-primary))"
+                  >
+                    {{ $t("products_mang.title") }}
+                  </h2>
+                  <div class="text-caption text-grey-darken-1">
+                    {{
+                      $t("products_mang.total_count", {
+                        count: products?.length || 0,
+                      })
+                    }}
+                  </div>
+                </v-col>
 
-                <v-select
-                  v-model="filterCategory"
-                  :items="[
-                    $t('products_mang.all'),
-                    ...(categories || []).map((c) => c.name),
-                  ]"
-                  :label="$t('products_mang.category')"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  style="max-width: 150px"
-                ></v-select>
-
-                <v-select
-                  v-model="filterBrand"
-                  :items="[
-                    $t('products_mang.all'),
-                    ...(brands || []).map((b) => b.name),
-                  ]"
-                  :label="$t('products_mang.brand')"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  style="max-width: 150px"
-                ></v-select>
-
-                <v-select
-                  v-model="filterStock"
-                  :items="[
-                    $t('products_mang.all'),
-                    $t('products_mang.out_of_stock'),
-                    $t('products_mang.low_stock'),
-                  ]"
-                  :label="$t('products_mang.stock_status')"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  style="max-width: 150px"
-                ></v-select>
-
-                <v-btn
-                  color="primary"
-                  prepend-icon="mdi-plus"
-                  class="font-weight-bold px-6 rounded-lg shadow-btn"
-                  height="40"
-                  @click="openAddDialog"
-                >
-                  {{ $t("products_mang.add_btn") }}
-                </v-btn>
-              </div>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-
-      <!-- Batch Actions Bar -->
-      <v-expand-transition>
-        <v-card
-          v-if="selectedIds.length > 0"
-          class="mb-6 rounded-xl bg-primary text-white pa-4"
-          elevation="4"
-        >
-          <div class="d-flex align-center justify-space-between">
-            <div class="d-flex align-center gap-3">
-              <v-icon>mdi-checkbox-multiple-marked</v-icon>
-              <div class="text-h6 font-weight-bold">
-                {{
-                  $t("products_mang.selected_count", {
-                    count: selectedIds.length,
-                  })
-                }}
-              </div>
-            </div>
-            <div class="d-flex gap-2">
-              <v-btn
-                color="white"
-                variant="tonal"
-                prepend-icon="mdi-delete-multiple"
-                @click="openBatchDeleteDialog"
-              >
-                {{ $t("products_mang.delete_selected") }}
-              </v-btn>
-              <v-btn
-                color="white"
-                variant="outlined"
-                @click="selectedIds = []"
-                >{{ $t("products_mang.cancel") }}</v-btn
-              >
-            </div>
-          </div>
-        </v-card>
-      </v-expand-transition>
-
-      <!-- Products Table -->
-      <v-card class="rounded-xl overflow-hidden" elevation="1">
-        <div class="table-responsive">
-          <v-table class="products-table pa-2" fixed-header height="600">
-            <thead class="bg-grey-lighten-4">
-              <tr>
-                <th class="text-right font-weight-bold" style="width: 50px">
-                  <v-checkbox-btn
-                    v-model="selectAll"
-                    color="primary"
-                    hide-details
-                  ></v-checkbox-btn>
-                </th>
-                <th class="text-right font-weight-bold">
-                  {{ $t("products_mang.table.product") }}
-                </th>
-                <th class="text-right font-weight-bold">
-                  {{ $t("products_mang.table.category_brand") }}
-                </th>
-                <th class="text-right font-weight-bold">
-                  {{ $t("products_mang.table.prices") }}
-                </th>
-                <th class="text-right font-weight-bold">
-                  {{ $t("products_mang.table.stock_profit") }}
-                </th>
-                <th class="text-right font-weight-bold">
-                  {{ $t("products_mang.table.status") }}
-                </th>
-                <th class="text-center font-weight-bold">
-                  {{ $t("products_mang.table.actions") }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Skeleton Loading -->
-              <template v-if="loading">
-                <tr v-for="n in 5" :key="n">
-                  <td><v-skeleton-loader type="list-item" /></td>
-                  <td>
-                    <div class="d-flex align-center gap-3 py-2">
-                      <v-skeleton-loader
-                        type="avatar"
-                        size="50"
-                        class="rounded-lg"
-                      />
-                      <div>
-                        <v-skeleton-loader type="text" width="120" />
-                        <v-skeleton-loader type="text" width="60" />
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="d-flex flex-column gap-1">
-                      <v-skeleton-loader type="chip" />
-                      <v-skeleton-loader type="chip" />
-                    </div>
-                  </td>
-                  <td>
-                    <v-skeleton-loader type="text" width="80" />
-                    <v-skeleton-loader type="text" width="60" />
-                  </td>
-                  <td>
-                    <v-skeleton-loader type="chip" class="mb-1" />
-                    <v-skeleton-loader type="chip" />
-                  </td>
-                  <td><v-skeleton-loader type="text" width="40" /></td>
-                  <td><v-skeleton-loader type="actions" width="80" /></td>
-                </tr>
-              </template>
-
-              <template v-else>
-                <tr v-if="(filteredProducts || []).length === 0">
-                  <td colspan="7" class="text-center pa-12">
-                    <v-icon size="64" color="grey-lighten-1" class="mb-4"
-                      >mdi-package-variant-closed</v-icon
-                    >
-                    <div class="text-h6 text-grey-darken-1">
-                      {{ $t("products_mang.no_products") }}
-                    </div>
-                  </td>
-                </tr>
-
-                <tr
-                  v-for="item in filteredProducts"
-                  :key="item.id"
-                  class="hover-row"
-                >
-                  <td>
-                    <v-checkbox-btn
-                      v-model="selectedIds"
-                      :value="item.id"
-                      color="primary"
+                <v-col cols="12" md="9">
+                  <div class="d-flex align-center gap-3 flex-wrap justify-end">
+                    <v-text-field
+                      v-model="searchQuery"
+                      prepend-inner-icon="mdi-magnify"
+                      :label="$t('products_mang.search_placeholder')"
+                      variant="outlined"
+                      density="compact"
                       hide-details
-                    ></v-checkbox-btn>
-                  </td>
-                  <td>
-                    <div class="d-flex align-center gap-3 py-2">
-                      <v-avatar
-                        size="50"
-                        rounded="lg"
-                        class="bg-grey-lighten-3 border"
-                      >
-                        <v-img :src="item.thumbnail" cover></v-img>
-                      </v-avatar>
-                      <div>
-                        <div class="font-weight-bold text-subtitle-2">
-                          {{ shortTitle(item.title) }}
+                      style="max-width: 250px"
+                      class="bg-white rounded-lg"
+                    ></v-text-field>
+
+                    <v-select
+                      v-model="filterCategory"
+                      :items="[
+                        $t('products_mang.all'),
+                        ...(categories || []).map((c) => c.name),
+                      ]"
+                      :label="$t('products_mang.category')"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      style="max-width: 150px"
+                    ></v-select>
+
+                    <v-select
+                      v-model="filterBrand"
+                      :items="[
+                        $t('products_mang.all'),
+                        ...(brands || []).map((b) => b.name),
+                      ]"
+                      :label="$t('products_mang.brand')"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      style="max-width: 150px"
+                    ></v-select>
+
+                    <v-select
+                      v-model="filterStock"
+                      :items="[
+                        $t('products_mang.all'),
+                        $t('products_mang.out_of_stock'),
+                        $t('products_mang.low_stock'),
+                      ]"
+                      :label="$t('products_mang.stock_status')"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      style="max-width: 150px"
+                    ></v-select>
+
+                    <v-btn
+                      color="primary"
+                      prepend-icon="mdi-plus"
+                      class="font-weight-bold px-6 rounded-lg shadow-btn"
+                      height="40"
+                      @click="openAddDialog"
+                    >
+                      {{ $t("products_mang.add_btn") }}
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+
+          <!-- Batch Actions Bar -->
+          <v-expand-transition>
+            <v-card
+              v-if="selectedIds.length > 0"
+              class="mb-6 rounded-xl bg-primary text-white pa-4"
+              elevation="4"
+            >
+              <div class="d-flex align-center justify-space-between">
+                <div class="d-flex align-center gap-3">
+                  <v-icon>mdi-checkbox-multiple-marked</v-icon>
+                  <div class="text-h6 font-weight-bold">
+                    {{
+                      $t("products_mang.selected_count", {
+                        count: selectedIds.length,
+                      })
+                    }}
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <v-btn
+                    color="white"
+                    variant="tonal"
+                    prepend-icon="mdi-delete-multiple"
+                    @click="openBatchDeleteDialog"
+                  >
+                    {{ $t("products_mang.delete_selected") }}
+                  </v-btn>
+                  <v-btn
+                    color="white"
+                    variant="outlined"
+                    @click="selectedIds = []"
+                    >{{ $t("products_mang.cancel") }}</v-btn
+                  >
+                </div>
+              </div>
+            </v-card>
+          </v-expand-transition>
+
+          <!-- Products Table -->
+          <v-card class="rounded-xl overflow-hidden" elevation="1">
+            <div class="table-responsive">
+              <v-table class="products-table pa-2" fixed-header height="600">
+                <thead class="bg-grey-lighten-4">
+                  <tr>
+                    <th class="text-right font-weight-bold" style="width: 50px">
+                      <v-checkbox-btn
+                        v-model="selectAll"
+                        color="primary"
+                        hide-details
+                      ></v-checkbox-btn>
+                    </th>
+                    <th class="text-right font-weight-bold">
+                      {{ $t("products_mang.table.product") }}
+                    </th>
+                    <th class="text-right font-weight-bold">
+                      {{ $t("products_mang.table.category_brand") }}
+                    </th>
+                    <th class="text-right font-weight-bold">
+                      {{ $t("products_mang.table.prices") }}
+                    </th>
+                    <th class="text-right font-weight-bold">
+                      {{ $t("products_mang.table.stock_profit") }}
+                    </th>
+                    <th class="text-right font-weight-bold">
+                      {{ $t("products_mang.table.status") }}
+                    </th>
+                    <th class="text-center font-weight-bold">
+                      {{ $t("products_mang.table.actions") }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Skeleton Loading -->
+                  <template v-if="loading">
+                    <tr v-for="n in 5" :key="n">
+                      <td><v-skeleton-loader type="list-item" /></td>
+                      <td>
+                        <div class="d-flex align-center gap-3 py-2">
+                          <v-skeleton-loader
+                            type="avatar"
+                            size="50"
+                            class="rounded-lg"
+                          />
+                          <div>
+                            <v-skeleton-loader type="text" width="120" />
+                            <v-skeleton-loader type="text" width="60" />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex flex-column gap-1">
+                          <v-skeleton-loader type="chip" />
+                          <v-skeleton-loader type="chip" />
+                        </div>
+                      </td>
+                      <td>
+                        <v-skeleton-loader type="text" width="80" />
+                        <v-skeleton-loader type="text" width="60" />
+                      </td>
+                      <td>
+                        <v-skeleton-loader type="chip" class="mb-1" />
+                        <v-skeleton-loader type="chip" />
+                      </td>
+                      <td><v-skeleton-loader type="text" width="40" /></td>
+                      <td><v-skeleton-loader type="actions" width="80" /></td>
+                    </tr>
+                  </template>
+
+                  <template v-else>
+                    <tr v-if="(filteredProducts || []).length === 0">
+                      <td colspan="7" class="text-center pa-12">
+                        <v-icon size="64" color="grey-lighten-1" class="mb-4"
+                          >mdi-package-variant-closed</v-icon
+                        >
+                        <div class="text-h6 text-grey-darken-1">
+                          {{ $t("products_mang.no_products") }}
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr
+                      v-for="item in filteredProducts"
+                      :key="item.id"
+                      class="hover-row"
+                    >
+                      <td>
+                        <v-checkbox-btn
+                          v-model="selectedIds"
+                          :value="item.id"
+                          color="primary"
+                          hide-details
+                        ></v-checkbox-btn>
+                      </td>
+                      <td>
+                        <div class="d-flex align-center gap-3 py-2">
+                          <v-avatar
+                            size="50"
+                            rounded="lg"
+                            class="bg-grey-lighten-3 border"
+                          >
+                            <v-img :src="item.thumbnail" cover></v-img>
+                          </v-avatar>
+                          <div>
+                            <div class="font-weight-bold text-subtitle-2">
+                              {{ shortTitle(item.title) }}
+                            </div>
+                            <div class="text-caption text-grey">
+                              SKU: {{ item.sku || "N/A" }}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="d-flex flex-column gap-1">
+                          <v-chip
+                            size="x-small"
+                            color="primary"
+                            variant="tonal"
+                            class="w-fit"
+                            >{{ item.category }}</v-chip
+                          >
+                          <v-chip
+                            size="x-small"
+                            color="secondary"
+                            variant="outlined"
+                            v-if="item.brand"
+                            class="w-fit"
+                            >{{ item.brand }}</v-chip
+                          >
+                        </div>
+                      </td>
+                      <td>
+                        <div class="font-weight-bold text-primary">
+                          {{ item.price }} {{ $t("egp") }}
                         </div>
                         <div class="text-caption text-grey">
-                          SKU: {{ item.sku || "N/A" }}
+                          {{ $t("products_mang.cost_label") }}
+                          {{ item.purchase_price || 0 }} {{ $t("egp") }}
                         </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="d-flex flex-column gap-1">
-                      <v-chip
-                        size="x-small"
-                        color="primary"
-                        variant="tonal"
-                        class="w-fit"
-                        >{{ item.category }}</v-chip
-                      >
-                      <v-chip
-                        size="x-small"
-                        color="secondary"
-                        variant="outlined"
-                        v-if="item.brand"
-                        class="w-fit"
-                        >{{ item.brand }}</v-chip
-                      >
-                    </div>
-                  </td>
-                  <td>
-                    <div class="font-weight-bold text-primary">
-                      {{ item.price }} {{ $t("egp") }}
-                    </div>
-                    <div class="text-caption text-grey">
-                      {{ $t("products_mang.cost_label") }}
-                      {{ item.purchase_price || 0 }} {{ $t("egp") }}
-                    </div>
-                  </td>
-                  <td>
-                    <div class="mb-1">
-                      <v-chip
-                        size="x-small"
-                        :color="
-                          item.stock > 10
-                            ? 'success'
-                            : item.stock > 0
-                            ? 'warning'
-                            : 'error'
-                        "
-                        class="font-weight-bold"
-                      >
-                        {{
-                          $t("products_mang.in_stock_label", {
-                            count: item.stock,
-                          })
-                        }}
-                      </v-chip>
-                    </div>
-                    <v-chip
-                      size="x-small"
-                      :color="
-                        item.price - item.purchase_price > 0
-                          ? 'success'
-                          : 'grey'
-                      "
-                      variant="flat"
-                    >
-                      {{ $t("products_mang.profit_label") }}
-                      {{ (item.price - (item.purchase_price || 0)).toFixed(1) }}
-                      {{ $t("egp") }}
-                    </v-chip>
-                  </td>
-                  <td>
-                    <v-switch
-                      :model-value="item.isActive"
-                      @update:model-value="toggleProductStatus(item)"
-                      color="success"
-                      hide-details
-                      density="compact"
-                    ></v-switch>
-                  </td>
-                  <td class="text-center">
-                    <v-tooltip :text="$t('products_mang.edit')" location="top">
-                      <template v-slot:activator="{ props }">
-                        <v-btn
-                          v-bind="props"
-                          icon
-                          size="small"
-                          color="primary"
-                          variant="text"
-                          @click="editItem(item)"
+                      </td>
+                      <td>
+                        <div class="mb-1">
+                          <v-chip
+                            size="x-small"
+                            :color="
+                              item.stock > 10
+                                ? 'success'
+                                : item.stock > 0
+                                ? 'warning'
+                                : 'error'
+                            "
+                            class="font-weight-bold"
+                          >
+                            {{
+                              $t("products_mang.in_stock_label", {
+                                count: item.stock,
+                              })
+                            }}
+                          </v-chip>
+                        </div>
+                        <v-chip
+                          size="x-small"
+                          :color="
+                            item.price - item.purchase_price > 0
+                              ? 'success'
+                              : 'grey'
+                          "
+                          variant="flat"
                         >
-                          <v-icon>mdi-pencil</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-tooltip>
-                    <v-tooltip
-                      :text="$t('products_mang.delete')"
-                      location="top"
-                    >
-                      <template v-slot:activator="{ props }">
-                        <v-btn
-                          v-bind="props"
-                          icon
-                          size="small"
-                          color="error"
-                          variant="text"
-                          @click="openDeleteDialog(item)"
+                          {{ $t("products_mang.profit_label") }}
+                          {{
+                            (item.price - (item.purchase_price || 0)).toFixed(1)
+                          }}
+                          {{ $t("egp") }}
+                        </v-chip>
+                      </td>
+                      <td>
+                        <v-switch
+                          :model-value="item.isActive"
+                          @update:model-value="toggleProductStatus(item)"
+                          color="success"
+                          hide-details
+                          density="compact"
+                        ></v-switch>
+                      </td>
+                      <td class="text-center">
+                        <v-tooltip
+                          :text="$t('products_mang.edit')"
+                          location="top"
                         >
-                          <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-tooltip>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-          </v-table>
-        </div>
-      </v-card>
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              v-bind="props"
+                              icon
+                              size="small"
+                              color="primary"
+                              variant="text"
+                              @click="editItem(item)"
+                            >
+                              <v-icon>mdi-pencil</v-icon>
+                            </v-btn>
+                          </template>
+                        </v-tooltip>
+                        <v-tooltip
+                          :text="$t('products_mang.delete')"
+                          location="top"
+                        >
+                          <template v-slot:activator="{ props }">
+                            <v-btn
+                              v-bind="props"
+                              icon
+                              size="small"
+                              color="error"
+                              variant="text"
+                              @click="openDeleteDialog(item)"
+                            >
+                              <v-icon>mdi-delete</v-icon>
+                            </v-btn>
+                          </template>
+                        </v-tooltip>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </v-table>
+            </div>
+          </v-card>
+        </v-window-item>
+
+        <v-window-item value="flash_deals">
+          <v-card class="rounded-xl pa-6" elevation="1">
+            <h3 class="text-h6 font-weight-bold mb-6 d-flex align-center">
+              <v-icon color="primary" class="ml-2">mdi-clock-fast</v-icon>
+              إعدادات عداد العروض (Flash Deals)
+            </h3>
+            <v-row>
+              <v-col cols="12" md="6" lg="4">
+                <v-text-field
+                  v-model="flashDealEndsAt"
+                  label="تاريخ ووقت انتهاء العرض"
+                  type="datetime-local"
+                  variant="outlined"
+                  color="primary"
+                  hint="سيتم استخدام هذا التاريخ لعداد العروض في الصفحة الرئيسية"
+                  persistent-hint
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <div class="mt-6">
+              <v-btn
+                color="primary"
+                size="large"
+                class="px-8 font-weight-bold shadow-btn"
+                @click="saveFlashDealSettings"
+                :loading="savingSettings"
+              >
+                <v-icon class="ml-2">mdi-check</v-icon>
+                حفظ الإعدادات
+              </v-btn>
+            </div>
+          </v-card>
+        </v-window-item>
+      </v-window>
 
       <!-- Add/Edit Dialog with Tabs -->
       <v-dialog v-model="dialog" max-width="700px" persistent>
@@ -773,12 +832,19 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useI18n } from "vue-i18n";
 import api from "../../axios";
 import { ProductModule } from "@/store/Products";
+import { useSettingsStore } from "@/store/Settings";
 
 const { t, locale } = useI18n();
 const productStore = ProductModule();
+const settingsStore = useSettingsStore();
+
 const products = ref([]);
 const loading = ref(false);
 const activeTab = ref("basic");
+const mainTab = ref("products");
+const flashDealEndsAt = ref("");
+const savingSettings = ref(false);
+
 const filterCategory = ref(t("products_mang.all"));
 const filterBrand = ref(t("products_mang.all"));
 const filterStock = ref(t("products_mang.all"));
@@ -820,7 +886,16 @@ const handleVisibilityChange = () => {
 };
 
 const fetchAllData = async (quiet = false) => {
-  await Promise.all([fetchProducts(quiet), fetchCategories(), fetchBrands()]);
+  await Promise.all([
+    fetchProducts(quiet),
+    fetchCategories(),
+    fetchBrands(),
+    settingsStore.fetchSettings(),
+  ]);
+
+  if (settingsStore.guestHome?.flashDealEndsAt) {
+    flashDealEndsAt.value = settingsStore.guestHome.flashDealEndsAt;
+  }
 };
 // ----------------------------------
 
@@ -1123,6 +1198,31 @@ const confirmDelete = async () => {
     showMessage(t("products_mang.delete_error"), "error");
   } finally {
     deleting.value = false;
+  }
+};
+
+const saveFlashDealSettings = async () => {
+  savingSettings.value = true;
+  try {
+    const updatedGuestHome = {
+      ...settingsStore.guestHome,
+      flashDealEndsAt: flashDealEndsAt.value,
+    };
+
+    const payload = new FormData();
+    payload.append("guest_home", JSON.stringify(updatedGuestHome));
+
+    await api.post("/admin/settings", payload, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    settingsStore.guestHome = updatedGuestHome;
+    showMessage("تم حفظ إعدادات العروض بنجاح", "success");
+  } catch (error) {
+    console.error("Error saving flash deal settings:", error);
+    showMessage("فشل حفظ إعدادات العروض", "error");
+  } finally {
+    savingSettings.value = false;
   }
 };
 </script>
